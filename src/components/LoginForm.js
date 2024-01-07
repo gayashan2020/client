@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { TextField, Button, Grid } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Cookies from 'js-cookie';
 
 const theme = createTheme({
   palette: {
@@ -23,7 +24,7 @@ const theme = createTheme({
 });
 
 export default function LoginForm() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
@@ -34,7 +35,7 @@ export default function LoginForm() {
       const response = await axios.post(
         "/api/auth",
         {
-          username,
+          email,
           password,
         },
         {
@@ -45,8 +46,11 @@ export default function LoginForm() {
       );
 
       if (response.status === 200) {
-        // If the login is successful, redirect to the dashboard
-        router.push("/dashboard");
+        // If the login is successful, store the token in a cookie
+        Cookies.set('token', response.data.token);
+
+        // Then redirect to the dashboard
+        router.push("/admin");
       }
     } catch (error) {
       console.error("An error occurred while logging in:", error);
@@ -62,8 +66,8 @@ export default function LoginForm() {
               variant="outlined"
               margin="normal"
               label="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               fullWidth
             />

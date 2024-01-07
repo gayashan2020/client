@@ -2,16 +2,17 @@
 
 import dbConnect from '../../lib/dbConnect';
 import { comparePasswords, generateToken } from '../../lib/auth';
+import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { db, client } = await dbConnect();
 
     // Destructure the username and password from the request body
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     // Find the user in the database
-    const user = await db.collection('users').findOne({ username });
+    const user = await db.collection('users').findOne({ email });
 
     if (user && await comparePasswords(password, user.password)) {
       // If the user is found and the password is correct, create a JWT
@@ -25,8 +26,22 @@ export default async function handler(req, res) {
     }
 
     client.close();
+  } else if (req.method === 'GET') {
+    // Handle GET requests
+    const token = req.cookies.token; // Assuming the token is stored in a cookie
+
+    if (!token) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    try {
+      const user = jwt.verify(token, process.env.JWT_SECRET); // Verify the token
+      return res.status(200).json({ user });
+    } catch (err) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
   } else {
-    // If the request method is not POST, return a 405 Method Not Allowed status
+    // Handle other HTTP methods
     res.status(405).json({ message: 'Method not allowed' });
   }
 }

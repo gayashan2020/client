@@ -28,7 +28,6 @@ const theme = createTheme({
 });
 
 export default function RegisterForm() {
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -48,7 +47,6 @@ export default function RegisterForm() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username,
         password,
         firstName,
         lastName,
@@ -83,17 +81,6 @@ export default function RegisterForm() {
                   label="First Name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  required
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  label="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
                   required
                   fullWidth
                 />
@@ -177,7 +164,12 @@ export default function RegisterForm() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControl required fullWidth variant="outlined" margin="normal">
+                <FormControl
+                  required
+                  fullWidth
+                  variant="outlined"
+                  margin="normal"
+                >
                   <InputLabel>Gender</InputLabel>
                   <Select
                     value={gender}
