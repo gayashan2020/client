@@ -1,5 +1,6 @@
 // components/Layout.js
 import { Box, Drawer, List, ListItemButton, ListItemText } from "@mui/material";
+import Link from 'next/link';
 
 export default function Layout({ children }) {
   return (
@@ -17,12 +18,16 @@ export default function Layout({ children }) {
       >
         <List>
           {/* Add your navigation items here */}
-          <ListItemButton>
-            <ListItemText primary="Dashboard" />
-          </ListItemButton>
-          <ListItemButton>
-            <ListItemText primary="Item 2" />
-          </ListItemButton>
+          <Link href="/admin" passHref>
+            <ListItemButton component="a">
+              <ListItemText primary="Dashboard" />
+            </ListItemButton>
+          </Link>
+          <Link href="/admin/userProfile" passHref>
+            <ListItemButton component="a">
+              <ListItemText primary="User Profile" />
+            </ListItemButton>
+          </Link>
           {/* ... */}
         </List>
       </Drawer>

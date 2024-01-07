@@ -6,13 +6,14 @@ import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { db, client } = await dbConnect();
+    const { db } = await dbConnect();
 
     // Destructure the username and password from the request body
     const { email, password } = req.body;
 
     // Find the user in the database
     const user = await db.collection('users').findOne({ email });
+    console.log("user",user);
 
     if (user && await comparePasswords(password, user.password)) {
       // If the user is found and the password is correct, create a JWT
@@ -24,8 +25,6 @@ export default async function handler(req, res) {
       // If the user is not found or the password is incorrect, return a 401 Unauthorized status
       res.status(401).json({ message: 'Invalid username or password' });
     }
-
-    client.close();
   } else if (req.method === 'GET') {
     // Handle GET requests
     const token = req.cookies.token; // Assuming the token is stored in a cookie
