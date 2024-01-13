@@ -8,13 +8,39 @@ import {
   MenuItem,
   Grid,
   InputAdornment,
+  Card,
+  Container,
+  Typography,
+  ListItemButton,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import citiesAndPostalCodes from "../assets/constants/cities-and-postalcode-by-district.json";
 
+// Updated theme for styling
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#3f51b5", // replace with your color
+      main: "#4a4a4a", // Example color, adjust as needed
+    },
+    background: {
+      default: "#e7e7e7", // Light gray background
+    },
+  },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#fff", // White background for textfields
+          borderRadius: "4px", // Rounded corners for textfields
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          marginTop: "16px", // Space above the button
+        },
+      },
     },
   },
   typography: {
@@ -34,7 +60,8 @@ export default function RegisterForm() {
   const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
   const [occupation, setOccupation] = useState("");
-  const [address, setAddress] = useState("");
+  const [district, setDistrict] = useState("");
+  const [city, setCity] = useState("");
   const [currentStation, setCurrentStation] = useState("");
   const [nicOrPassport, setNicOrPassport] = useState("");
   const [contactNumber, setContactNumber] = useState("");
@@ -53,7 +80,8 @@ export default function RegisterForm() {
         gender,
         email,
         occupation,
-        address,
+        city,
+        district,
         currentStation,
         nicOrPassport,
         contactNumber,
@@ -70,151 +98,194 @@ export default function RegisterForm() {
 
   return (
     <ThemeProvider theme={theme}>
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+      <Container component="main" maxWidth="s">
+        <Card raised sx={{ marginTop: 8, padding: 2 }}>
+          <Typography component="h1" variant="h4" align="center">
+            Register
+          </Typography>
+          <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  label="First Name"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
-                  fullWidth
-                />
+              <Grid item xs={12} sm={6}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      label="First Name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      label="Email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth variant="outlined" margin="normal">
+                      <InputLabel>District</InputLabel>
+                      <Select
+                        value={district}
+                        onChange={(e) => setDistrict(e.target.value)}
+                        label="District"
+                      >
+                        <MenuItem value="">
+                          <em>None</em>
+                        </MenuItem>
+                        {Object.keys(citiesAndPostalCodes).map((district) => (
+                          <MenuItem key={district} value={district}>
+                            {district}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <FormControl fullWidth variant="outlined" margin="normal">
+                      <InputLabel>City</InputLabel>
+                      <Select
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        label="City"
+                      >
+                        <MenuItem value="">
+                          <em>None</em>
+                        </MenuItem>
+                        {district &&
+                          citiesAndPostalCodes[district].map(
+                            ({ city: cityName }) => (
+                              <MenuItem key={cityName} value={cityName}>
+                                {cityName}
+                              </MenuItem>
+                            )
+                          )}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      label="NIC/Passport Number"
+                      value={nicOrPassport}
+                      onChange={(e) => setNicOrPassport(e.target.value)}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      label="Contact Number"
+                      type="tel"
+                      value={contactNumber}
+                      onChange={(e) => setContactNumber(e.target.value)}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">+94</InputAdornment>
+                        ),
+                      }}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  label="Email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  fullWidth
-                />
+              <Grid item xs={12} sm={6}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      label="Last Name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      label="Password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControl
+                      required
+                      fullWidth
+                      variant="outlined"
+                      margin="normal"
+                    >
+                      <InputLabel>Gender</InputLabel>
+                      <Select
+                        value={gender}
+                        onChange={(e) => setGender(e.target.value)}
+                      >
+                        <MenuItem value="">
+                          <em>None</em>
+                        </MenuItem>
+                        <MenuItem value="male">Male</MenuItem>
+                        <MenuItem value="female">Female</MenuItem>
+                        <MenuItem value="other">Other</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      label="Occupation"
+                      value={occupation}
+                      onChange={(e) => setOccupation(e.target.value)}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      label="Current Station"
+                      value={currentStation}
+                      onChange={(e) => setCurrentStation(e.target.value)}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  label="Address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  required
-                  fullWidth
-                />
+              <Grid item xs={6}>
+                <Button type="submit" variant="contained" color="primary">
+                  Register
+                </Button>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  label="NIC/Passport Number"
-                  value={nicOrPassport}
-                  onChange={(e) => setNicOrPassport(e.target.value)}
-                  required
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  label="Contact Number"
-                  type="tel"
-                  value={contactNumber}
-                  onChange={(e) => setContactNumber(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">+94</InputAdornment>
-                    ),
-                  }}
-                  required
-                  fullWidth
-                />
+              <Grid item xs={6}>
+                <ListItemButton component="a" href="/login">
+                  Login
+                </ListItemButton>
               </Grid>
             </Grid>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  label="Last Name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  required
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  label="Password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl
-                  required
-                  fullWidth
-                  variant="outlined"
-                  margin="normal"
-                >
-                  <InputLabel>Gender</InputLabel>
-                  <Select
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    <MenuItem value="male">Male</MenuItem>
-                    <MenuItem value="female">Female</MenuItem>
-                    <MenuItem value="other">Other</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  label="Occupation"
-                  value={occupation}
-                  onChange={(e) => setOccupation(e.target.value)}
-                  required
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  label="Current Station"
-                  value={currentStation}
-                  onChange={(e) => setCurrentStation(e.target.value)}
-                  required
-                  fullWidth
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary">
-              Register
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
+          </form>
+        </Card>
+      </Container>
     </ThemeProvider>
   );
 }
