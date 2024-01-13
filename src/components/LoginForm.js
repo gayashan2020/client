@@ -11,54 +11,9 @@ import {
   Container,
   Typography,
 } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import Cookies from "js-cookie";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#1976d2", // This is the color you want for the button and the focus
-    },
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: "#1976d2", // This is to change the border color
-            },
-            "&:hover fieldset": {
-              borderColor: "#1976d2", // This is to change the border color on hover
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: "#1976d2", // This is to change the border color on focus
-            },
-          },
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          margin: "24px 0 16px", // Replace theme.spacing(3, 0, 2) with the equivalent pixel values
-          backgroundColor: "#1976d2",
-          "&:hover": {
-            backgroundColor: "#115293",
-          },
-        },
-      },
-    },
-    typography: {
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      fontSize: 14,
-      fontWeightLight: 300,
-      fontWeightRegular: 400,
-      fontWeightMedium: 500,
-      fontWeightBold: 700,
-    },
-  },
-});
+import theme from "@/styles/theme";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");

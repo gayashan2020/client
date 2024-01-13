@@ -13,45 +13,9 @@ import {
   Typography,
   ListItemButton,
 } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import citiesAndPostalCodes from "../assets/constants/cities-and-postalcode-by-district.json";
-
-// Updated theme for styling
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#4a4a4a", // Example color, adjust as needed
-    },
-    background: {
-      default: "#e7e7e7", // Light gray background
-    },
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          backgroundColor: "#fff", // White background for textfields
-          borderRadius: "4px", // Rounded corners for textfields
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          marginTop: "16px", // Space above the button
-        },
-      },
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    fontSize: 14,
-    fontWeightLight: 300,
-    fontWeightRegular: 400,
-    fontWeightMedium: 500,
-    fontWeightBold: 700,
-  },
-});
+import theme from "@/styles/theme";
 
 export default function RegisterForm() {
   const [password, setPassword] = useState("");
