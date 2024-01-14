@@ -7,7 +7,7 @@ import {
   Select,
   MenuItem,
   Grid,
-  InputAdornment,
+  ListItemButton,
   Card,
   Container,
   Typography,
@@ -20,7 +20,8 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { GENDER_OPTIONS } from "@/assets/constants/studentConstants";
 import { OCCUPATION_OPTIONS } from "@/assets/constants/adminConstants";
-import citiesAndPostalCodes from "../../assets/constants/cities-and-postalcode-by-district.json";
+import citiesAndPostalCodes from "../../../../assets/constants/cities-and-postalcode-by-district.json";
+import { routes } from "@/assets/constants/routeConstants";
 import Layout from "@/components/Layout";
 
 export default function RegisterForm() {
@@ -60,14 +61,11 @@ export default function RegisterForm() {
         contactNumber,
         slmcRegNumber,
         username,
-        role: userRoles.STUDENT,
+        role: userRoles.ADMIN,
       }),
     });
 
     if (response.ok) {
-      const { userId } = await response.json();
-      console.log("Registered:", userId);
-
       // Show a toast message
       toast.success("Registration successful!");
 
@@ -196,27 +194,9 @@ export default function RegisterForm() {
                   </Grid>
                 </Grid>
                 {/*Column 2*/}
+
                 <Grid item xs={12} sm={6}>
                   <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth>
-                        <InputLabel id="occupation-label">
-                          Occupation
-                        </InputLabel>
-                        <Select
-                          labelId="occupation-label"
-                          value={occupation}
-                          onChange={(e) => setOccupation(e.target.value)}
-                          required
-                        >
-                          {OCCUPATION_OPTIONS.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                              {option.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
                     <Grid item xs={6}>
                       <FormControl fullWidth variant="outlined" margin="normal">
                         <InputLabel>District</InputLabel>
@@ -271,6 +251,26 @@ export default function RegisterForm() {
                       />
                     </Grid>
                     <Grid item xs={12}>
+                      <FormControl fullWidth>
+                        <InputLabel id="occupation-label">
+                          Occupation
+                        </InputLabel>
+                        <Select
+                          labelId="occupation-label"
+                          value={occupation}
+                          onChange={(e) => setOccupation(e.target.value)}
+                          required
+                        >
+                          {OCCUPATION_OPTIONS.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+
+                    <Grid item xs={12}>
                       <TextField
                         variant="outlined"
                         margin="normal"
@@ -284,17 +284,20 @@ export default function RegisterForm() {
                     </Grid>
                   </Grid>
                 </Grid>
+                <Grid item xs={6}>
+                  <Button type="submit" variant="contained" color="primary">
+                    Register
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <ListItemButton
+                    component="a"
+                    href={routes.ADMIN_USERS_SITE_ADMIN}
+                  >
+                    Back
+                  </ListItemButton>
+                </Grid>
               </Grid>
-              {/* Add more Grid items for additional columns */}
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Register
-              </Button>
             </form>
           </Card>
         </Container>

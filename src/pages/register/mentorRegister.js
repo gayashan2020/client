@@ -65,9 +65,6 @@ export default function RegisterForm() {
     });
 
     if (response.ok) {
-      const { userId } = await response.json();
-      console.log("Registered:", userId);
-
       // Show a toast message
       toast.success("Registration successful!");
 

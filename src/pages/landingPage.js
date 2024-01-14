@@ -13,6 +13,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import ChatIcon from "@mui/icons-material/Chat";
 import CastForEducationIcon from "@mui/icons-material/CastForEducation";
 import Link from "next/link";
+import {routes} from "@/assets/constants/routeConstants";
 
 export default function IntroSection() {
   const cardData = [
@@ -142,12 +143,12 @@ export default function IntroSection() {
               },
             }}
           >
-            <Link href="/login" passHref>
+            <Link href={routes.LOGIN} passHref>
               <Button variant="contained" color="primary" sx={{ mr: 2 }}>
                 Log in
               </Button>
             </Link>
-            <Link href="/register" passHref>
+            <Link href={routes.REGISTER} passHref>
               <Button variant="contained" color="secondary">
                 Sign up
               </Button>

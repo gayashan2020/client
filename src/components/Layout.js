@@ -12,6 +12,8 @@ import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import { useRouter } from "next/router";
 import { darkTheme as theme } from "@/styles/theme";
+import {userRoles} from "@/assets/constants/authConstants";
+import {routes} from "@/assets/constants/routeConstants";
 
 export default function Layout({ children }) {
   const router = useRouter();
@@ -51,17 +53,13 @@ export default function Layout({ children }) {
           </IconButton>
           <List>
             {/* Dashboard */}
-            <ListItemButton component="a" href="/admin">
+            <ListItemButton component="a" href={routes.ADMIN}>
               <ListItemText primary="Dashboard" />
             </ListItemButton>
-            {/* user Profile */}
-            <ListItemButton component="a" href="/admin/userProfile">
-              <ListItemText primary="User Profile" />
-            </ListItemButton>
             {/* admin Registration */}
-            {user && user.role === "superAdmin" && (
-              <ListItemButton component="a" href="/admin/adminRegistration">
-                <ListItemText primary="Registration" />
+            {user && user.role === userRoles.SUPER_ADMIN && (
+              <ListItemButton component="a" href={routes.ADMIN_USERS}>
+                <ListItemText primary="Users" />
               </ListItemButton>
             )}
           </List>
