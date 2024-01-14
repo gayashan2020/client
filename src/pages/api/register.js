@@ -7,15 +7,15 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { db, client } = await dbConnect();
 
-    // Destructure the username and password from the request body
-    const { username, password, firstName, lastName, gender, email, occupation, address, currentStation, nicOrPassport, contactNumber } = req.body;
-
+    // Destructure the request body
+    const { password, ...otherDetails } = req.body;
+    
     // Hash the password before storing it
     const hashedPassword = await hashPassword(password);
-
+    
     // Insert the user into the 'users' collection
-    const result = await db.collection('users').insertOne({ username, password: hashedPassword, firstName, lastName, gender, email, occupation, address, currentStation, nicOrPassport, contactNumber });
-
+    const result = await db.collection('users').insertOne({ password: hashedPassword, ...otherDetails });
+    
     // Close the database connection
     client.close();
 

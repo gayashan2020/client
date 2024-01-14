@@ -14,10 +14,21 @@ import {
   ListItemButton,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
-import citiesAndPostalCodes from "../assets/constants/cities-and-postalcode-by-district.json";
-import theme from "@/styles/theme";
+import citiesAndPostalCodes from "../../assets/constants/cities-and-postalcode-by-district.json";
+import { lightTheme as theme } from "@/styles/theme";
+import {
+  GENDER_OPTIONS,
+  BATCH_OPTIONS,
+  FACULTY_OPTIONS,
+} from "@/assets/constants/studentConstants";
+import {userRoles} from "@/assets/constants/authConstants";
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
 
 export default function RegisterForm() {
+
+  const router = useRouter();
+
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -29,6 +40,9 @@ export default function RegisterForm() {
   const [currentStation, setCurrentStation] = useState("");
   const [nicOrPassport, setNicOrPassport] = useState("");
   const [contactNumber, setContactNumber] = useState("");
+  const [batch, setBatch] = useState("");
+  const [faculty, setFaculty] = useState("");
+  const [facultyRegNumber, setFacultyRegNumber] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -49,14 +63,42 @@ export default function RegisterForm() {
         currentStation,
         nicOrPassport,
         contactNumber,
+        batch,
+        faculty,
+        facultyRegNumber,
+        role: userRoles.STUDENT,
       }),
     });
 
     if (response.ok) {
       const { userId } = await response.json();
       console.log("Registered:", userId);
+    
+      // Show a toast message
+      toast.success('Registration successful!');
+    
+      // Clear the form
+      setPassword("");
+      setFirstName("");
+      setLastName("");
+      setGender("");
+      setEmail("");
+      setOccupation("");
+      setDistrict("");
+      setCity("");
+      setCurrentStation("");
+      setNicOrPassport("");
+      setContactNumber("");
+      setBatch("");
+      setFaculty("");
+      setFacultyRegNumber("");
+    
+      // Navigate to the login page
+      toast.success("Registration successful!");
+      router.push('/login');
     } else {
       console.log("Failed to register");
+      toast.error('Registration failed.');
     }
   };
 
@@ -69,6 +111,7 @@ export default function RegisterForm() {
           </Typography>
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
+              {/*Column 1*/}
               <Grid item xs={12} sm={6}>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
@@ -164,8 +207,40 @@ export default function RegisterForm() {
                       fullWidth
                     />
                   </Grid>
+                  <Grid item xs={12}>
+                    <FormControl
+                      required
+                      fullWidth
+                      variant="outlined"
+                      margin="normal"
+                    >
+                      <InputLabel>Batch by A/L Year</InputLabel>
+                      <Select
+                        value={batch}
+                        onChange={(e) => setBatch(e.target.value)}
+                      >
+                        {BATCH_OPTIONS.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      label="Faculty registration number"
+                      value={facultyRegNumber}
+                      onChange={(e) => setFacultyRegNumber(e.target.value)}
+                      required
+                      fullWidth
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
+              {/*Column 2*/}
               <Grid item xs={12} sm={6}>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
@@ -203,12 +278,11 @@ export default function RegisterForm() {
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
                       >
-                        <MenuItem value="">
-                          <em>None</em>
-                        </MenuItem>
-                        <MenuItem value="male">Male</MenuItem>
-                        <MenuItem value="female">Female</MenuItem>
-                        <MenuItem value="other">Other</MenuItem>
+                        {GENDER_OPTIONS.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                   </Grid>
@@ -233,6 +307,26 @@ export default function RegisterForm() {
                       required
                       fullWidth
                     />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControl
+                      required
+                      fullWidth
+                      variant="outlined"
+                      margin="normal"
+                    >
+                      <InputLabel>Faculty</InputLabel>
+                      <Select
+                        value={faculty}
+                        onChange={(e) => setFaculty(e.target.value)}
+                      >
+                        {FACULTY_OPTIONS.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </Grid>
                 </Grid>
               </Grid>

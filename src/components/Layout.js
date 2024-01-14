@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Drawer,
@@ -7,50 +7,30 @@ import {
   ListItemText,
   CssBaseline,
   ThemeProvider,
-  createTheme,
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import { useRouter } from "next/router";
-
-// Create a dark theme instance
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: {
-      main: "#fff", // Adjust the primary color if needed
-    },
-    // ... You can add more color options here
-  },
-  components: {
-    // Override MUI component styles globally
-    MuiListItemButton: {
-      styleOverrides: {
-        root: {
-          "&.Mui-selected": {
-            backgroundColor: "rgba(255, 255, 255, 0.08)", // Adjust selected item background
-          },
-          "&:hover": {
-            backgroundColor: "rgba(255, 255, 255, 0.08)", // Adjust hover background
-          },
-        },
-      },
-    },
-    MuiListItemText: {
-      styleOverrides: {
-        primary: {
-          color: "#fff", // Text color for list items
-          textDecoration: "none", // Remove underline from links
-        },
-      },
-    },
-  },
-});
+import { darkTheme as theme } from "@/styles/theme";
 
 export default function Layout({ children }) {
   const router = useRouter();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/user")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => setUser(data))
+      .catch((error) => console.error("Error:", error));
+  }, []);
+
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline /> {/* This ensures that the background is dark */}
       <Box sx={{ display: "flex" }}>
         <Drawer
@@ -70,14 +50,20 @@ export default function Layout({ children }) {
             <HomeIcon />
           </IconButton>
           <List>
-            {/* Add your navigation items here */}
+            {/* Dashboard */}
             <ListItemButton component="a" href="/admin">
               <ListItemText primary="Dashboard" />
             </ListItemButton>
+            {/* user Profile */}
             <ListItemButton component="a" href="/admin/userProfile">
               <ListItemText primary="User Profile" />
             </ListItemButton>
-            {/* ... */}
+            {/* admin Registration */}
+            {user && user.role === "superAdmin" && (
+              <ListItemButton component="a" href="/admin/adminRegistration">
+                <ListItemText primary="Registration" />
+              </ListItemButton>
+            )}
           </List>
         </Drawer>
         <Box
