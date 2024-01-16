@@ -2,11 +2,11 @@
   "name": "lms",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://nccpdim.org",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "NODE_ENV=production node server.js"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
