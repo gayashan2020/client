@@ -36,6 +36,15 @@ export default function UserManagement() {
               <TableCell>Last Name</TableCell>
               <TableCell>Gender</TableCell>
               <TableCell>Email</TableCell>
+              <TableCell>Occupation</TableCell>
+              <TableCell>District</TableCell>
+              <TableCell>City</TableCell>
+              <TableCell>Current Station</TableCell>
+              <TableCell>NIC/Passport</TableCell>
+              <TableCell>Contact Number</TableCell>
+              <TableCell>Batch</TableCell>
+              <TableCell>Faculty</TableCell>
+              <TableCell>Faculty Reg. Number</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -45,6 +54,15 @@ export default function UserManagement() {
                 <TableCell>{user.lastName}</TableCell>
                 <TableCell>{user.gender}</TableCell>
                 <TableCell>{user.email}</TableCell>
+                <TableCell>{user.occupation}</TableCell>
+                <TableCell>{user.district}</TableCell>
+                <TableCell>{user.city}</TableCell>
+                <TableCell>{user.currentStation}</TableCell>
+                <TableCell>{user.nicOrPassport}</TableCell>
+                <TableCell>{user.contactNumber}</TableCell>
+                <TableCell>{user.batch}</TableCell>
+                <TableCell>{user.faculty}</TableCell>
+                <TableCell>{user.facultyRegNumber}</TableCell>
               </TableRow>
             ))}
           </TableBody>

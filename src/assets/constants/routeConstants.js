@@ -24,5 +24,8 @@ export const routes = {
 
     //admin user management
     ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT:'/admin/users/siteAdmin/userManagement',
+    ADMIN_USERS_MENTORS_USER_MANAGEMENT:'/admin/users/mentors/userManagement',
+    ADMIN_USERS_STUDENTS_USER_MANAGEMENT:'/admin/users/students/userManagement',
+    ADMIN_USERS_CPD_PROVIDERS_USER_MANAGEMENT:'/admin/users/cpdProviders/userManagement',
     
 }
