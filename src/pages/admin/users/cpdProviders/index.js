@@ -48,8 +48,8 @@ export default function Index() {
           </Card>
         </Grid>
 
-        {/* <Grid item>
-          <Card sx={cardStyle} onClick={() => router.push(routes.ADMIN_USERS_MENTORS)}>
+        <Grid item>
+          <Card sx={cardStyle} onClick={() => router.push(routes.ADMIN_USERS_CPD_PROVIDERS_USER_MANAGEMENT)}>
             <CardActionArea sx={{ height: '100%' }}>
               <CardContent>
                 <Typography variant="h5" component="div">
@@ -61,7 +61,7 @@ export default function Index() {
               </CardContent>
             </CardActionArea>
           </Card>
-        </Grid> */}
+        </Grid>
       </Grid>
     </Layout>
   );
