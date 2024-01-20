@@ -13,7 +13,6 @@ export default async function handler(req, res) {
 
     // Find the user in the database
     const user = await db.collection('users').findOne({ email });
-    console.log("user",user);
 
     if (user && await comparePasswords(password, user.password)) {
       // If the user is found and the password is correct, create a JWT

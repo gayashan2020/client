@@ -15,9 +15,8 @@ export function generateToken(user) {
   const token = jwt.sign(
     { id: user._id, email: user.email },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "6h" }
   );
-  console.log("token",token);
   return token;
 }
 

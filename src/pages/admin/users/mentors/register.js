@@ -61,7 +61,7 @@ export default function RegisterForm() {
         contactNumber,
         slmcRegNumber,
         username,
-        role: userRoles.STUDENT,
+        role: userRoles.MENTOR,
       }),
     });
 
@@ -196,25 +196,6 @@ export default function RegisterForm() {
                 {/*Column 2*/}
                 <Grid item xs={12} sm={6}>
                   <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth>
-                        <InputLabel id="occupation-label">
-                          Occupation
-                        </InputLabel>
-                        <Select
-                          labelId="occupation-label"
-                          value={occupation}
-                          onChange={(e) => setOccupation(e.target.value)}
-                          required
-                        >
-                          {OCCUPATION_OPTIONS.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                              {option.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
                     <Grid item xs={6}>
                       <FormControl fullWidth variant="outlined" margin="normal">
                         <InputLabel>District</InputLabel>
@@ -267,6 +248,25 @@ export default function RegisterForm() {
                         required
                         fullWidth
                       />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormControl fullWidth>
+                        <InputLabel id="occupation-label">
+                          Occupation
+                        </InputLabel>
+                        <Select
+                          labelId="occupation-label"
+                          value={occupation}
+                          onChange={(e) => setOccupation(e.target.value)}
+                          required
+                        >
+                          {OCCUPATION_OPTIONS.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                              {option.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </Grid>
                     <Grid item xs={12}>
                       <TextField

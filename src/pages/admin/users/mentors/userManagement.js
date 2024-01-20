@@ -27,18 +27,18 @@ export default function UserManagement() {
   const [editOpen, setEditOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
   const [occupation, setOccupation] = useState("");
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
-  const [currentStation, setCurrentStation] = useState("");
-  const [nicOrPassport, setNicOrPassport] = useState("");
   const [contactNumber, setContactNumber] = useState("");
-  const [batch, setBatch] = useState("");
-  const [faculty, setFaculty] = useState("");
+
+  const [fullName, setFullName] = useState("");
+  const [initialsName, setInitialsName] = useState("");
+  const [workingStation, setWorkingStation] = useState("");
+  const [slmcRegNumber, setSlmcRegNumber] = useState("");
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -74,17 +74,16 @@ export default function UserManagement() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email, // Include the email to identify the user to update
-        firstName,
-        lastName,
         gender,
         occupation,
         city,
         district,
-        currentStation,
-        nicOrPassport,
         contactNumber,
-        batch,
-        faculty,
+        fullName,
+        initialsName,
+        workingStation,
+        slmcRegNumber,
+        username,
       }),
     });
 
@@ -93,18 +92,16 @@ export default function UserManagement() {
       toast.success("Update successful!");
 
       // Clear the form
-      setFirstName("");
-      setLastName("");
       setGender("");
       setEmail("");
-      setOccupation("");
       setDistrict("");
       setCity("");
-      setCurrentStation("");
-      setNicOrPassport("");
       setContactNumber("");
-      setBatch("");
-      setFaculty("");
+      setFullName("");
+      setInitialsName("");
+      setWorkingStation("");
+      setSlmcRegNumber("");
+      setUsername("");
 
       // Update the table
       fetchData();
@@ -123,18 +120,17 @@ export default function UserManagement() {
 
   const handleEditOpen = (user) => {
     setEditUser(user); // Set the user to be edited
-    setFirstName(user.firstName); // Update the firstName state
-    setLastName(user.lastName); // Update the lastName state
     setGender(user.gender); // Update the gender state
     setEmail(user.email); // Update the email state
-    setOccupation(user.occupation); // Update the occupation state
+    setContactNumber(user.contactNumber); // Update the contactNumber state
     setDistrict(user.district); // Update the district state
     setCity(user.city); // Update the city state
-    setCurrentStation(user.currentStation); // Update the currentStation state
-    setNicOrPassport(user.nicOrPassport); // Update the nicOrPassport state
-    setContactNumber(user.contactNumber); // Update the contactNumber state
-    setBatch(user.batch); // Update the batch state
-    setFaculty(user.faculty); // Update the faculty state
+    setFullName(user.fullName);
+    setInitialsName(user.initialsName);
+    setWorkingStation(user.workingStation);
+    setSlmcRegNumber(user.slmcRegNumber);
+    setUsername(user.username);
+
     setEditOpen(true); // Open the modal
   };
 
@@ -153,28 +149,24 @@ export default function UserManagement() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>First Name</TableCell>
-              <TableCell>Last Name</TableCell>
+              <TableCell>Full Name</TableCell>
               <TableCell>Occupation</TableCell>
+              <TableCell>Working Station</TableCell>
               <TableCell>District</TableCell>
-              <TableCell>Current Station</TableCell>
               <TableCell>Contact Number</TableCell>
-              <TableCell>Batch</TableCell>
-              <TableCell>Faculty</TableCell>
+              <TableCell>Username</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((user) => (
               <TableRow key={user._id}>
-                <TableCell>{user.firstName}</TableCell>
-                <TableCell>{user.lastName}</TableCell>
+                <TableCell>{user.fullName}</TableCell>
                 <TableCell>{user.occupation}</TableCell>
+                <TableCell>{user.workingStation}</TableCell>
                 <TableCell>{user.district}</TableCell>
-                <TableCell>{user.currentStation}</TableCell>
                 <TableCell>{user.contactNumber}</TableCell>
-                <TableCell>{user.batch}</TableCell>
-                <TableCell>{user.faculty}</TableCell>
+                <TableCell>{user.username}</TableCell>
                 <TableCell>
                   <IconButton color="primary" onClick={() => handleOpen(user)}>
                     <VisibilityIcon />
@@ -216,11 +208,12 @@ export default function UserManagement() {
           </Typography>
           {selectedUser && (
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              Initials Name: {selectedUser.initialsName} <br />
               Gender: {selectedUser.gender} <br />
               Email: {selectedUser.email} <br />
               City: {selectedUser.city} <br />
               NIC/Passport: {selectedUser.nicOrPassport} <br />
-              Faculty Reg. Number: {selectedUser.facultyRegNumber}
+              SLMC Reg. Number: {selectedUser.slmcRegNumber}
             </Typography>
           )}
         </Box>
@@ -256,21 +249,51 @@ export default function UserManagement() {
               <TextField
                 margin="normal"
                 fullWidth
-                id="firstName"
-                label="First Name"
-                name="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                id="fullName"
+                label="Full Name"
+                name="fullName"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 required
               />
               <TextField
                 margin="normal"
                 fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                id="initialsName"
+                label="Initials Name"
+                name="initialsName"
+                value={initialsName}
+                onChange={(e) => setInitialsName(e.target.value)}
+                required
+              />
+              <TextField
+                margin="normal"
+                fullWidth
+                id="workingStation"
+                label="Working Station"
+                name="workingStation"
+                value={workingStation}
+                onChange={(e) => setWorkingStation(e.target.value)}
+                required
+              />
+              <TextField
+                margin="normal"
+                fullWidth
+                id="slmcRegNumber"
+                label="SLMC Reg. Number"
+                name="slmcRegNumber"
+                value={slmcRegNumber}
+                onChange={(e) => setSlmcRegNumber(e.target.value)}
+                required
+              />
+              <TextField
+                margin="normal"
+                fullWidth
+                id="username"
+                label="Username"
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
               <TextField
@@ -326,51 +349,11 @@ export default function UserManagement() {
               <TextField
                 margin="normal"
                 fullWidth
-                id="currentStation"
-                label="Current Station"
-                name="currentStation"
-                value={currentStation}
-                onChange={(e) => setCurrentStation(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="nicOrPassport"
-                label="NIC or Passport"
-                name="nicOrPassport"
-                value={nicOrPassport}
-                onChange={(e) => setNicOrPassport(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
                 id="contactNumber"
                 label="Contact Number"
                 name="contactNumber"
                 value={contactNumber}
                 onChange={(e) => setContactNumber(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="batch"
-                label="Batch"
-                name="batch"
-                value={batch}
-                onChange={(e) => setBatch(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="faculty"
-                label="Faculty"
-                name="faculty"
-                value={faculty}
-                onChange={(e) => setFaculty(e.target.value)}
                 required
               />
               <Button

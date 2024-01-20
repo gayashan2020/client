@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -27,18 +27,12 @@ export default function UserManagement() {
   const [editOpen, setEditOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [gender, setGender] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [district, setDistrict] = useState("");
-  const [city, setCity] = useState("");
-  const [currentStation, setCurrentStation] = useState("");
-  const [nicOrPassport, setNicOrPassport] = useState("");
+  const [institution, setInstitution] = useState("");
   const [contactNumber, setContactNumber] = useState("");
-  const [batch, setBatch] = useState("");
-  const [faculty, setFaculty] = useState("");
+  const [cpdProviderRegNumber, setCpdProviderRegNumber] = useState("");
+  const [officialAddress, setOfficialAddress] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -73,18 +67,12 @@ export default function UserManagement() {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email, // Include the email to identify the user to update
-        firstName,
-        lastName,
-        gender,
-        occupation,
-        city,
-        district,
-        currentStation,
-        nicOrPassport,
+        institution,
+        email,
         contactNumber,
-        batch,
-        faculty,
+        officialAddress,
+        username,
+        cpdProviderRegNumber,
       }),
     });
 
@@ -93,18 +81,12 @@ export default function UserManagement() {
       toast.success("Update successful!");
 
       // Clear the form
-      setFirstName("");
-      setLastName("");
-      setGender("");
+      setInstitution("");
       setEmail("");
-      setOccupation("");
-      setDistrict("");
-      setCity("");
-      setCurrentStation("");
-      setNicOrPassport("");
       setContactNumber("");
-      setBatch("");
-      setFaculty("");
+      setOfficialAddress("");
+      setUsername("");
+      setCpdProviderRegNumber("");
 
       // Update the table
       fetchData();
@@ -123,18 +105,12 @@ export default function UserManagement() {
 
   const handleEditOpen = (user) => {
     setEditUser(user); // Set the user to be edited
-    setFirstName(user.firstName); // Update the firstName state
-    setLastName(user.lastName); // Update the lastName state
-    setGender(user.gender); // Update the gender state
-    setEmail(user.email); // Update the email state
-    setOccupation(user.occupation); // Update the occupation state
-    setDistrict(user.district); // Update the district state
-    setCity(user.city); // Update the city state
-    setCurrentStation(user.currentStation); // Update the currentStation state
-    setNicOrPassport(user.nicOrPassport); // Update the nicOrPassport state
-    setContactNumber(user.contactNumber); // Update the contactNumber state
-    setBatch(user.batch); // Update the batch state
-    setFaculty(user.faculty); // Update the faculty state
+    setInstitution(user.institution);
+    setEmail(user.email);
+    setContactNumber(user.contactNumber);
+    setOfficialAddress(user.officialAddress);
+    setUsername(user.username);
+    setCpdProviderRegNumber(user.cpdProviderRegNumber);
     setEditOpen(true); // Open the modal
   };
 
@@ -153,32 +129,25 @@ export default function UserManagement() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>First Name</TableCell>
-              <TableCell>Last Name</TableCell>
-              <TableCell>Occupation</TableCell>
-              <TableCell>District</TableCell>
-              <TableCell>Current Station</TableCell>
+              <TableCell>Institution</TableCell>
+              <TableCell>Email</TableCell>
               <TableCell>Contact Number</TableCell>
-              <TableCell>Batch</TableCell>
-              <TableCell>Faculty</TableCell>
+              <TableCell>Official Address</TableCell>
+              <TableCell>Username</TableCell>
+              <TableCell>CPD Provider</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((user) => (
               <TableRow key={user._id}>
-                <TableCell>{user.firstName}</TableCell>
-                <TableCell>{user.lastName}</TableCell>
-                <TableCell>{user.occupation}</TableCell>
-                <TableCell>{user.district}</TableCell>
-                <TableCell>{user.currentStation}</TableCell>
+                <TableCell>{user.institution}</TableCell>
+                <TableCell>{user.email}</TableCell>
                 <TableCell>{user.contactNumber}</TableCell>
-                <TableCell>{user.batch}</TableCell>
-                <TableCell>{user.faculty}</TableCell>
+                <TableCell>{user.officialAddress}</TableCell>
+                <TableCell>{user.username}</TableCell>
+                <TableCell>{user.cpdProviderRegNumber}</TableCell>
                 <TableCell>
-                  <IconButton color="primary" onClick={() => handleOpen(user)}>
-                    <VisibilityIcon />
-                  </IconButton>
                   <IconButton
                     color="primary"
                     onClick={() => handleEditOpen(user)}
@@ -191,40 +160,6 @@ export default function UserManagement() {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* View model */}
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            border: "2px solid #000",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            User Details
-          </Typography>
-          {selectedUser && (
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Gender: {selectedUser.gender} <br />
-              Email: {selectedUser.email} <br />
-              City: {selectedUser.city} <br />
-              NIC/Passport: {selectedUser.nicOrPassport} <br />
-              Faculty Reg. Number: {selectedUser.facultyRegNumber}
-            </Typography>
-          )}
-        </Box>
-      </Modal>
 
       {/* Edit model */}
       <Modal
@@ -256,31 +191,11 @@ export default function UserManagement() {
               <TextField
                 margin="normal"
                 fullWidth
-                id="firstName"
-                label="First Name"
-                name="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="gender"
-                label="Gender"
-                name="gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
+                id="username"
+                label="User Name"
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
               <TextField
@@ -296,51 +211,21 @@ export default function UserManagement() {
               <TextField
                 margin="normal"
                 fullWidth
-                id="occupation"
-                label="Occupation"
-                name="occupation"
-                value={occupation}
-                onChange={(e) => setOccupation(e.target.value)}
+                id="officialAddress"
+                label="Official Address"
+                name="officialAddress"
+                value={officialAddress}
+                onChange={(e) => setOfficialAddress(e.target.value)}
                 required
               />
               <TextField
                 margin="normal"
                 fullWidth
-                id="district"
-                label="District"
-                name="district"
-                value={district}
-                onChange={(e) => setDistrict(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="city"
-                label="City"
-                name="city"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="currentStation"
-                label="Current Station"
-                name="currentStation"
-                value={currentStation}
-                onChange={(e) => setCurrentStation(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="nicOrPassport"
-                label="NIC or Passport"
-                name="nicOrPassport"
-                value={nicOrPassport}
-                onChange={(e) => setNicOrPassport(e.target.value)}
+                id="institution"
+                label="Institution"
+                name="institution"
+                value={institution}
+                onChange={(e) => setInstitution(e.target.value)}
                 required
               />
               <TextField
@@ -356,21 +241,11 @@ export default function UserManagement() {
               <TextField
                 margin="normal"
                 fullWidth
-                id="batch"
-                label="Batch"
-                name="batch"
-                value={batch}
-                onChange={(e) => setBatch(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="faculty"
-                label="Faculty"
-                name="faculty"
-                value={faculty}
-                onChange={(e) => setFaculty(e.target.value)}
+                id="cpdProviderRegNumber"
+                label="CPD Provider Reg Number"
+                name="cpdProviderRegNumber"
+                value={cpdProviderRegNumber}
+                onChange={(e) => setCpdProviderRegNumber(e.target.value)}
                 required
               />
               <Button

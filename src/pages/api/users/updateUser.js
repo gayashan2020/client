@@ -7,12 +7,12 @@ export default async function handler(req, res) {
     const { db, client } = await dbConnect();
 
     // Destructure the request body
-    const { email, firstName, lastName, gender, occupation, city, district, currentStation, nicOrPassport, contactNumber, batch, faculty } = req.body;
+    const { email, ...fieldsToUpdate } = req.body;
 
     // Update the user in the 'users' collection
     const result = await db.collection('users').updateOne(
       { email },
-      { $set: { firstName, lastName, gender, occupation, city, district, currentStation, nicOrPassport, contactNumber, batch, faculty } }
+      { $set: fieldsToUpdate }
     );
 
     // Return a success message

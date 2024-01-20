@@ -41,8 +41,10 @@ export default function LoginForm() {
         // If the login is successful, store the token in a cookie
         Cookies.set("token", response.data.token);
 
+        console.log("Login successful");
+
         // Then redirect to the dashboard
-        router.push("/admin");
+        await router.push("/admin");
       }
     } catch (error) {
       console.error("An error occurred while logging in:", error);
