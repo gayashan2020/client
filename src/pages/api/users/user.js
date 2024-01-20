@@ -1,7 +1,7 @@
 // pages/api/user.js
 
 import jwt from 'jsonwebtoken';
-import dbConnect from '../../lib/dbConnect';
+import dbConnect from '@/lib/dbConnect';
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {

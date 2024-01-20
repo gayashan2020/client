@@ -20,7 +20,7 @@ export default function Layout({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("/api/user")
+    fetch("/api/users/user")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

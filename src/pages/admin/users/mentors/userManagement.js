@@ -15,7 +15,7 @@ export default function UserManagement() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch("/api/allUsers", {
+    fetch("/api/users/allUsers", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
