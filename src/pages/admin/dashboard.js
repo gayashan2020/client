@@ -21,23 +21,43 @@ export default function AdminDashboard() {
 
     const theme = useTheme();
 
-
     useEffect(() => {
         const getUser = async () => {
             setLoading(true);
-            const currentUser = await fetchCurrentUser();
-            setLoading(false);
-            setUser(currentUser);
+            try {
+                const currentUser = await fetchCurrentUser();
+                setUser(currentUser);
+            } catch (error) {
+                console.error('Failed to fetch current user', error);
+            } finally {
+                setLoading(false);
+            }
         };
 
         const fetchData = async () => {
-            const data = await getOccupationData();
-            setOccupationData(data);
+            try {
+                const data = await getOccupationData();
+                if (data) {
+                    setOccupationData(data);
+                } else {
+                    console.error('Failed to fetch occupation data');
+                }
+            } catch (error) {
+                console.error('Failed to fetch occupation data', error);
+            }
         };
 
         const fetchCityData = async () => {
-            const data = await getCityData();
-            setCityData(data);
+            try {
+                const data = await getCityData();
+                if (data) {
+                    setCityData(data);
+                } else {
+                    console.error('Failed to fetch city data');
+                }
+            } catch (error) {
+                console.error('Failed to fetch city data', error);
+            }
         };
 
         getUser();
