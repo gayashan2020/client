@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { use, useEffect, useState, useContext } from "react";
 import {
   Table,
   TableBody,
@@ -16,16 +16,17 @@ import {
 } from "@mui/material";
 import Layout from "@/components/Layout";
 import { userRoles } from "@/assets/constants/authConstants";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import { toast } from "react-toastify";
+import { LoadingContext } from "@/contexts/LoadingContext";
+import { updateUser, fetchUsers, approveUser } from "@/services/users";
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
+
+  const { setLoading } = useContext(LoadingContext);
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -40,19 +41,9 @@ export default function UserManagement() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("/api/users/allUsers", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ filter: "", role: userRoles.CPD_PROVIDER }), // Fetch all users
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      setLoading(true);
+      const data = await fetchUsers("", userRoles.CPD_PROVIDER);
+      setLoading(false);
       setUsers(data);
     } catch (error) {
       console.error("Failed to fetch users:", error);
@@ -62,19 +53,17 @@ export default function UserManagement() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Send a PUT request to the /api/updateUser endpoint with the form data
-    const response = await fetch("/api/users/updateUser", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        institution,
-        email,
-        contactNumber,
-        officialAddress,
-        username,
-        cpdProviderRegNumber,
-      }),
-    });
+    const userData = {
+      institution,
+      email,
+      contactNumber,
+      officialAddress,
+      username,
+      cpdProviderRegNumber,
+    };
+    setLoading(true);
+    const response = await updateUser(userData);
+    setLoading(false);
 
     if (response.ok) {
       // Show a toast message
@@ -115,13 +104,6 @@ export default function UserManagement() {
   };
 
   const handleEditClose = () => setEditOpen(false);
-
-  const handleOpen = (user) => {
-    setSelectedUser(user);
-    setOpen(true);
-  };
-
-  const handleClose = () => setOpen(false);
 
   return (
     <Layout>
