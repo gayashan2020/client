@@ -38,10 +38,10 @@ export default function Layout({ children }) {
         <Drawer
           variant="permanent"
           sx={{
-            width: 240,
+            width: 100,
             flexShrink: 0,
             "& .MuiDrawer-paper": {
-              width: 240,
+              width: 200,
               boxSizing: "border-box",
               backgroundColor: "#121212", // Drawer background color
               color: "#fff", // Drawer text color

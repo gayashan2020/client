@@ -2,15 +2,14 @@
 
 import { getSession } from "../../lib/session";
 import { Box } from "@mui/material";
-import Layout from "../../components/Layout";
+import Layout from "@/components/Layout";
+import AdminDashboard from "./dashboard";
 
 export default function AdminPage() {
   // Your page component
   return (
     <Layout>
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-          <h1>Dashboard</h1>
-        </Box>
+        <AdminDashboard />
     </Layout>
   );
 }

@@ -17,6 +17,23 @@ export async function fetchUsers(filter = "", role) {
     return data;
 }
 
+export async function fetchCurrentUser() {
+    const response = await fetch("/api/users/user", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: 'include', // Include cookies in the request
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+}
+
 export async function updateUser(userData) {
     const response = await fetch("/api/users/updateUser", {
         method: "PUT",
