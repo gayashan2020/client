@@ -10,7 +10,6 @@ export default function AdminPage() {
     <Layout>
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
           <h1>Dashboard</h1>
-          {/* Add your main content here */}
         </Box>
     </Layout>
   );
