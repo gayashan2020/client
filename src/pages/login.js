@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
+import { routes } from "@/assets/constants/routeConstants";
 import {
   TextField,
   Button,
@@ -14,6 +14,8 @@ import {
 import { ThemeProvider } from "@mui/material/styles";
 import Cookies from "js-cookie";
 import { lightTheme as theme } from "@/styles/theme";
+import { toast } from 'react-toastify';
+import { loginUser } from "@/services/auth";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -22,32 +24,24 @@ export default function LoginForm() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     try {
-      const response = await axios.post(
-        "/api/auth",
-        {
-          email,
-          password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
+      const response = await loginUser(email, password);
+  
       if (response.status === 200) {
         // If the login is successful, store the token in a cookie
         Cookies.set("token", response.data.token);
-
-        console.log("Login successful");
-
+  
+        toast.success("Login successful");
+  
         // Then redirect to the dashboard
-        await router.push("/admin");
+        await router.push(routes.ADMIN);
       }
     } catch (error) {
       console.error("An error occurred while logging in:", error);
+  
+      // Display the error message from the API
+      toast.error(error.response.data.message);
     }
   };
 

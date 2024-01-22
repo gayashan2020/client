@@ -15,11 +15,17 @@ export default async function handler(req, res) {
     const user = await db.collection('users').findOne({ email });
 
     if (user && await comparePasswords(password, user.password)) {
-      // If the user is found and the password is correct, create a JWT
-      const token = generateToken(user);
+      // Check if the user has been approved
+      if (user.approval) {
+        // If the user is found and the password is correct, create a JWT
+        const token = generateToken(user);
 
-      // Return the JWT to the client
-      res.status(200).json({ token });
+        // Return the JWT to the client
+        res.status(200).json({ token });
+      } else {
+        // If the user has not been approved, return a 403 Forbidden status
+        res.status(403).json({ message: 'Approval has not been given by admin' });
+      }
     } else {
       // If the user is not found or the password is incorrect, return a 401 Unauthorized status
       res.status(401).json({ message: 'Invalid username or password' });

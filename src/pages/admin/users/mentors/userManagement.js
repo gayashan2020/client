@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Table,
   TableBody,
@@ -13,12 +13,21 @@ import {
   Typography,
   IconButton,
   TextField,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControl,
 } from "@mui/material";
 import Layout from "@/components/Layout";
 import { userRoles } from "@/assets/constants/authConstants";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { toast } from "react-toastify";
+import { updateUser, fetchUsers, approveUser } from "@/services/users";
+import { formatString } from "@/components/stringUtils";
+import { OCCUPATION_OPTIONS } from "@/assets/constants/adminConstants";
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -26,6 +35,8 @@ export default function UserManagement() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
+
+  const { setLoading } = useContext(LoadingContext);
 
   const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
@@ -46,19 +57,9 @@ export default function UserManagement() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("/api/users/allUsers", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ filter: "", role: userRoles.MENTOR }), // Fetch all users
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      setLoading(true);
+      const data = await fetchUsers("", userRoles.MENTOR);
+      setLoading(false);
       setUsers(data);
     } catch (error) {
       console.error("Failed to fetch users:", error);
@@ -68,24 +69,22 @@ export default function UserManagement() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Send a PUT request to the /api/updateUser endpoint with the form data
-    const response = await fetch("/api/users/updateUser", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email, // Include the email to identify the user to update
-        gender,
-        occupation,
-        city,
-        district,
-        contactNumber,
-        fullName,
-        initialsName,
-        workingStation,
-        slmcRegNumber,
-        username,
-      }),
-    });
+    const userData = {
+      email,
+      gender,
+      occupation,
+      city,
+      district,
+      contactNumber,
+      fullName,
+      initialsName,
+      workingStation,
+      slmcRegNumber,
+      username,
+    };
+    setLoading(true);
+    const response = await updateUser(userData);
+    setLoading(false);
 
     if (response.ok) {
       // Show a toast message
@@ -108,10 +107,6 @@ export default function UserManagement() {
 
       // Close the modal
       setEditOpen(false);
-
-      // Navigate to the login page
-      toast.success("Update successful!");
-      //   router.push("/login");
     } else {
       console.log("Failed to update");
       toast.error("Update failed.");
@@ -143,232 +138,271 @@ export default function UserManagement() {
 
   const handleClose = () => setOpen(false);
 
-  return (
-    <Layout>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Full Name</TableCell>
-              <TableCell>Occupation</TableCell>
-              <TableCell>Working Station</TableCell>
-              <TableCell>District</TableCell>
-              <TableCell>Contact Number</TableCell>
-              <TableCell>Username</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user._id}>
-                <TableCell>{user.fullName}</TableCell>
-                <TableCell>{user.occupation}</TableCell>
-                <TableCell>{user.workingStation}</TableCell>
-                <TableCell>{user.district}</TableCell>
-                <TableCell>{user.contactNumber}</TableCell>
-                <TableCell>{user.username}</TableCell>
-                <TableCell>
-                  <IconButton color="primary" onClick={() => handleOpen(user)}>
-                    <VisibilityIcon />
-                  </IconButton>
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleEditOpen(user)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {/* View model */}
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            border: "2px solid #000",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            User Details
-          </Typography>
-          {selectedUser && (
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Initials Name: {selectedUser.initialsName} <br />
-              Gender: {selectedUser.gender} <br />
-              Email: {selectedUser.email} <br />
-              City: {selectedUser.city} <br />
-              NIC/Passport: {selectedUser.nicOrPassport} <br />
-              SLMC Reg. Number: {selectedUser.slmcRegNumber}
-            </Typography>
-          )}
-        </Box>
-      </Modal>
+  const handleApproval = async (user) => {
+    if (window.confirm("Do you really want to approve this user?")) {
+      setLoading(true);
+      const response = await approveUser(user);
+      setLoading(false);
 
-      {/* Edit model */}
-      <Modal
-        open={editOpen}
-        onClose={handleEditClose}
-        aria-labelledby="edit-modal-title"
-        aria-describedby="edit-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            maxHeight: "90vh", // 90% of the viewport height
-            overflow: "auto", // Add a scrollbar when the content exceeds the maxHeight
-            bgcolor: "background.paper",
-            border: "2px solid #000",
-            boxShadow: 24,
-            p: 4,
-          }}
+      if (response.ok) {
+        toast.success("User approved successfully!");
+        fetchData();
+      } else {
+        toast.error("Failed to approve user.");
+      }
+    }
+  };
+
+  return (
+    <>
+      <Layout>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Full Name</TableCell>
+                <TableCell>Occupation</TableCell>
+                <TableCell>Working Station</TableCell>
+                <TableCell>District</TableCell>
+                <TableCell>Contact Number</TableCell>
+                <TableCell>Username</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user._id}>
+                  <TableCell>{user.fullName}</TableCell>
+                  <TableCell>{formatString(user.occupation)}</TableCell>
+                  <TableCell>{user.workingStation}</TableCell>
+                  <TableCell>{user.district}</TableCell>
+                  <TableCell>{user.contactNumber}</TableCell>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>
+                    <IconButton color="primary" onClick={() => handleOpen(user)}>
+                      <VisibilityIcon />
+                    </IconButton>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEditOpen(user)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    {!user.approval && (
+                      <IconButton color="primary" onClick={() => handleApproval(user)}>
+                        <CheckCircleIcon />
+                      </IconButton>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        {/* View model */}
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
         >
-          <Typography id="edit-modal-title" variant="h6" component="h2">
-            Edit User Details
-          </Typography>
-          {editUser && (
-            <form>
-              <TextField
-                margin="normal"
-                fullWidth
-                id="fullName"
-                label="Full Name"
-                name="fullName"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="initialsName"
-                label="Initials Name"
-                name="initialsName"
-                value={initialsName}
-                onChange={(e) => setInitialsName(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="workingStation"
-                label="Working Station"
-                name="workingStation"
-                value={workingStation}
-                onChange={(e) => setWorkingStation(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="slmcRegNumber"
-                label="SLMC Reg. Number"
-                name="slmcRegNumber"
-                value={slmcRegNumber}
-                onChange={(e) => setSlmcRegNumber(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="username"
-                label="Username"
-                name="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="gender"
-                label="Gender"
-                name="gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="email"
-                label="Email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="occupation"
-                label="Occupation"
-                name="occupation"
-                value={occupation}
-                onChange={(e) => setOccupation(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="district"
-                label="District"
-                name="district"
-                value={district}
-                onChange={(e) => setDistrict(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="city"
-                label="City"
-                name="city"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                required
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                id="contactNumber"
-                label="Contact Number"
-                name="contactNumber"
-                value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
-                required
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-              >
-                Update
-              </Button>
-            </form>
-          )}
-        </Box>
-      </Modal>
-    </Layout>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 400,
+              bgcolor: "background.paper",
+              border: "2px solid #000",
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              User Details
+            </Typography>
+            {selectedUser && (
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                Initials Name: {selectedUser.initialsName} <br />
+                Gender: {selectedUser.gender} <br />
+                Email: {selectedUser.email} <br />
+                City: {selectedUser.city} <br />
+                NIC/Passport: {selectedUser.nicOrPassport} <br />
+                SLMC Reg. Number: {selectedUser.slmcRegNumber}
+              </Typography>
+            )}
+          </Box>
+        </Modal>
+
+        {/* Edit model */}
+        <Modal
+          open={editOpen}
+          onClose={handleEditClose}
+          aria-labelledby="edit-modal-title"
+          aria-describedby="edit-modal-description"
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 400,
+              maxHeight: "90vh", // 90% of the viewport height
+              overflow: "auto", // Add a scrollbar when the content exceeds the maxHeight
+              bgcolor: "background.paper",
+              border: "2px solid #000",
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Typography id="edit-modal-title" variant="h6" component="h2">
+              Edit User Details
+            </Typography>
+            {editUser && (
+              <form>
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="fullName"
+                  label="Full Name"
+                  name="fullName"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="initialsName"
+                  label="Initials Name"
+                  name="initialsName"
+                  value={initialsName}
+                  onChange={(e) => setInitialsName(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="workingStation"
+                  label="Working Station"
+                  name="workingStation"
+                  value={workingStation}
+                  onChange={(e) => setWorkingStation(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="slmcRegNumber"
+                  label="SLMC Reg. Number"
+                  name="slmcRegNumber"
+                  value={slmcRegNumber}
+                  onChange={(e) => setSlmcRegNumber(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="username"
+                  label="Username"
+                  name="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="gender"
+                  label="Gender"
+                  name="gender"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="email"
+                  label="Email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                {/* <TextField
+                  margin="normal"
+                  fullWidth
+                  id="occupation"
+                  label="Occupation"
+                  name="occupation"
+                  value={occupation}
+                  onChange={(e) => setOccupation(e.target.value)}
+                  required
+                /> */}
+                <FormControl fullWidth>
+                  <InputLabel id="occupation-label">
+                    Occupation
+                  </InputLabel>
+                  <Select
+                    labelId="occupation-label"
+                    value={occupation}
+                    onChange={(e) => setOccupation(e.target.value)}
+                    required
+                  >
+                    {OCCUPATION_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="district"
+                  label="District"
+                  name="district"
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="city"
+                  label="City"
+                  name="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="contactNumber"
+                  label="Contact Number"
+                  name="contactNumber"
+                  value={contactNumber}
+                  onChange={(e) => setContactNumber(e.target.value)}
+                  required
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSubmit}
+                >
+                  Update
+                </Button>
+              </form>
+            )}
+          </Box>
+        </Modal>
+      </Layout>
+    </>
   );
 }

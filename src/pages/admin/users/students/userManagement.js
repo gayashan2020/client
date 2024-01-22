@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Table,
   TableBody,
@@ -13,8 +13,6 @@ import {
   Typography,
   IconButton,
   TextField,
-  CircularProgress,
-  Backdrop,
 } from "@mui/material";
 import Layout from "@/components/Layout";
 import { userRoles } from "@/assets/constants/authConstants";
@@ -23,6 +21,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { toast } from "react-toastify";
 import { updateUser, fetchUsers, approveUser } from "@/services/users";
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -30,7 +29,8 @@ export default function UserManagement() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+
+  const { setLoading } = useContext(LoadingContext);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -64,7 +64,7 @@ export default function UserManagement() {
     event.preventDefault();
 
     const userData = {
-      email, // Include the email to identify the user to update
+      email,
       firstName,
       lastName,
       gender,
@@ -154,9 +154,6 @@ export default function UserManagement() {
 
   return (
     <>
-      <Backdrop open={loading} style={{ color: '#fff', zIndex: 1500 }}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
       <Layout>
         <TableContainer component={Paper}>
           <Table>
