@@ -61,8 +61,8 @@ export default function AdminDashboard() {
         };
 
         getUser();
-        fetchData();
-        fetchCityData();
+        // fetchData();
+        // fetchCityData();
     }, []);
 
     return (
@@ -94,8 +94,7 @@ export default function AdminDashboard() {
                     </Box>
                 </Grid>
 
-                <Grid item xs={12} lg={5}>
-                    {/* Charts Section */}
+                {/* <Grid item xs={12} lg={5}>
                     <Box component="section" sx={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(3) }}>
                         <Paper sx={{ padding: theme.spacing(2), boxSizing: 'border-box' }}>
                             <PieChartComponent data={occupationData} />
@@ -104,7 +103,7 @@ export default function AdminDashboard() {
                             <BarChartComponent data={cityData} />
                         </Paper>
                     </Box>
-                </Grid>
+                </Grid> */}
 
                 <Grid item xs={12} lg={4}>
                     <Box component="section">
