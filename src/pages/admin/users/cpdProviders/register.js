@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   TextField,
   Button,
@@ -15,9 +15,13 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
 import { routes } from "@/assets/constants/routeConstants";
+import { registerUser } from "@/services/auth";
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 export default function RegisterForm() {
   const router = useRouter();
+
+  const { setLoading } = useContext(LoadingContext);
 
   const [password, setPassword] = useState("");
   const [institution, setInstitution] = useState("");
@@ -29,23 +33,23 @@ export default function RegisterForm() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Send a POST request to the /api/register endpoint with the form data
-    const response = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        password,
-        institution,
-        email,
-        contactNumber,
-        officialAddress,
-        username,
-        cpdProviderRegNumber,
-        role: userRoles.CPD_PROVIDER,
-      }),
-    });
 
-    if (response.ok) {
+    const userData = {
+      password,
+      institution,
+      email,
+      contactNumber,
+      officialAddress,
+      username,
+      cpdProviderRegNumber,
+      role: userRoles.CPD_PROVIDER,
+      approval: true,
+    };
+    setLoading(true);
+    const response = await registerUser(userData);
+    setLoading(false);
+
+    if (response.status === 200) {
       // Show a toast message
       toast.success("Registration successful!");
 

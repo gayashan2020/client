@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   TextField,
   Button,
@@ -26,9 +26,13 @@ import { userRoles } from "@/assets/constants/authConstants";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { routes } from "@/assets/constants/routeConstants";
+import { registerUser } from "@/services/auth";
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 export default function RegisterForm() {
   const router = useRouter();
+
+  const { setLoading } = useContext(LoadingContext);
 
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -48,30 +52,29 @@ export default function RegisterForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Send a POST request to the /api/register endpoint with the form data
-    const response = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        password,
-        firstName,
-        lastName,
-        gender,
-        email,
-        occupation,
-        city,
-        district,
-        currentStation,
-        nicOrPassport,
-        contactNumber,
-        batch,
-        faculty,
-        facultyRegNumber,
-        role: userRoles.STUDENT,
-      }),
-    });
+    const userData = {
+      password,
+      firstName,
+      lastName,
+      gender,
+      email,
+      occupation,
+      city,
+      district,
+      currentStation,
+      nicOrPassport,
+      contactNumber,
+      batch,
+      faculty,
+      facultyRegNumber,
+      role: userRoles.STUDENT,
+      approval: true,
+    };
+    setLoading(true);
+    const response = await registerUser(userData);
+    setLoading(false);
 
-    if (response.ok) {
+    if (response.status === 200) {
       // Show a toast message
       toast.success("Registration successful!");
 
@@ -91,9 +94,7 @@ export default function RegisterForm() {
       setFaculty("");
       setFacultyRegNumber("");
 
-      // Navigate to the login page
-      toast.success("Registration successful!");
-    //   router.push("/login");
+      router.push(routes.ADMIN_USERS_STUDENTS);
     } else {
       console.log("Failed to register");
       toast.error("Registration failed.");

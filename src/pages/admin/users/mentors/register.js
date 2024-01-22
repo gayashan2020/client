@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   TextField,
   Button,
@@ -23,9 +23,13 @@ import { OCCUPATION_OPTIONS } from "@/assets/constants/adminConstants";
 import citiesAndPostalCodes from "../../../../assets/constants/cities-and-postalcode-by-district.json";
 import Layout from "@/components/Layout";
 import { routes } from "@/assets/constants/routeConstants";
+import { registerUser } from "@/services/auth";
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 export default function RegisterForm() {
   const router = useRouter();
+
+  const { setLoading } = useContext(LoadingContext);
 
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -43,29 +47,29 @@ export default function RegisterForm() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Send a POST request to the /api/register endpoint with the form data
-    const response = await fetch("/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        password,
-        fullName,
-        initialsName,
-        gender,
-        email,
-        occupation,
-        workingStation,
-        city,
-        district,
-        nicOrPassport,
-        contactNumber,
-        slmcRegNumber,
-        username,
-        role: userRoles.MENTOR,
-      }),
-    });
 
-    if (response.ok) {
+    const userData = {
+      password,
+      fullName,
+      initialsName,
+      gender,
+      email,
+      occupation,
+      workingStation,
+      city,
+      district,
+      nicOrPassport,
+      contactNumber,
+      slmcRegNumber,
+      username,
+      role: userRoles.MENTOR,
+      approval: true,
+    };
+    setLoading(true);
+    const response = await registerUser(userData);
+    setLoading(false);
+
+    if (response.status === 200) {
       // Show a toast message
       toast.success("Registration successful!");
 
@@ -84,7 +88,7 @@ export default function RegisterForm() {
       setSlmcRegNumber("");
       setUsername("");
 
-      toast.success("Registration successful!");
+      router.push(routes.ADMIN_USERS_MENTORS);
     } else {
       console.log("Failed to register");
       toast.error("Registration failed.");

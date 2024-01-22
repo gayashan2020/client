@@ -18,3 +18,17 @@ export async function loginUser(email, password) {
 
   return response;
 }
+
+export async function registerUser(userData) {
+  const response = await axios.post(
+    "/api/register",
+    userData,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response;
+}
