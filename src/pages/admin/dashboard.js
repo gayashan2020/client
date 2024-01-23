@@ -15,7 +15,7 @@ import { getOccupationData, getCityData } from "@/services/dashboard";
 export default function AdminDashboard() {
     const [user, setUser] = useState(null);
     const [occupationData, setOccupationData] = useState([]);
-    const [cityData, setCityData] = useState([]);
+    const [cityData, setCityData] = useState([{district: "", count: 0}]);
 
     const { setLoading } = useContext(LoadingContext);
 
@@ -50,6 +50,7 @@ export default function AdminDashboard() {
         const fetchCityData = async () => {
             try {
                 const data = await getCityData();
+                console.log("getCityData",data);
                 if (data) {
                     setCityData(data);
                 } else {
@@ -62,7 +63,7 @@ export default function AdminDashboard() {
 
         getUser();
         fetchData();
-        // fetchCityData();
+        fetchCityData();
     }, []);
 
     return (
@@ -99,9 +100,9 @@ export default function AdminDashboard() {
                         <Paper sx={{ padding: theme.spacing(2), boxSizing: 'border-box' }}>
                             <PieChartComponent data={occupationData} />
                         </Paper>
-                        {/* <Paper sx={{ padding: theme.spacing(2), boxSizing: 'border-box' }}>
+                        <Paper sx={{ padding: theme.spacing(2), boxSizing: 'border-box' }}>
                             <BarChartComponent data={cityData} />
-                        </Paper> */}
+                        </Paper>
                     </Box>
                 </Grid>
 

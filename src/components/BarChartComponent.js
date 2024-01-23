@@ -2,12 +2,12 @@
 import { BarChart } from "@mui/x-charts";
 
 export const BarChartComponent = ({ data }) => {
-    const cities = data.map(item => item.city);
+    const districts = data.map(item => item.district);
     const counts = data.map(item => item.count);
 
     return (
         <BarChart
-            xAxis={[{ scaleType: 'band', data: cities }]}
+            xAxis={[{ scaleType: 'band', data: districts }]}
             series={[{ data: counts }]}
             width={500}
             height={300}
