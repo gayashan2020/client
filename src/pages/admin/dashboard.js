@@ -619,7 +619,9 @@ export default function AdminDashboard() {
               <Button
                 variant="contained"
                 color="secondary"
-                style={{ backgroundColor: "#1976d2", color: "white" }}
+                sx={{
+                    backgroundColor:"red"
+                }}
               >
                 Reset Password
               </Button>
@@ -627,6 +629,9 @@ export default function AdminDashboard() {
                 variant="outlined"
                 style={{ borderColor: "white", color: "white" }}
                 onClick={() => handleEditOpen(user)}
+                sx={{
+                    backgroundColor:"green"
+                }}
               >
                 Edit Profile
               </Button>
