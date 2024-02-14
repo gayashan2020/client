@@ -25,6 +25,7 @@ import {
   School,
   Business,
   CloudUpload,
+  CameraAlt
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
 import { useEffect, useState, useContext } from "react";
@@ -262,7 +263,7 @@ export default function AdminDashboard() {
 
   const handleAvatarSubmit = async () => {
     // Send a PUT or POST request to the endpoint handling file uploads
-    const response = await updateAvatar(user._id,avatar)
+    const response = await updateAvatar(user._id, avatar);
 
     // Handle the response from the file upload endpoint
     if (response.ok) {
@@ -279,21 +280,21 @@ export default function AdminDashboard() {
     event.preventDefault();
 
     const userData = {
-        email,
-        fullName,
-        gender,
-        occupation,
-        city,
-        district,
-        currentStation,
-        nicOrPassport,
-        contactNumber,
-        batch,
-        faculty,
-      };
-      setLoading(true);
-      const response = await updateUser(userData);
-      setLoading(false);
+      email,
+      fullName,
+      gender,
+      occupation,
+      city,
+      district,
+      currentStation,
+      nicOrPassport,
+      contactNumber,
+      batch,
+      faculty,
+    };
+    setLoading(true);
+    const response = await updateUser(userData);
+    setLoading(false);
 
     if (response.ok) {
       await handleAvatarSubmit();
@@ -459,32 +460,70 @@ export default function AdminDashboard() {
               position: "relative", // Position relative for absolute positioning of children
             }}
           >
-            {/* Box to contain the Avatar and give it a shadow */}
+            {/* Avatar Box */}
             <Box
               style={{
-                position: "absolute", // Absolute position of the avatar
-                top: "-40px", // Half of the avatar size to make it pop out
+                position: "absolute",
+                top: "-40px",
                 left: "50%",
                 transform: "translateX(-50%)",
-                zIndex: 1, // To lift the avatar above the Divider
+                zIndex: 1,
               }}
             >
               <Avatar
                 src={avatarPreview || user?.image}
                 sx={{
-                  width: 150, // Size of the avatar
-                  height: 150, // Size of the avatar
-                  border: "3px solid #121212", // Border color matching the Card's background
-                  boxShadow: "0 4px 8px rgba(0,0,0,0.5)", // Shadow effect for the 3D pop
+                  width: 150,
+                  height: 150,
+                  border: "3px solid #121212",
+                  boxShadow: "0 4px 8px rgba(0,0,0,0.5)",
                 }}
               />
+              {/* Upload Button Box */}
+              <Box
+                style={{
+                  position: "absolute",
+                  top: 110, // adjust this value as needed
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  zIndex: 2, // above the avatar
+                }}
+              >
+                <Button
+                  component="label"
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    backgroundColor:"white",
+                    minWidth: 0,
+                    padding: "10px",
+                    borderRadius: "50%", // Makes the button circular
+                    position: "absolute", // Position the button absolutely
+                    top: "calc(100% - 10px)", // Position it 20px from the bottom of the avatar
+                    left: "calc(50% - 20px)", // Center it horizontally with respect to the avatar
+                    boxShadow: 3, // Apply some shadow for better visibility
+                    "& .MuiButton-startIcon": {
+                      margin: 0, // Remove the margin from the start icon
+                    },
+                    "& .MuiButton-label": {
+                      display: "none", // Hide the label
+                    },
+                  }}
+                >
+                  <CameraAlt />
+                  <VisuallyHiddenInput
+                    type="file"
+                    onChange={handleAvatarChange}
+                  />
+                </Button>
+              </Box>
             </Box>
             <CardContent style={{ marginTop: "60px" }}>
               <Typography
                 variant="h5"
                 component="div"
                 align="center"
-                style={{ paddingTop: "100px" }}
+                style={{ paddingTop: "120px" }}
               >
                 {user?.fullName}
               </Typography>
@@ -495,19 +534,20 @@ export default function AdminDashboard() {
               >
                 {user?.role}
               </Typography>
-              <Button
+              {/* <Button
                 component="label"
                 role={undefined}
                 variant="contained"
                 tabIndex={-1}
                 startIcon={<CloudUpload />}
+                style={{ alignContent: "center" }}
               >
                 Upload New Avatar
                 <VisuallyHiddenInput
                   type="file"
                   onChange={handleAvatarChange}
                 />
-              </Button>
+              </Button> */}
               <List dense style={{ position: "relative", marginTop: "20px" }}>
                 {/* Vertical line container */}
                 <Box
