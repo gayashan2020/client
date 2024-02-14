@@ -25,7 +25,7 @@ import {
   School,
   Business,
   CloudUpload,
-  CameraAlt
+  CameraAlt,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
 import { useEffect, useState, useContext } from "react";
@@ -399,6 +399,22 @@ export default function AdminDashboard() {
         justifyContent: "space-around",
         padding: "40px 20px",
       }}
+      sx={{
+        display: "flex",
+        justifyContent: "space-around",
+        padding: "40px 20px",
+        "& .roleBox": {
+          // Adding a className for reference
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          transition: "transform 0.4s ease-in-out", // Smooth transition for transform
+          "&:hover": {
+            transform: "scale(1.1)", // Scale up box slightly on hover
+            cursor: "pointer", // Change cursor to indicate clickable
+          },
+        },
+      }}
     >
       <Box
         display="flex"
@@ -407,6 +423,7 @@ export default function AdminDashboard() {
         onClick={() =>
           router.push(routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT)
         }
+        className="roleBox"
       >
         <AccountBox fontSize="large" />
         <Typography>Admin</Typography>
@@ -416,6 +433,7 @@ export default function AdminDashboard() {
         flexDirection="column"
         alignItems="center"
         onClick={() => router.push(routes.ADMIN_USERS_STUDENTS_USER_MANAGEMENT)}
+        className="roleBox"
       >
         <School fontSize="large" />
         <Typography>Mentee</Typography>
@@ -425,6 +443,7 @@ export default function AdminDashboard() {
         flexDirection="column"
         alignItems="center"
         onClick={() => router.push(routes.ADMIN_USERS_MENTORS_USER_MANAGEMENT)}
+        className="roleBox"
       >
         <People fontSize="large" />
         <Typography>Mentor</Typography>
@@ -436,6 +455,7 @@ export default function AdminDashboard() {
         onClick={() =>
           router.push(routes.ADMIN_USERS_CPD_PROVIDERS_USER_MANAGEMENT)
         }
+        className="roleBox"
       >
         <Business fontSize="large" />
         <Typography>CPD Provider</Typography>
@@ -494,7 +514,7 @@ export default function AdminDashboard() {
                   variant="contained"
                   color="primary"
                   sx={{
-                    backgroundColor:"white",
+                    backgroundColor: "white",
                     minWidth: 0,
                     padding: "10px",
                     borderRadius: "50%", // Makes the button circular
@@ -620,7 +640,7 @@ export default function AdminDashboard() {
                 variant="contained"
                 color="secondary"
                 sx={{
-                    backgroundColor:"red"
+                  backgroundColor: "red",
                 }}
               >
                 Reset Password
@@ -630,7 +650,7 @@ export default function AdminDashboard() {
                 color="secondary"
                 onClick={() => handleEditOpen(user)}
                 sx={{
-                    backgroundColor:"green"
+                  backgroundColor: "green",
                 }}
               >
                 Edit Profile
