@@ -12,12 +12,13 @@ import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import { useRouter } from "next/router";
 import { darkTheme as theme } from "@/styles/theme";
-import {userRoles} from "@/assets/constants/authConstants";
-import {routes} from "@/assets/constants/routeConstants";
+import { userRoles } from "@/assets/constants/authConstants";
+import { routes } from "@/assets/constants/routeConstants";
 
 export default function Layout({ children }) {
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const drawerWidth = 12;
 
   useEffect(() => {
     fetch("/api/users/user")
@@ -66,9 +67,16 @@ export default function Layout({ children }) {
         </Drawer>
         <Box
           component="main"
-          sx={{ flexGrow: 1, p: 3, color: "#fff", backgroundColor: "#121212" }}
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            marginLeft: drawerWidth, // Add marginLeft equal to the drawer width
+            width: `calc(100% - ${drawerWidth}px)`, // Adjust width to account for the drawer
+            backgroundColor: "#121212",
+            color: "#fff",
+          }}
         >
-          {children} {/* This is where the current page will be rendered */}
+          {children}
         </Box>
       </Box>
     </ThemeProvider>
