@@ -68,9 +68,10 @@ export default function Index() {
   };
 
   const navigateToCourse = (course) => {
-    // This will open the course link in a new tab
-    window.open(course.link, "_blank");
+    // Navigate to the dynamic route for course details
+    router.push(`/admin/courses/${course._id}`);
   };
+  
 
   return (
     <Layout>

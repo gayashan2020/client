@@ -48,3 +48,47 @@ export async function fetchCourses(filter = "") {
   const data = await response.json();
   return data;
 }
+
+export const fetchCourseById = async (courseId) => {
+  const response = await fetch(`/api/courses/${courseId}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch course");
+  }
+  return await response.json();
+};
+
+export async function enrollToCourse(userId, courseId) {
+  const response = await fetch("/api/courses/enroll", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId, courseId }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(`Enrollment error! ${errorData.message}`);
+  }
+
+  return await response.json();
+}
+
+export async function getEnrolledDataByCourse(userId, courseId) {
+  console.log("getEnrolledDataByCourse", userId, courseId);
+  const response = await fetch("/api/courses/getEnrolledDataByCourse", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId, courseId }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(`Enrollment error! ${errorData.message}`);
+  }
+
+  return await response.json();
+}
+
