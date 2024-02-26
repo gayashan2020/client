@@ -15,6 +15,7 @@ import {
   ListItemText,
   Modal,
   TextField,
+  Tooltip
 } from "@mui/material";
 import {
   Phone,
@@ -594,12 +595,20 @@ export default function AdminDashboard() {
                     </ListItemIcon>
                     <ListItemText
                       primary={
-                        <Typography
-                          type="body2"
-                          style={{ color: "white", marginLeft: "45px" }}
-                        >
-                          {info.text}
-                        </Typography>
+                        <Tooltip title={info.text} placement="top">
+                          <Typography
+                            type="body2"
+                            sx={{
+                              color: "white",
+                              marginLeft: "45px",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {info.text}
+                          </Typography>
+                        </Tooltip>
                       }
                     />
                   </ListItem>

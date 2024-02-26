@@ -58,11 +58,22 @@ export default function Layout({ children }) {
               <ListItemText primary="Dashboard" />
             </ListItemButton>
             {/* admin Registration */}
-            {user && user.role === userRoles.SUPER_ADMIN && (
-              <ListItemButton component="a" href={routes.ADMIN_USERS}>
-                <ListItemText primary="Users" />
-              </ListItemButton>
-            )}
+            {user &&
+              [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
+                <ListItemButton component="a" href={routes.ADMIN_USERS}>
+                  <ListItemText primary="Users" />
+                </ListItemButton>
+              )}
+            {user &&
+              [
+                userRoles.SUPER_ADMIN,
+                userRoles.ADMIN,
+                userRoles.CPD_PROVIDER,
+              ].includes(user.role) && (
+                <ListItemButton component="a" href={routes.ADMIN_COURSES}>
+                  <ListItemText primary="Courses" />
+                </ListItemButton>
+              )}
           </List>
         </Drawer>
         <Box
