@@ -72,3 +72,20 @@ export async function approveUser(user) {
 
   return response;
 }
+
+export async function sendEmail(options) {
+  const response = await fetch("/api/users/sendEmail", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(options),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
+}

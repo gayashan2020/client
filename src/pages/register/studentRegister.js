@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   TextField,
   Button,
@@ -24,6 +24,10 @@ import {
 import {userRoles} from "@/assets/constants/authConstants";
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
+import { sendEmail } from "@/services/users";
+import { LoadingContext } from "@/contexts/LoadingContext";
+import { Email } from "../../../emails/basicTemplate";
+import { render } from "@react-email/render";
 
 export default function RegisterForm() {
 
@@ -43,6 +47,7 @@ export default function RegisterForm() {
   const [batch, setBatch] = useState("");
   const [faculty, setFaculty] = useState("");
   const [facultyRegNumber, setFacultyRegNumber] = useState("");
+  const { setLoading } = useContext(LoadingContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -89,6 +94,20 @@ export default function RegisterForm() {
       setBatch("");
       setFaculty("");
       setFacultyRegNumber("");
+
+      
+      setLoading(true);
+      const emailHtml = render(
+        <Email email={email} password={password} fullName={fullName} />
+      );
+      const options = {
+        to: email,
+        subject: "Email Confirmation",
+        html: emailHtml,
+      };
+
+      await sendEmail(options);
+      setLoading(false);
     
       // Navigate to the login page
       toast.success("Registration successful!");

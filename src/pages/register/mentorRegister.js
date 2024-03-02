@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   TextField,
   Button,
@@ -22,6 +22,10 @@ import { useRouter } from "next/router";
 import { GENDER_OPTIONS } from "@/assets/constants/studentConstants";
 import { OCCUPATION_OPTIONS } from "@/assets/constants/adminConstants";
 import citiesAndPostalCodes from "../../assets/constants/cities-and-postalcode-by-district.json";
+import { sendEmail } from "@/services/users";
+import { LoadingContext } from "@/contexts/LoadingContext";
+import { Email } from "../../../emails/basicTemplate";
+import { render } from "@react-email/render";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -39,10 +43,12 @@ export default function RegisterForm() {
   const [contactNumber, setContactNumber] = useState("");
   const [slmcRegNumber, setSlmcRegNumber] = useState("");
   const [username, setUsername] = useState("");
+  const { setLoading } = useContext(LoadingContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     // Send a POST request to the /api/register endpoint with the form data
+    setLoading(true);
     const response = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -63,7 +69,7 @@ export default function RegisterForm() {
         role: userRoles.STUDENT,
       }),
     });
-
+    setLoading(false);
     if (response.ok) {
       // Show a toast message
       toast.success("Registration successful!");
@@ -83,9 +89,22 @@ export default function RegisterForm() {
       setSlmcRegNumber("");
       setUsername("");
 
+      setLoading(true);
+      const emailHtml = render(
+        <Email email={email} password={password} fullName={fullName} />
+      );
+      const options = {
+        to: email,
+        subject: "Email Confirmation",
+        html: emailHtml,
+      };
+
+      await sendEmail(options);
+      setLoading(false);
+      
       toast.success("Registration successful!");
       // Navigate to the login page
-      router.push("/login");
+      await router.push("/login");
     } else {
       console.log("Failed to register");
       toast.error("Registration failed.");

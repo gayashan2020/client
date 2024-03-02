@@ -1,6 +1,6 @@
 // components/LoginForm.js
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useRouter } from "next/router";
 import { routes } from "@/assets/constants/routeConstants";
 import {
@@ -16,22 +16,26 @@ import Cookies from "js-cookie";
 import { lightTheme as theme } from "@/styles/theme";
 import { toast } from 'react-toastify';
 import { loginUser } from "@/services/auth";
+import { LoadingContext } from "@/contexts/LoadingContext";
+
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const { setLoading } = useContext(LoadingContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
   
     try {
+      setLoading(true);
       const response = await loginUser(email, password);
-  
+      setLoading(false);
       if (response.status === 200) {
         // If the login is successful, store the token in a cookie
         Cookies.set("token", response.data.token);
-  
+
         toast.success("Login successful");
   
         // Then redirect to the dashboard
@@ -39,9 +43,9 @@ export default function LoginForm() {
       }
     } catch (error) {
       console.error("An error occurred while logging in:", error);
-  
+      setLoading(false);
       // Display the error message from the API
-      toast.error(error.response.data.message);
+      toast.error("An error occurred while logging in");
     }
   };
 
