@@ -69,6 +69,7 @@ export default function Layout({ children }) {
                 userRoles.SUPER_ADMIN,
                 userRoles.ADMIN,
                 userRoles.CPD_PROVIDER,
+                userRoles.STUDENT
               ].includes(user.role) && (
                 <ListItemButton component="a" href={routes.ADMIN_COURSES}>
                   <ListItemText primary="Courses" />

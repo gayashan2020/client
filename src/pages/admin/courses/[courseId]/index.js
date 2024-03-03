@@ -18,6 +18,7 @@ import {
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { fetchCurrentUser } from "@/services/users";
 import { toast } from "react-toastify";
+import { userRoles } from "@/assets/constants/authConstants";
 
 export default function CourseDetail() {
   const [course, setCourse] = useState(null);
@@ -59,7 +60,7 @@ export default function CourseDetail() {
     try {
       setLoading(true);
       const data = await getEnrolledDataByCourse(currentUser._id, courseId);
-      console.log(data,"data");
+
       setLoading(false);
       setEnroll(data[0].enrollStatus);
     } catch (error) {
@@ -115,14 +116,20 @@ export default function CourseDetail() {
               Min CPD Points: {course.cpdMin}
             </Typography>
             <Typography variant="body2" sx={{ mb: 2 }} gutterBottom>
-              Duration: {course.duration} weeks
+              Duration: {course.duration} hours
             </Typography>
             <Button
               variant="contained"
-              style={{
-                backgroundColor: "rgb(32 176 31)",
-                color: "#ffffff",
-              }}
+              // style={{
+              //   backgroundColor: "rgb(32 176 31)",
+              //   color: "#ffffff",
+              // }}
+              style={
+                !enroll
+                  ? { backgroundColor: "rgb(32 176 31)", color: "#ffffff" }
+                  : {}
+              }
+              disabled={enroll}
               onClick={handleEnroll}
             >
               Enroll
@@ -154,6 +161,21 @@ export default function CourseDetail() {
             >
               Back
             </Button>
+            {user &&
+              [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
+                <Button
+                  style={{
+                    marginLeft: "1rem",
+                    backgroundColor: "rgb(240 35 35)",
+                    color: "#ffffff",
+                  }}
+                  onClick={() =>
+                    router.push(`/admin/courses/${course._id}/editCourse`)
+                  }
+                >
+                  Edit Course
+                </Button>
+              )}
           </Grid>
         </Grid>
       </Container>

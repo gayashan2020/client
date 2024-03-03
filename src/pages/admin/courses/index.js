@@ -40,20 +40,20 @@ export default function Index() {
 
   const cardStyle = {
     width: 250, // You can set this to the size you desire
-    // height: 250, // Making the height the same as width to create a square
+    height: 400, // Making the height the same as width to create a square
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center", // This centers the content vertically
+    // justifyContent: "center", // This centers the content vertically
     alignItems: "center", // This centers the content horizontally
     textAlign: "center", // Ensures text is centered within the content area
-    "&:hover": {
-      transform: "scale(1.05)", // Slightly increase the size of the card on hover
-      transition: "transform 0.3s ease-in-out", // Smooth transition for the transform
-      minHeight: "auto", // Ensure the card expands to fill the available space
-      zIndex: 1, // Ensure the card is above others when it expands
-      position: "relative", // Position relative for proper stacking context
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)", // Optional: add shadow for better emphasis
-    },
+    // "&:hover": {
+    //   transform: "scale(1.05)", // Slightly increase the size of the card on hover
+    //   transition: "transform 0.3s ease-in-out", // Smooth transition for the transform
+    //   minHeight: "auto", // Ensure the card expands to fill the available space
+    //   zIndex: 1, // Ensure the card is above others when it expands
+    //   position: "relative", // Position relative for proper stacking context
+    //   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)", // Optional: add shadow for better emphasis
+    // },
   };
 
   const fetchData = async () => {
@@ -78,15 +78,15 @@ export default function Index() {
       <Grid
         container
         spacing={2}
-        alignItems="center"
-        justifyContent="center"
-        style={{ minHeight: "100vh" }}
+        alignItems="start"
+        justifyContent="flex-start"
+        style={{ padding: '20px' }}
       >
         {courses.map((course) => (
           <Grid item key={course._id["$oid"]} xs={12} sm={6} md={4} lg={3}>
             <Card sx={cardStyle} onClick={() => navigateToCourse(course)}>
               <CardActionArea
-                sx={{ height: 250, "&:hover": { height: "auto" } }}
+                sx={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: "flex-start" }}
               >
                 {course.image && (
                   <CardMedia
@@ -100,13 +100,13 @@ export default function Index() {
                   <Typography variant="h5" component="div" gutterBottom>
                     {course.name}
                   </Typography>
-                  <Typography
+                  {/* <Typography
                     variant="body2"
                     color="text.secondary"
                     gutterBottom
                   >
                     {course.description}
-                  </Typography>
+                  </Typography> */}
                   <Box
                     display="flex"
                     justifyContent="space-between"
@@ -121,7 +121,7 @@ export default function Index() {
                       color="text.primary"
                       fontWeight="fontWeightMedium"
                     >
-                      {course.duration} weeks
+                      {course.duration} hours
                     </Typography>
                   </Box>
                   <Box

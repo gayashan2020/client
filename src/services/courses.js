@@ -92,3 +92,21 @@ export async function getEnrolledDataByCourse(userId, courseId) {
   return await response.json();
 }
 
+export async function updateCourse(courseId, updateData) {
+  const response = await fetch("/api/courses/updateCourse", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: courseId,
+      update: updateData,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error updating course: ${response.status}`);
+  }
+
+  return response.json();
+}
