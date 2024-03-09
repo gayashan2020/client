@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -7,16 +7,20 @@ import {
   Grid,
   Container,
   Card,
-  CardContent,
   CardMedia,
   CardActionArea,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import Layout from "@/components/Layout";
 import { toast } from "react-toastify";
 import { addCourse, updateCourseImage } from "@/services/courses";
 import { styled } from "@mui/material/styles";
-import { set } from "mongoose";
+import { addCategories, fetchCategories } from "@/services/courseCategories";
 
 export default function Index() {
   const { setLoading } = useContext(LoadingContext);
@@ -24,7 +28,7 @@ export default function Index() {
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
-  const [category, setCategory] = useState("");
+  // const [category, setCategory] = useState("");
   const [duration, setDuration] = useState("");
   const [cpdTotal, setCpdTotal] = useState(0);
   const [cpdMin, setCpdMin] = useState(0);
@@ -35,6 +39,21 @@ export default function Index() {
   const [objectives, setObjectives] = useState("");
   const [authors, setAuthors] = useState("");
   const [keywords, setKeywords] = useState("");
+
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [open, setOpen] = useState(false);
+  const [category, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const categories = await fetchCategories();
+      setLoading(false);
+      setCategories(categories);
+    };
+    fetchData();
+  }, []);
 
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -47,6 +66,29 @@ export default function Index() {
     whiteSpace: "nowrap",
     width: 1,
   });
+
+  const handleSelectChange = (event) => {
+    setSelectedCategory(event.target.value);
+  };
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleAddCategory = async () => {
+    try {
+      setLoading(true);
+      await addCategories({ category });
+      setLoading(false);
+      handleClose();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -99,7 +141,7 @@ export default function Index() {
     const response = await addCourse(dataObject);
     setLoading(false);
     if (response.message && response.body.insertedId) {
-      console.log(response.body.insertedId);
+
       setLoading(true);
       await handleImageSubmit(response.body.insertedId);
       setLoading(false);
@@ -108,7 +150,6 @@ export default function Index() {
       setName("");
       setImage("");
       setImagePreview("");
-      setCategory("");
       setDuration("");
       setCpdTotal("");
       setCpdMin("");
@@ -185,14 +226,35 @@ export default function Index() {
                   />
                 </Grid> */}
                 <Grid item xs={12}>
-                  <TextField
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    label="Course Category"
-                    required
+                  <Select
+                    value={category ? category : selectedCategory}
+                    onChange={handleSelectChange}
                     fullWidth
-                  />
+                  >
+                    {categories.map((category) => (
+                      <MenuItem key={category._id} value={category.category}>
+                        {category.category}
+                      </MenuItem>
+                    ))}
+                    <MenuItem value="addNew" onClick={handleOpen}>
+                      Add New
+                    </MenuItem>
+                  </Select>
                 </Grid>
+
+                <Dialog open={open} onClose={handleClose}>
+                  <DialogTitle>Add New Category</DialogTitle>
+                  <DialogContent>
+                    <TextField
+                      value={category}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleAddCategory}>Add</Button>
+                  </DialogActions>
+                </Dialog>
                 <Grid item xs={12}>
                   <TextField
                     type="number"

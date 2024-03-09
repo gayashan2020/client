@@ -43,7 +43,7 @@ export default function Index() {
   const [keywords, setKeywords] = useState("");
 
   const router = useRouter();
-  const { courseId } = router.query;
+  const { categoryId, courseId } = router.query;
 
   const [course, setCourse] = useState(null);
   const [user, setUser] = useState(null);
@@ -67,7 +67,7 @@ export default function Index() {
   const fetchCourseData = async () => {
     try {
       setLoading(true);
-      const data = await fetchCourseById(courseId);
+      const data = await fetchCourseById(categoryId, courseId);
       setName(data.name);
       setImagePreview(data.image ? data.image : "");
       setCategory(data.category);

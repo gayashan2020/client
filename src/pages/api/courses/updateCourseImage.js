@@ -29,7 +29,6 @@ router.put(async (req, res) => {
   // Create the file name using the courseId
   const filename = `courseImage_${courseId}.png`;
   const filePath = path.join(process.cwd(), "public", "images", filename);
-  console.log(filePath, "filepath");
   // Write the file to the file system in the public/images directory
   fs.writeFile(filePath, file.buffer, async (err) => {
     if (err) {

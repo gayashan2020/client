@@ -1,3 +1,5 @@
+// src\pages\admin\courses\[categoryId]\[courseId]\index.js
+
 import React, { useEffect, useState, useContext } from "react";
 import {
   Button,
@@ -25,7 +27,7 @@ export default function CourseDetail() {
   const [user, setUser] = useState(null);
   const [enroll, setEnroll] = useState(false);
   const router = useRouter();
-  const { courseId } = router.query;
+  const { categoryId, courseId } = router.query;
 
   const { setLoading } = useContext(LoadingContext);
 
@@ -48,7 +50,7 @@ export default function CourseDetail() {
   const fetchCourseData = async () => {
     try {
       setLoading(true);
-      const data = await fetchCourseById(courseId);
+      const data = await fetchCourseById(categoryId, courseId);
       setLoading(false);
       setCourse(data);
     } catch (error) {
@@ -170,7 +172,7 @@ export default function CourseDetail() {
                     color: "#ffffff",
                   }}
                   onClick={() =>
-                    router.push(`/admin/courses/${course._id}/editCourse`)
+                    router.push(`/admin/courses/${categoryId}/${course._id}/editCourse`)
                   }
                 >
                   Edit Course

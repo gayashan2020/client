@@ -49,8 +49,8 @@ export async function fetchCourses(filter = "") {
   return data;
 }
 
-export const fetchCourseById = async (courseId) => {
-  const response = await fetch(`/api/courses/${courseId}`);
+export const fetchCourseById = async (categoryId, courseId) => {
+  const response = await fetch(`/api/courses/${categoryId}/${courseId}`);
   if (!response.ok) {
     throw new Error("Failed to fetch course");
   }
@@ -110,3 +110,11 @@ export async function updateCourse(courseId, updateData) {
 
   return response.json();
 }
+
+export const fetchCoursesByCategoryId = async (categoryId) => {
+  const response = await fetch(`/api/courses/${categoryId}/`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch course");
+  }
+  return await response.json();
+};
