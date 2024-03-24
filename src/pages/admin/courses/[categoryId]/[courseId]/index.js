@@ -32,6 +32,8 @@ export default function CourseDetail() {
   const { setLoading } = useContext(LoadingContext);
 
   useEffect(() => {
+    if (!router.isReady) return;
+  
     setLoading(true);
     fetchCourseData();
     fetchCurrentUser()
@@ -45,7 +47,7 @@ export default function CourseDetail() {
       .finally(() => {
         setLoading(false);
       });
-  }, [setLoading]);
+  }, [router.isReady, setLoading]);
 
   const fetchCourseData = async () => {
     try {

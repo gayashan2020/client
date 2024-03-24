@@ -28,6 +28,7 @@ export default function Index() {
   const { categoryId } = router.query;
 
   useEffect(() => {
+    if (!router.isReady) return;
     setLoading(true);
     fetchData();
     fetchCurrentUser()
@@ -40,7 +41,7 @@ export default function Index() {
       .finally(() => {
         setLoading(false);
       });
-  }, [setLoading]);
+    }, [router.isReady, setLoading]);
 
   const cardStyle = {
     width: 250, // You can set this to the size you desire

@@ -53,6 +53,7 @@ export default function Index() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    if (!router.isReady) return;
     setLoading(true);
     fetchCourseData();
     fetchCategoryData();
@@ -67,7 +68,7 @@ export default function Index() {
       .finally(() => {
         setLoading(false);
       });
-  }, [setLoading]);
+  }, [router.isReady, setLoading]);
 
   const handleSelectChange = (event) => {
     const selectedIndex = event.target.value;
@@ -189,7 +190,7 @@ export default function Index() {
     setLoading(false);
     if (response.message === "Course updated successfully") {
       setLoading(true);
-      if (image && image.type.startsWith('image/')) {
+      if (image && image.type.startsWith("image/")) {
         await handleImageSubmit(courseId);
       }
       setLoading(false);
