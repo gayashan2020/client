@@ -1,4 +1,4 @@
-// pages/api/allCourses.js
+// src\pages\api\courses\getCourses.js
 
 import dbConnect from '@/lib/dbConnect';
 

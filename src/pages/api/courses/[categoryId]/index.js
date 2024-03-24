@@ -12,17 +12,9 @@ export default async function handler(req, res) {
     const { db } = await dbConnect();
 
     try {
-      const category = await db.collection("courseCategories").findOne({
-        _id: new ObjectId(categoryId),
-      });
-
-      // Check if the category was found
-      if (!category) {
-        return res.status(404).json({ message: "Category not found" });
-      }
-
+      // Find courses by category ID
       const courses = await db.collection("courses").find({
-        category: category.category,
+        categoryId: categoryId,
       }).toArray(); // Convert cursor to array
 
       // Check if any courses were found

@@ -37,4 +37,5 @@ export const routes = {
   //admin courses------------------------------
   ADMIN_COURSES: "/admin/courses",
   ADMIN_COURSES_ADD_COURSE: "/admin/courses/addCourses",
+  ADMIN_COURSES_MANAGE_COURSE: "/admin/courses/manageCourses",
 };

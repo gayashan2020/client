@@ -5,38 +5,74 @@ import {
   CardContent,
   Typography,
   Grid,
-  CardMedia,
   Box,
+  Modal,
+  TextField,
+  Button,
 } from "@mui/material";
 import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
-import { routes } from "@/assets/constants/routeConstants";
-import { fetchCategories } from "@/services/courseCategories";
+import { fetchCategories, addCategories } from "@/services/courseCategories";
 import { fetchCurrentUser } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
 
 export default function Index() {
   const [categories, setCategories] = useState([]);
   const [user, setUser] = useState(null);
-
+  const [open, setOpen] = useState(false); // For modal visibility
+  const [newCategory, setNewCategory] = useState(""); // For new category name
   const { setLoading } = useContext(LoadingContext);
+  const router = useRouter();
 
   useEffect(() => {
     setLoading(true);
-    fetchData();
-    fetchCurrentUser()
-      .then((currentUser) => {
-        setUser(currentUser);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch current user", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    fetchCategoriesAndUser();
   }, [setLoading]);
 
-  const router = useRouter();
+  const fetchCategoriesAndUser = async () => {
+    try {
+      const categoriesData = await fetchCategories();
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+    try {
+      const currentUser = await fetchCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      console.error("Failed to fetch current user", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      await addCategories({ category: newCategory });
+      fetchCategoriesAndUser(); // Refresh the list of categories
+      setNewCategory(""); // Clear the input field
+      handleClose(); // Close the modal
+    } catch (error) {
+      console.error("Failed to add category:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+  };
 
   const cardStyle = {
     width: 250, // You can set this to the size you desire
@@ -45,17 +81,6 @@ export default function Index() {
     flexDirection: "column",
     alignItems: "center", // This centers the content horizontally
     textAlign: "center", // Ensures text is centered within the content area
-  };
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchCategories("");
-      setLoading(false);
-      setCategories(data);
-    } catch (error) {
-      console.error("Failed to fetch categories:", error);
-    }
   };
 
   const navigateToCategory = (category) => {
@@ -87,7 +112,51 @@ export default function Index() {
             </Grid>
           </Grid>
         ))}
+        <Grid item key={"addCategory"} xs={12} sm={6} md={4} lg={3}>
+          <Grid item>
+            <Card sx={cardStyle} onClick={handleOpen}>
+              <CardActionArea sx={{ height: "100%", minHeight: "100px" }}>
+                <CardContent>
+                  <Typography variant="h5" component="div">
+                    Add a New Category
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          </Grid>
+        </Grid>
       </Grid>
+
+      {/* Add Category Modal */}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={modalStyle}>
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            marginBottom={2}
+          >
+            Add New Category
+          </Typography>
+          <TextField
+            fullWidth
+            label="Category Name"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            margin="normal"
+          />
+          <Box textAlign="right">
+            <Button onClick={handleSubmit} variant="contained" sx={{ mt: 2 }}>
+              Submit
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Layout>
   );
 }

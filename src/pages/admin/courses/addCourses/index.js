@@ -68,26 +68,11 @@ export default function Index() {
   });
 
   const handleSelectChange = (event) => {
-    setSelectedCategory(event.target.value);
-  };
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleAddCategory = async () => {
-    try {
-      setLoading(true);
-      await addCategories({ category });
-      setLoading(false);
-      handleClose();
-    } catch (error) {
-      console.error(error);
-    }
+    const selectedIndex = event.target.value;
+    const selectedCategory = categories.find(
+      (category) => category._id === selectedIndex
+    );
+    setSelectedCategory(selectedCategory || {});
   };
 
   const handleImageChange = (event) => {
@@ -123,17 +108,18 @@ export default function Index() {
     const dataObject = {
       name,
       image,
-      category,
+      category: selectedCategory.category,
+      categoryId: selectedCategory._id,
       duration,
-      cpdTotal,
-      cpdMin,
+      cpdTotal: Number(cpdTotal),
+      cpdMin: Number(cpdMin),
       type,
       link,
       creator,
       description,
       objectives,
       authors,
-      keywords,
+      keywords: keywords.split(",").map((keyword) => keyword.trim()),
       approved: false,
     };
 
@@ -141,7 +127,6 @@ export default function Index() {
     const response = await addCourse(dataObject);
     setLoading(false);
     if (response.message && response.body.insertedId) {
-
       setLoading(true);
       await handleImageSubmit(response.body.insertedId);
       setLoading(false);
@@ -227,34 +212,24 @@ export default function Index() {
                 </Grid> */}
                 <Grid item xs={12}>
                   <Select
-                    value={category ? category : selectedCategory}
+                    value={selectedCategory._id || ""}
                     onChange={handleSelectChange}
+                    displayEmpty
                     fullWidth
+                    renderValue={
+                      selectedCategory._id
+                        ? undefined
+                        : () => <em>Choose a category</em>
+                    }
                   >
                     {categories.map((category) => (
-                      <MenuItem key={category._id} value={category.category}>
+                      <MenuItem key={category._id} value={category._id}>
                         {category.category}
                       </MenuItem>
                     ))}
-                    <MenuItem value="addNew" onClick={handleOpen}>
-                      Add New
-                    </MenuItem>
                   </Select>
                 </Grid>
 
-                <Dialog open={open} onClose={handleClose}>
-                  <DialogTitle>Add New Category</DialogTitle>
-                  <DialogContent>
-                    <TextField
-                      value={category}
-                      onChange={(e) => setNewCategory(e.target.value)}
-                    />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleAddCategory}>Add</Button>
-                  </DialogActions>
-                </Dialog>
                 <Grid item xs={12}>
                   <TextField
                     type="number"

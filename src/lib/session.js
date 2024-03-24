@@ -1,6 +1,5 @@
 // lib/session.js
 
-import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import Cookies from 'cookie';
 

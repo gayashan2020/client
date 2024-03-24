@@ -1,4 +1,4 @@
-// src\pages\api\courses\[courseId].js
+// src\pages\api\courses\[categoryId]\[courseId].js
 
 import dbConnect from '@/lib/dbConnect';
 import { ObjectId } from 'mongodb';

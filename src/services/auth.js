@@ -32,3 +32,8 @@ export async function registerUser(userData) {
 
   return response;
 }
+
+export async function logoutUser() {
+  const response = await axios.delete("/api/auth");
+  return response;
+}

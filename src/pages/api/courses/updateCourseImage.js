@@ -26,6 +26,8 @@ router.put(async (req, res) => {
     return;
   }
 
+  try {
+  } catch (error) {}
   // Create the file name using the courseId
   const filename = `courseImage_${courseId}.png`;
   const filePath = path.join(process.cwd(), "public", "images", filename);
@@ -37,19 +39,22 @@ router.put(async (req, res) => {
       return;
     }
 
-    // Update the user's image path in the database
-    const imageUrl = `/images/${filename}`;
-    const result = await db.collection("courses").updateOne(
-      { _id: new ObjectId(courseId) }, // Use `new` keyword here
-      { $set: { image: imageUrl } }
-    );
+    try {
+      // Update the user's image path in the database
+      const imageUrl = `/images/${filename}`;
+      const result = await db.collection("courses").updateOne(
+        { _id: new ObjectId(courseId) }, // Use `new` keyword here
+        { $set: { image: imageUrl } }
+      );
 
-    if (result.modifiedCount > 0) {
-      res
-        .status(200)
-        .send({ message: "Avatar updated successfully", imageUrl });
-    } else {
-      res.status(404).send({ message: "User not found" });
+      if (result.matchedCount === 0) {
+        return res.status(404).send({ message: "Course not found" });
+      }
+
+      res.status(200).send({ message: "Image updated successfully", imageUrl });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: "Error updating course image" });
     }
   });
 });

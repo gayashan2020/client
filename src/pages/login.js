@@ -34,7 +34,12 @@ export default function LoginForm() {
       setLoading(false);
       if (response.status === 200) {
         // If the login is successful, store the token in a cookie
-        Cookies.set("token", response.data.token);
+        Cookies.set("token", response.data.token, {
+          expires: 7, // Cookie will expire in 7 days
+          path: '/', // Cookie will be accessible for the whole site
+          secure: true, // Cookie will only be transmitted over secure protocol as HTTPS
+          sameSite: 'Strict', // Strict SameSite policy to mitigate CSRF attacks
+        });
 
         toast.success("Login successful");
   

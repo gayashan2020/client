@@ -10,6 +10,7 @@ import {
   CardContent,
   CardMedia,
   CardActionArea,
+  MenuItem,
 } from "@mui/material";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import Layout from "@/components/Layout";
@@ -22,6 +23,7 @@ import {
 } from "@/services/courses";
 import { styled } from "@mui/material/styles";
 import { fetchCurrentUser } from "@/services/users";
+import { fetchCategories } from "@/services/courseCategories";
 import { useRouter } from "next/router";
 
 export default function Index() {
@@ -41,6 +43,8 @@ export default function Index() {
   const [objectives, setObjectives] = useState("");
   const [authors, setAuthors] = useState("");
   const [keywords, setKeywords] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [categories, setCategories] = useState([]);
 
   const router = useRouter();
   const { categoryId, courseId } = router.query;
@@ -51,6 +55,7 @@ export default function Index() {
   useEffect(() => {
     setLoading(true);
     fetchCourseData();
+    fetchCategoryData();
     fetchCurrentUser()
       .then((currentUser) => {
         // getEnrolledData(currentUser);
@@ -64,6 +69,22 @@ export default function Index() {
       });
   }, [setLoading]);
 
+  const handleSelectChange = (event) => {
+    const selectedIndex = event.target.value;
+    const Category = categories.find(
+      (category) => category._id === selectedIndex
+    );
+    setCategory(Category.category || "");
+    setSelectedCategory(Category._id);
+  };
+
+  const fetchCategoryData = async () => {
+    setLoading(true);
+    const categories = await fetchCategories();
+    setLoading(false);
+    setCategories(categories);
+  };
+
   const fetchCourseData = async () => {
     try {
       setLoading(true);
@@ -71,6 +92,7 @@ export default function Index() {
       setName(data.name);
       setImagePreview(data.image ? data.image : "");
       setCategory(data.category);
+      setSelectedCategory(data.categoryId);
       setDuration(data.duration);
       setCpdTotal(data.cpdTotal);
       setCpdMin(data.cpdMin);
@@ -128,9 +150,10 @@ export default function Index() {
   const handleImageSubmit = async (course) => {
     // Send a PUT or POST request to the endpoint handling file uploads
     const response = await updateCourseImage(course, image);
+    console.log(response);
 
     // Handle the response from the file upload endpoint
-    if (response.ok) {
+    if (response.status === 200) {
       // Handle successful upload
       toast.success("Image updated successfully!");
       // Optionally, fetch the updated user data to refresh the avatar preview
@@ -145,7 +168,8 @@ export default function Index() {
 
     const dataObject = {
       name,
-      category,
+      category: category,
+      categoryId: selectedCategory,
       duration,
       cpdTotal,
       cpdMin,
@@ -165,7 +189,9 @@ export default function Index() {
     setLoading(false);
     if (response.message === "Course updated successfully") {
       setLoading(true);
-      await handleImageSubmit(courseId);
+      if (image && image.type.startsWith('image/')) {
+        await handleImageSubmit(courseId);
+      }
       setLoading(false);
 
       toast.success("Update successful!");
@@ -252,13 +278,23 @@ export default function Index() {
                   />
                 </Grid> */}
                 <Grid item xs={12}>
-                  <TextField
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    label="Course Category"
-                    required
+                  <Select
+                    value={selectedCategory || ""}
+                    onChange={handleSelectChange}
+                    displayEmpty
                     fullWidth
-                  />
+                    renderValue={
+                      selectedCategory
+                        ? undefined
+                        : () => <em>Choose a category</em>
+                    }
+                  >
+                    {categories.map((category) => (
+                      <MenuItem key={category._id} value={category._id}>
+                        {category.category}
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField

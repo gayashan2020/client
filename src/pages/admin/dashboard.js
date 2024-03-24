@@ -15,7 +15,7 @@ import {
   ListItemText,
   Modal,
   TextField,
-  Tooltip
+  Tooltip,
 } from "@mui/material";
 import {
   Phone,
@@ -640,9 +640,12 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={12} lg={12}>
-            <RoleCard />
-          </Grid>
+          {user &&
+            [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
+              <Grid item xs={12} md={12} lg={12}>
+                <RoleCard />
+              </Grid>
+            )}
           <Grid item xs={12} md={12} lg={12}>
             <Box display="flex" justifyContent="space-between" padding={2}>
               <Button

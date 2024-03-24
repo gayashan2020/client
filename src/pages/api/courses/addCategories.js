@@ -1,4 +1,4 @@
-// pages/api/courses/addCourse.js
+// pages/api/courses/addCategories.js
 import dbConnect from "@/lib/dbConnect";
 
 export default async function handler(req, res) {
