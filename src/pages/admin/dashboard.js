@@ -37,7 +37,7 @@ import { routes } from "@/assets/constants/routeConstants";
 import { styled } from "@mui/material/styles";
 import { toast } from "react-toastify";
 import { updateUser, updateAvatar } from "@/services/users";
-// import { userRoles } from "@/assets/constants/authConstants";
+import { userRoles } from "@/assets/constants/authConstants";
 // import { useTheme } from "@mui/material/styles";
 // import { PieChartComponent } from "@/components/PieChartComponent";
 // import { BarChartComponent } from "@/components/BarChartComponent";
