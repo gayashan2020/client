@@ -35,7 +35,7 @@ export default function ManageCourses() {
 
   return (
     <Layout>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ minHeight: "100vh" }}>
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>

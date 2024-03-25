@@ -103,6 +103,17 @@ export default function Layout({ children }) {
                   <ListItemText primary="Manage Courses" />
                 </ListItemButton>
               )}
+            {user &&
+              [
+                userRoles.SUPER_ADMIN,
+                userRoles.ADMIN,
+                userRoles.CPD_PROVIDER,
+                userRoles.STUDENT,
+              ].includes(user.role) && (
+                <ListItemButton component="a" href={routes.ADMIN_REFLOG}>
+                  <ListItemText primary="Reflective Logs" />
+                </ListItemButton>
+              )}
 
             {/* Logout Button */}
             <ListItemButton onClick={handleLogout}>

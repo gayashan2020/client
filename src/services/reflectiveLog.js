@@ -29,19 +29,34 @@ export async function uploadReflectiveFile(reflectiveLogId, file) {
 }
 
 export async function fetchReflectiveLogByUsersCourses(userId, courseId) {
-  const response = await fetch(
-    "/api/reflectiveLog/fetchReflectiveLog",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId, courseId }),
-    }
-  );
+  const response = await fetch("/api/reflectiveLog/fetchReflectiveLog", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId, courseId }),
+  });
 
   if (!response.ok) {
     throw new Error(`Error fetching reflective log: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function fetchAllReflectiveLogs(userId) {
+  const response = await fetch("/api/reflectiveLog/fetchAllReflectiveLogs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Error fetching all reflective logs: ${response.statusText}`
+    );
   }
 
   return response.json();
