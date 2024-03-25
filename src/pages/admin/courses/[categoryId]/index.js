@@ -87,8 +87,8 @@ export default function Index() {
         justifyContent="flex-start"
         style={{ padding: '20px', minHeight: '100vh' }}
       >
-        {courses.map((course) => (
-          <Grid item key={course._id["$oid"]} xs={12} sm={6} md={4} lg={3}>
+        {courses.map((course, index) => (
+          <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
             <Card sx={cardStyle} onClick={() => navigateToCourse(course)}>
               <CardActionArea
                 sx={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: "flex-start" }}

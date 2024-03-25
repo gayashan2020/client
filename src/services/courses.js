@@ -57,13 +57,13 @@ export const fetchCourseById = async (categoryId, courseId) => {
   return await response.json();
 };
 
-export async function enrollToCourse(userId, courseId) {
+export async function enrollToCourse(userId, courseId, mentorId) {
   const response = await fetch("/api/courses/enroll", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ userId, courseId }),
+    body: JSON.stringify({ userId, courseId, mentorId }),
   });
 
   if (!response.ok) {
@@ -75,7 +75,6 @@ export async function enrollToCourse(userId, courseId) {
 }
 
 export async function getEnrolledDataByCourse(userId, courseId) {
-  console.log("getEnrolledDataByCourse", userId, courseId);
   const response = await fetch("/api/courses/getEnrolledDataByCourse", {
     method: "POST",
     headers: {

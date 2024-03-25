@@ -100,32 +100,6 @@ import { userRoles } from "@/assets/constants/authConstants";
 //     return (
 //         <Layout>
 //             <Grid container spacing={3} justifyContent="flex-start">
-//                 <Grid item xs={12} lg={3}>
-//                     <Box component="section">
-//                         <h2>User Profile</h2>
-//                         {user ? (
-//                             <Card>
-//                                 <CardContent>
-//                                     <Typography variant="h5" component="div">
-//                                         {(user.role === userRoles.MENTOR || user.role === userRoles.ADMIN || user.role === userRoles.SUPER_ADMIN) ? user.fullName : `${user.firstName} ${user.lastName}`}
-//                                     </Typography>
-//                                     <Typography variant="body2" color="text.secondary">
-//                                         Initials: {user.initialsName}
-//                                     </Typography>
-//                                     <Typography variant="body2" color="text.secondary">
-//                                         Email: {user.email}
-//                                     </Typography>
-//                                     <Typography variant="body2" color="text.secondary">
-//                                         Role: {user.role}
-//                                     </Typography>
-//                                 </CardContent>
-//                             </Card>
-//                         ) : (
-//                             <p></p>
-//                         )}
-//                     </Box>
-//                 </Grid>
-
 //                 <Grid item xs={12} lg={5}>
 //                     <Box component="section" sx={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(3) }}>
 //                         <Paper sx={{ padding: theme.spacing(2), boxSizing: 'border-box' }}>
@@ -134,62 +108,6 @@ import { userRoles } from "@/assets/constants/authConstants";
 //                         <Paper sx={{ padding: theme.spacing(2), boxSizing: 'border-box' }}>
 //                             <BarChartComponent data={cityData} />
 //                         </Paper>
-//                     </Box>
-//                 </Grid>
-
-//                 <Grid item xs={12} lg={4}>
-//                     <Box component="section">
-//                         <h2>User Details</h2>
-//                         {user ? (
-//                             <TableContainer component={Paper}>
-//                                 <Table>
-//                                     <TableBody>
-//                                         <TableRow>
-//                                             <TableCell>Gender</TableCell>
-//                                             <TableCell>{user.gender}</TableCell>
-//                                         </TableRow>
-//                                         <TableRow>
-//                                             <TableCell>Occupation</TableCell>
-//                                             <TableCell>{user.occupation}</TableCell>
-//                                         </TableRow>
-//                                         <TableRow>
-//                                             <TableCell>Working Station</TableCell>
-//                                             <TableCell>{user.workingStation}</TableCell>
-//                                         </TableRow>
-//                                         <TableRow>
-//                                             <TableCell>City</TableCell>
-//                                             <TableCell>{user.city}</TableCell>
-//                                         </TableRow>
-//                                         <TableRow>
-//                                             <TableCell>District</TableCell>
-//                                             <TableCell>{user.district}</TableCell>
-//                                         </TableRow>
-//                                         <TableRow>
-//                                             <TableCell>NIC or Passport Number</TableCell>
-//                                             <TableCell>{user.nicOrPassport}</TableCell>
-//                                         </TableRow>
-//                                         <TableRow>
-//                                             <TableCell>Contact Number</TableCell>
-//                                             <TableCell>{user.contactNumber}</TableCell>
-//                                         </TableRow>
-//                                         <TableRow>
-//                                             <TableCell>SLMC Registration Number</TableCell>
-//                                             <TableCell>{user.slmcregNumber}</TableCell>
-//                                         </TableRow>
-//                                         <TableRow>
-//                                             <TableCell>CPD Provider Registration Number</TableCell>
-//                                             <TableCell>{user.cpdProviderRegNumber}</TableCell>
-//                                         </TableRow>
-//                                         <TableRow>
-//                                             <TableCell>Official Address</TableCell>
-//                                             <TableCell>{user.officialAddress}</TableCell>
-//                                         </TableRow>
-//                                     </TableBody>
-//                                 </Table>
-//                             </TableContainer>
-//                         ) : (
-//                             <p></p>
-//                         )}
 //                     </Box>
 //                 </Grid>
 //             </Grid>

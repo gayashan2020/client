@@ -97,8 +97,8 @@ export default function Index() {
         justifyContent="flex-start"
         style={{ padding: "20px", minHeight: "100vh" }}
       >
-        {categories.map((category) => (
-          <Grid item key={category._id["$oid"]} xs={12} sm={6} md={4} lg={3}>
+        {categories.map((category, index) => (
+          <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
             <Grid item>
               <Card sx={cardStyle} onClick={() => navigateToCategory(category)}>
                 <CardActionArea sx={{ height: "100%", minHeight: "100px" }}>

@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { userId, courseId } = req.body;
+    const { userId, courseId, mentorId } = req.body;
 
     // Ensure the required fields are provided
     if (!userId || !courseId) {
@@ -17,6 +17,7 @@ export default async function handler(req, res) {
     const enrollment = {
       userId: new ObjectId(userId),
       courseId: new ObjectId(courseId),
+      mentorId: new ObjectId(mentorId),
       enrollStatus: true, // Assuming true means they are enrolled
     };
 
