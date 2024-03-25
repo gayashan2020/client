@@ -115,6 +115,17 @@ export default function Layout({ children }) {
                 </ListItemButton>
               )}
 
+{user &&
+              [
+                userRoles.SUPER_ADMIN,
+                userRoles.MENTOR,
+              ].includes(user.role) && (
+                <ListItemButton component="a" href={routes.ADMIN_MENTEEMANAGEMENT}>
+                  <ListItemText primary="Mentee Management" />
+                </ListItemButton>
+              )}
+
+
             {/* Logout Button */}
             <ListItemButton onClick={handleLogout}>
               <ListItemIcon>
@@ -133,6 +144,7 @@ export default function Layout({ children }) {
             width: `calc(100% - ${drawerWidth}px)`, // Adjust width to account for the drawer
             backgroundColor: "#121212",
             color: "#fff",
+            minHeight: "100vh"
           }}
         >
           {children}

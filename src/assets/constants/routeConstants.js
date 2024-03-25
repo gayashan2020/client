@@ -41,4 +41,7 @@ export const routes = {
 
   //admin reflective logs------------------------------
   ADMIN_REFLOG: "/admin/reflectiveLogs",
+
+  //admin mentor------------------------------
+  ADMIN_MENTEEMANAGEMENT: "/admin/menteeManagement",
 };
