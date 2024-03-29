@@ -1,5 +1,3 @@
-//to do --> add approval to enroll, reflectiveLog
-
 import React, { useEffect, useState, useContext } from "react";
 import {
   Card,
