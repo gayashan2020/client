@@ -61,3 +61,33 @@ export async function fetchAllReflectiveLogs(userId) {
 
   return response.json();
 }
+
+/**
+ * Sends a PATCH request to update a reflective log with a mentor's comment and score.
+ *
+ * @param {string} logId - The ID of the reflective log to update.
+ * @param {string} comment - The mentor's comment.
+ * @param {number} score - The score given by the mentor.
+ * @returns {Promise<Object>} The response from the server.
+ */
+export async function addMentorComment(logId, comment, score) {
+  try {
+    const response = await fetch("/api/reflectiveLog/addMentorComment", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ logId, comment, score }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} - ${await response.text()}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error in addMentorComment:", error);
+    throw error;
+  }
+}
