@@ -10,7 +10,7 @@ export default async (req, res) => {
         .collection("users")
         .aggregate([{ $group: { _id: "$district", count: { $sum: 1 } } }])
         .toArray();
-      console.log("districtData",districtData);
+
       if (districtData) {
         res.status(200).json(
           districtData.map((item) => ({

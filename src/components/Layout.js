@@ -65,7 +65,7 @@ export default function Layout({ children }) {
   };
 
   const drawerContent = (
-    <List sx={{ mt: '64px' }}>
+    <List sx={{ mt: "64px" }}>
       {/* Dashboard */}
       <ListItemButton component="a" href={routes.ADMIN}>
         <ListItemText primary="Dashboard" />
@@ -111,6 +111,11 @@ export default function Layout({ children }) {
           </ListItemButton>
         )}
 
+      {/* Chat*/}
+      <ListItemButton component="a" href={routes.ADMIN_CHAT}>
+        <ListItemText primary="Chat" />
+      </ListItemButton>
+
       {/* Logout Button */}
       <ListItemButton onClick={handleLogout}>
         <ListItemIcon>
@@ -127,20 +132,20 @@ export default function Layout({ children }) {
     flexGrow: 1,
     p: 3, // Adjust padding as needed
     marginLeft: isMobile ? 0 : `${drawerWidth}px`, // Conditional marginLeft for non-mobile view
-    transition: theme.transitions.create('margin', {
+    transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
     ...(mobileOpen && {
       // Only apply this style when the mobile drawer is open
       marginLeft: `${drawerWidth}px`, // Make sure the main content is pushed to the right when the drawer is open
-      transition: theme.transitions.create('margin', {
+      transition: theme.transitions.create("margin", {
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
       }),
     }),
     // marginTop: `64px`, // This height might need adjustment based on your AppBar's height
-    width: isMobile ? 'auto' : `calc(100% - ${drawerWidth}px)`, // Full width in mobile view
+    width: isMobile ? "auto" : `calc(100% - ${drawerWidth}px)`, // Full width in mobile view
   };
 
   return (
@@ -172,7 +177,7 @@ export default function Layout({ children }) {
           {drawerContent}
         </Drawer>
         <Box component="main" sx={mainContentStyle}>
-          <Toolbar /> 
+          <Toolbar />
           {children}
         </Box>
       </Box>

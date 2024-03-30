@@ -44,4 +44,7 @@ export const routes = {
 
   //admin mentor------------------------------
   ADMIN_MENTEEMANAGEMENT: "/admin/menteeManagement",
+
+  //admin chat------------------------------
+  ADMIN_CHAT: "/admin/chat",
 };

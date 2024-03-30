@@ -89,3 +89,11 @@ export async function sendEmail(options) {
   const data = await response.json();
   return data;
 }
+
+export async function fetchUserById(userId) {
+  const res = await fetch(`/api/users/getUserById?userId=${userId}`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch user: ${res.status}`);
+  }
+  return await res.json();
+}

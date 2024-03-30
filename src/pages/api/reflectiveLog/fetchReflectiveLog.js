@@ -40,11 +40,11 @@ export default async function handler(req, res) {
     const mentor = await usersCollection.findOne({
       _id: userCourseDocument.mentorId,
     });
-    console.log(mentor, "course");
+
     if (!course || !mentor) {
       return res.status(404).json({ message: "Course or Mentor not found." });
     }
-    console.log("reflectiveLogEntry", mentor);
+
     // Use the _id from the users_courses entry to find the reflective log
     const reflectiveLog = db.collection("reflectiveLog");
     const reflectiveLogEntry = await reflectiveLog.findOne({

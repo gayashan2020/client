@@ -151,7 +151,6 @@ export default function Index() {
   const handleImageSubmit = async (course) => {
     // Send a PUT or POST request to the endpoint handling file uploads
     const response = await updateCourseImage(course, image);
-    console.log(response);
 
     // Handle the response from the file upload endpoint
     if (response.status === 200) {

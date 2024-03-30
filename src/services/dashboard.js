@@ -13,7 +13,7 @@ export const getOccupationData = async () => {
 export const getCityData = async () => {
     try {
       const response = await axios.get('/api/dashboard/cityData');
-      console.log("City Data:", response.data);
+
       return response.data;
     } catch (error) {
       console.error(error);

@@ -41,6 +41,10 @@ export default function StudentDetails() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedLog, setSelectedLog] = useState(null);
 
+  const dialogContentTextStyle = {
+    paddingBottom: '10px', // or whatever value you need
+  };
+
   useEffect(() => {
     if (!router.isReady) return;
 
@@ -159,26 +163,32 @@ export default function StudentDetails() {
           <DialogContent>
             {selectedCourse && (
               <>
-                <DialogContentText>
-                  Name: {selectedCourse.name}
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>Name:</span>{" "}
+                  {selectedCourse.name}
                 </DialogContentText>
-                <DialogContentText>
-                  Category: {selectedCourse.category}
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>Category:</span>{" "}
+                  {selectedCourse.category}
                 </DialogContentText>
-                <DialogContentText>
-                  Duration: {selectedCourse.duration} hours
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>Duration:</span>{" "}
+                  {selectedCourse.duration} hours
                 </DialogContentText>
-                <DialogContentText>
-                  CPD Total: {selectedCourse.cpdTotal}
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>CPD Total:</span>{" "}
+                  {selectedCourse.cpdTotal}
                 </DialogContentText>
-                <DialogContentText>
-                  CPD Minimum: {selectedCourse.cpdMin}
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>CPD Minimum:</span>{" "}
+                  {selectedCourse.cpdMin}
                 </DialogContentText>
-                <DialogContentText>
-                  Type: {selectedCourse.type}
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>Type:</span>{" "}
+                  {selectedCourse.type}
                 </DialogContentText>
-                <DialogContentText>
-                  Link:{" "}
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>Link:</span>{" "}
                   <a
                     href={selectedCourse.link}
                     target="_blank"
@@ -187,17 +197,21 @@ export default function StudentDetails() {
                     {selectedCourse.link}
                   </a>
                 </DialogContentText>
-                <DialogContentText>
-                  Authors: {selectedCourse.authors}
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>Authors:</span>{" "}
+                  {selectedCourse.authors}
                 </DialogContentText>
-                <DialogContentText>
-                  Description: {selectedCourse.description}
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>Description:</span>{" "}
+                  {selectedCourse.description}
                 </DialogContentText>
-                <DialogContentText>
-                  Objectives: {selectedCourse.objectives}
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>Objectives:</span>{" "}
+                  {selectedCourse.objectives}
                 </DialogContentText>
-                <DialogContentText>
-                  Keywords: {selectedCourse.keywords}
+                <DialogContentText sx={dialogContentTextStyle}>
+                  <span style={{ fontWeight: "bold" }}>Keywords:</span>{" "}
+                  {selectedCourse.keywords}
                 </DialogContentText>
                 {selectedCourse.image && (
                   <img
@@ -218,24 +232,33 @@ export default function StudentDetails() {
             <DialogContent>
               {selectedLog ? (
                 <>
-                  <DialogContentText>
-                    Learning Experience: {selectedLog.learning_experience}
+                  <DialogContentText sx={dialogContentTextStyle}>
+                    <span style={{ fontWeight: "bold" }}>
+                      Learning Experience:
+                    </span>{" "}
+                    {selectedLog.learning_experience}
                   </DialogContentText>
-                  <DialogContentText>
-                    What Did I Learn: {selectedLog.what_did_I_learn}
+                  <DialogContentText sx={dialogContentTextStyle}>
+                    <span style={{ fontWeight: "bold" }}>
+                      What Did I Learn:
+                    </span>{" "}
+                    {selectedLog.what_did_I_learn}
                   </DialogContentText>
-                  <DialogContentText>
-                    More To Learn: {selectedLog.more_to_learn}
+                  <DialogContentText sx={dialogContentTextStyle}>
+                    <span style={{ fontWeight: "bold" }}>More To Learn:</span>{" "}
+                    {selectedLog.more_to_learn}
                   </DialogContentText>
-                  <DialogContentText>
-                    How To Learn: {selectedLog.how_to_learn}
+                  <DialogContentText sx={dialogContentTextStyle}>
+                    <span style={{ fontWeight: "bold" }}>How To Learn:</span>{" "}
+                    {selectedLog.how_to_learn}
                   </DialogContentText>
-                  <DialogContentText>
-                    Approval Status: {selectedLog.approval}
+                  <DialogContentText sx={dialogContentTextStyle}>
+                    <span style={{ fontWeight: "bold" }}>Approval Status:</span>{" "}
+                    {selectedLog.approval}
                   </DialogContentText>
                   {selectedLog.file && (
-                    <DialogContentText>
-                      File:{" "}
+                    <DialogContentText sx={dialogContentTextStyle}>
+                      <span style={{ fontWeight: "bold" }}>File:</span>{" "}
                       <a
                         href={selectedLog.file}
                         target="_blank"
@@ -276,7 +299,7 @@ export default function StudentDetails() {
                   />
                 </>
               ) : (
-                <DialogContentText>No Reflective Log Found</DialogContentText>
+                <DialogContentText sx={dialogContentTextStyle}>No Reflective Log Found</DialogContentText>
               )}
             </DialogContent>
             <DialogActions>
