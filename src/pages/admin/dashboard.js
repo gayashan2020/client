@@ -47,79 +47,8 @@ import {
   getOccupationData,
   getCityData,
   getUserData,
+  fetchRegisteredCourses,
 } from "@/services/dashboard";
-
-// export default function AdminDashboard() {
-//     const [user, setUser] = useState(null);
-//     const [occupationData, setOccupationData] = useState([]);
-//     const [cityData, setCityData] = useState([{district: "", count: 0}]);
-
-//     const { setLoading } = useContext(LoadingContext);
-
-//     const theme = useTheme();
-
-//     useEffect(() => {
-//         const getUser = async () => {
-//             setLoading(true);
-//             try {
-//                 const currentUser = await fetchCurrentUser();
-//                 setUser(currentUser);
-//             } catch (error) {
-//                 console.error('Failed to fetch current user', error);
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
-
-//         const fetchData = async () => {
-//             try {
-//                 const data = await getOccupationData();
-//                 if (data) {
-//                     setOccupationData(data);
-//                 } else {
-//                     console.error('Failed to fetch occupation data');
-//                 }
-//             } catch (error) {
-//                 console.error('Failed to fetch occupation data', error);
-//             }
-//         };
-
-//         const fetchCityData = async () => {
-//             try {
-//                 const data = await getCityData();
-//                 console.log("getCityData",data);
-//                 if (data) {
-//                     setCityData(data);
-//                 } else {
-//                     console.error('Failed to fetch city data');
-//                 }
-//             } catch (error) {
-//                 console.error('Failed to fetch city data', error);
-//             }
-//         };
-
-//         getUser();
-//         fetchData();
-//         fetchCityData();
-//     }, []);
-
-//     return (
-//         <Layout>
-//             <Grid container spacing={3} justifyContent="flex-start">
-//                 <Grid item xs={12} lg={5}>
-//                     <Box component="section" sx={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(3) }}>
-//                         <Paper sx={{ padding: theme.spacing(2), boxSizing: 'border-box' }}>
-//                             <PieChartComponent data={occupationData} />
-//                         </Paper>
-//                         <Paper sx={{ padding: theme.spacing(2), boxSizing: 'border-box' }}>
-//                             <BarChartComponent data={cityData} />
-//                         </Paper>
-//                     </Box>
-//                 </Grid>
-//             </Grid>
-//         </Layout>
-//     );
-// }
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
@@ -149,12 +78,19 @@ export default function AdminDashboard() {
     names: [],
     counts: [],
   });
+  const [registeredCourses, setRegisteredCourses] = useState({
+    names: [],
+    counts: [],
+  });
 
   useEffect(() => {
     setLoading(true);
     fetchCurrentUser()
       .then((currentUser) => {
         setUser(currentUser);
+        if (currentUser?._id) {
+          fetchRegisteredCoursesData(currentUser._id);
+        }
       })
       .catch((error) => {
         console.error("Failed to fetch current user", error);
@@ -167,8 +103,9 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const data = await getUserData();
-      console.log("getUserData", data);
+      setLoading(false);
       if (data) {
         setPendingApprovalCount(data?.pendingApprovalByRole);
         const courseNames = data?.enrolledUsersPerCourse.map(
@@ -184,6 +121,21 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error("Failed to fetch user data:", error);
       // Handle error appropriately, perhaps set some error state
+    }
+  };
+
+  const fetchRegisteredCoursesData = async (userId) => {
+    try {
+      setLoading(true);
+      const registeredCoursesData = await fetchRegisteredCourses(userId);
+      console.log(registeredCoursesData);
+      const courseNames = registeredCoursesData.map((item) => item.courseName);
+      const userCounts = registeredCoursesData.map((item) => item.userCount);
+      setRegisteredCourses({ names: courseNames, counts: userCounts });
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+      setLoading(false);
     }
   };
 
@@ -640,6 +592,30 @@ export default function AdminDashboard() {
                 </Box>
               </Grid>
             )}
+
+          {user && [userRoles.MENTOR].includes(user.role) && (
+            <Grid item xs={12} lg={12}>
+              <Box
+                component="section"
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Paper sx={{ padding: "10px", boxSizing: "border-box" }}>
+                  {registeredCourses.names.length > 0 && (
+                    <BarChartComponent
+                      label={"Registered Student Count"}
+                      names={registeredCourses.names}
+                      counts={registeredCourses.counts}
+                    />
+                  )}
+                </Paper>
+              </Box>
+            </Grid>
+          )}
+
           <Grid item xs={12} md={12} lg={12}>
             <Box display="flex" justifyContent="space-between" padding={2}>
               <Button

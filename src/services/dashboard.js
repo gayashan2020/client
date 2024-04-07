@@ -29,3 +29,15 @@ export const getUserData = async () => {
     throw error;
   }
 };
+
+export async function fetchRegisteredCourses(userId) {
+  try {
+    const { data } = await axios.get(
+      `/api/dashboard/registeredCourses?userId=${userId}`
+    );
+    return data;
+  } catch (error) {
+    console.error("Error fetching registered courses:", error);
+    throw error;
+  }
+}
