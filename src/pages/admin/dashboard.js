@@ -48,6 +48,7 @@ import {
   getCityData,
   getUserData,
   fetchRegisteredCourses,
+  fetchRegisteredCoursesByUser,
 } from "@/services/dashboard";
 
 export default function AdminDashboard() {
@@ -89,7 +90,7 @@ export default function AdminDashboard() {
       .then((currentUser) => {
         setUser(currentUser);
         if (currentUser?._id) {
-          fetchRegisteredCoursesData(currentUser._id);
+          fetchRegisteredCoursesData(currentUser._id, currentUser.role);
         }
       })
       .catch((error) => {
@@ -124,15 +125,28 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchRegisteredCoursesData = async (userId) => {
+  const fetchRegisteredCoursesData = async (userId, role) => {
     try {
       setLoading(true);
-      const registeredCoursesData = await fetchRegisteredCourses(userId);
-      console.log(registeredCoursesData);
-      const courseNames = registeredCoursesData.map((item) => item.courseName);
-      const userCounts = registeredCoursesData.map((item) => item.userCount);
-      setRegisteredCourses({ names: courseNames, counts: userCounts });
-      setLoading(false);
+      if (role === userRoles.MENTOR) {
+        const registeredCoursesData = await fetchRegisteredCourses(userId);
+        const courseNames = registeredCoursesData.map(
+          (item) => item.courseName
+        );
+        const userCounts = registeredCoursesData.map((item) => item.userCount);
+        setRegisteredCourses({ names: courseNames, counts: userCounts });
+        setLoading(false);
+      } else {
+        const registeredCoursesData = await fetchRegisteredCoursesByUser(
+          userId
+        );
+        const courseNames = registeredCoursesData.map(
+          (item) => item.courseName
+        );
+        const userCounts = registeredCoursesData.map((item) => item.userCount);
+        setRegisteredCourses({ names: courseNames, counts: userCounts });
+        setLoading(false);
+      }
     } catch (error) {
       console.error("Failed to fetch user data:", error);
       setLoading(false);
@@ -586,6 +600,7 @@ export default function AdminDashboard() {
                         label={"Enrolled Student Count"}
                         names={enrolledUsersPerCourse.names}
                         counts={enrolledUsersPerCourse.counts}
+                        size={0}
                       />
                     )}
                   </Paper>
@@ -593,7 +608,7 @@ export default function AdminDashboard() {
               </Grid>
             )}
 
-          {user && [userRoles.MENTOR].includes(user.role) && (
+          {user && [userRoles.MENTOR, userRoles.STUDENT].includes(user.role) && (
             <Grid item xs={12} lg={12}>
               <Box
                 component="section"
@@ -609,6 +624,7 @@ export default function AdminDashboard() {
                       label={"Registered Student Count"}
                       names={registeredCourses.names}
                       counts={registeredCourses.counts}
+                      size={0}
                     />
                   )}
                 </Paper>

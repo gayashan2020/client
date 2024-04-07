@@ -41,3 +41,15 @@ export async function fetchRegisteredCourses(userId) {
     throw error;
   }
 }
+
+export async function fetchRegisteredCoursesByUser(userId) {
+  try {
+    const { data } = await axios.get(
+      `/api/dashboard/registerdCoursesByUser?userId=${userId}`
+    );
+    return data;
+  } catch (error) {
+    console.error("Error fetching registered courses:", error);
+    throw error;
+  }
+}
