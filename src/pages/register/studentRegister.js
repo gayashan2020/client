@@ -21,16 +21,15 @@ import {
   BATCH_OPTIONS,
   FACULTY_OPTIONS,
 } from "@/assets/constants/studentConstants";
-import {userRoles} from "@/assets/constants/authConstants";
-import { toast } from 'react-toastify';
-import { useRouter } from 'next/router';
+import { userRoles } from "@/assets/constants/authConstants";
+import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 import { sendEmail } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { Email } from "../../../emails/basicTemplate";
 import { render } from "@react-email/render";
 
 export default function RegisterForm() {
-
   const router = useRouter();
 
   const [password, setPassword] = useState("");
@@ -75,10 +74,10 @@ export default function RegisterForm() {
       }),
     });
 
-    if (response.ok) { 
+    if (response.ok) {
       // Show a toast message
-      toast.success('Registration successful!');
-    
+      toast.success("Registration successful!");
+
       // Clear the form
       setPassword("");
       setFirstName("");
@@ -95,10 +94,13 @@ export default function RegisterForm() {
       setFaculty("");
       setFacultyRegNumber("");
 
-      
       setLoading(true);
       const emailHtml = render(
-        <Email email={email} password={password} fullName={fullName} />
+        <Email
+          email={email}
+          password={password}
+          fullName={firstName + " " + lastName}
+        />
       );
       const options = {
         to: email,
@@ -108,13 +110,13 @@ export default function RegisterForm() {
 
       await sendEmail(options);
       setLoading(false);
-    
+
       // Navigate to the login page
       toast.success("Registration successful!");
-      router.push('/login');
+      router.push("/login");
     } else {
       console.log("Failed to register");
-      toast.error('Registration failed.');
+      toast.error("Registration failed.");
     }
   };
 

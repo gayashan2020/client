@@ -173,8 +173,8 @@ export default function UserManagement() {
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user._id}>
-                  <TableCell>{user.firstName}</TableCell>
-                  <TableCell>{user.lastName}</TableCell>
+                  <TableCell>{user.fullName?user.fullName.split(' ')[0]:user.firstName}</TableCell>
+                  <TableCell>{user.fullName?user.fullName.split(' ')[1]:user.lastName}</TableCell>
                   <TableCell>{user.occupation}</TableCell>
                   <TableCell>{user.district}</TableCell>
                   <TableCell>{user.currentStation}</TableCell>

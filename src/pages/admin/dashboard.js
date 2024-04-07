@@ -16,6 +16,8 @@ import {
   Modal,
   TextField,
   Tooltip,
+  Paper,
+  Badge,
 } from "@mui/material";
 import {
   Phone,
@@ -40,8 +42,12 @@ import { updateUser, updateAvatar } from "@/services/users";
 import { userRoles } from "@/assets/constants/authConstants";
 // import { useTheme } from "@mui/material/styles";
 // import { PieChartComponent } from "@/components/PieChartComponent";
-// import { BarChartComponent } from "@/components/BarChartComponent";
-// import { getOccupationData, getCityData } from "@/services/dashboard";
+import { BarChartComponent } from "@/components/BarChartComponent";
+import {
+  getOccupationData,
+  getCityData,
+  getUserData,
+} from "@/services/dashboard";
 
 // export default function AdminDashboard() {
 //     const [user, setUser] = useState(null);
@@ -138,6 +144,12 @@ export default function AdminDashboard() {
   const [batch, setBatch] = useState("");
   const [faculty, setFaculty] = useState("");
 
+  const [pendingApprovalCount, setPendingApprovalCount] = useState(0);
+  const [enrolledUsersPerCourse, setEnrolledUsersPerCourse] = useState({
+    names: [],
+    counts: [],
+  });
+
   useEffect(() => {
     setLoading(true);
     fetchCurrentUser()
@@ -150,7 +162,30 @@ export default function AdminDashboard() {
       .finally(() => {
         setLoading(false);
       });
+    fetchData();
   }, [setLoading]);
+
+  const fetchData = async () => {
+    try {
+      const data = await getUserData();
+      console.log("getUserData", data);
+      if (data) {
+        setPendingApprovalCount(data?.pendingApprovalByRole);
+        const courseNames = data?.enrolledUsersPerCourse.map(
+          (item) => item.courseName
+        );
+        const userCounts = data?.enrolledUsersPerCourse.map(
+          (item) => item.enrolledUsersCount
+        );
+        setEnrolledUsersPerCourse({ names: courseNames, counts: userCounts });
+      } else {
+        console.error("Failed to fetch user data");
+      }
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+      // Handle error appropriately, perhaps set some error state
+    }
+  };
 
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
@@ -347,26 +382,42 @@ export default function AdminDashboard() {
         <AccountBox fontSize="large" />
         <Typography>Admin</Typography>
       </Box>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        onClick={() => router.push(routes.ADMIN_USERS_STUDENTS_USER_MANAGEMENT)}
-        className="roleBox"
+      <Badge
+        badgeContent={pendingApprovalCount.student}
+        color="error"
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <School fontSize="large" />
-        <Typography>Mentee</Typography>
-      </Box>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        onClick={() => router.push(routes.ADMIN_USERS_MENTORS_USER_MANAGEMENT)}
-        className="roleBox"
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          onClick={() =>
+            router.push(routes.ADMIN_USERS_STUDENTS_USER_MANAGEMENT)
+          }
+          className="roleBox"
+        >
+          <School fontSize="large" />
+          <Typography>Mentee</Typography>
+        </Box>
+      </Badge>
+      <Badge
+        badgeContent={pendingApprovalCount.mentor}
+        color="error"
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <People fontSize="large" />
-        <Typography>Mentor</Typography>
-      </Box>
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          onClick={() =>
+            router.push(routes.ADMIN_USERS_MENTORS_USER_MANAGEMENT)
+          }
+          className="roleBox"
+        >
+          <People fontSize="large" />
+          <Typography>Mentor</Typography>
+        </Box>
+      </Badge>
       <Box
         display="flex"
         flexDirection="column"
@@ -499,7 +550,6 @@ export default function AdminDashboard() {
                     backgroundColor: "white",
                   }}
                 />
-
                 {contactInfo.map((info, index) => (
                   <ListItem key={info.key} style={{ padding: "8px 10px" }}>
                     <ListItemIcon
@@ -542,6 +592,7 @@ export default function AdminDashboard() {
                 backgroundColor: "#121212",
                 color: "white",
                 marginTop: "60px",
+                marginBottom: "10px",
               }}
             >
               <CardContent>
@@ -560,8 +611,33 @@ export default function AdminDashboard() {
           </Grid>
           {user &&
             [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
-              <Grid item xs={12} md={12} lg={12}>
+              <Grid item xs={12} md={12} lg={12} sx={{ marginBottom: "10px" }}>
                 <RoleCard />
+              </Grid>
+            )}
+
+          {/* Display enrolled users per course */}
+          {user &&
+            [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
+              <Grid item xs={12} lg={12}>
+                <Box
+                  component="section"
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Paper sx={{ padding: "10px", boxSizing: "border-box" }}>
+                    {enrolledUsersPerCourse.names.length > 0 && (
+                      <BarChartComponent
+                        label={"Enrolled Student Count"}
+                        names={enrolledUsersPerCourse.names}
+                        counts={enrolledUsersPerCourse.counts}
+                      />
+                    )}
+                  </Paper>
+                </Box>
               </Grid>
             )}
           <Grid item xs={12} md={12} lg={12}>

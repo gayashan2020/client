@@ -66,7 +66,7 @@ export default function RegisterForm() {
         contactNumber,
         slmcRegNumber,
         username,
-        role: userRoles.STUDENT,
+        role: userRoles.MENTOR,
       }),
     });
     setLoading(false);
