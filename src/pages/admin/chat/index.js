@@ -161,7 +161,9 @@ export default function Chat() {
     if (conversation) {
       if (!selectedConversation) {
         setLoading(true);
-        const conversationsWithNames = await fetchConversationsWithNames(currentUser._id);
+        const conversationsWithNames = await fetchConversationsWithNames(
+          currentUser._id
+        );
         setLoading(false);
         const currentConversation = conversationsWithNames.find(
           (c) => c._id === conversation.conversationId
@@ -255,12 +257,11 @@ export default function Chat() {
           </Box>
           <Box
             flexGrow={1}
-            // height="100vh"
             display="flex"
             flexDirection="column"
           >
             {selectedConversation && (
-              <>
+              <div style={{ minHeight: "40vh" }}>
                 <Typography variant="h5" gutterBottom sx={{ p: 1 }}>
                   Conversation with {selectedConversation?.partnerName}
                 </Typography>
@@ -278,48 +279,55 @@ export default function Chat() {
                     </ListItem>
                   ))}
                 </List>
-              </>
+              </div>
             )}
+            {!selectedConversation && (
+              <div style={{ height: "40vh" }}>
+                <Typography variant="h5" gutterBottom sx={{ p: 1 }}>
+                  Select a Conversation
+                </Typography>
+              </div>
+            )}
+            {/* Chat Section */}
+            <Box
+              className={styles.messageInputContainer}
+              component="form"
+              onSubmit={handleSendMessage}
+              display={"flex"}
+              //   sx={{ pointerEvents: selectedConversation ? 'auto' : 'none' }}
+            >
+              <TextField
+                fullWidth
+                id="message-field"
+                label="Type a message"
+                variant="outlined"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={(e) =>
+                  e.key === "Enter" ? handleSendMessage(e) : null
+                }
+                className={styles.messageInputBox}
+                disabled={!selectedConversation && !selectedUser}
+              />
+              <Box display={"flex"}>
+                <IconButton
+                  type="submit"
+                  sx={{ p: "10px" }} // padding around the icon
+                  aria-label="send"
+                  disabled={!selectedConversation && !selectedUser}
+                >
+                  <SendIcon />
+                </IconButton>
+                <IconButton
+                  className={styles.addConversationButton}
+                  onClick={() => setDialogOpen(true)}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+            </Box>
           </Box>
         </Box>{" "}
-        {/* Chat Section */}
-        <Box
-          className={styles.messageInputContainer}
-          component="form"
-          onSubmit={handleSendMessage}
-          display={"flex"}
-          //   sx={{ pointerEvents: selectedConversation ? 'auto' : 'none' }}
-        >
-          <TextField
-            fullWidth
-            id="message-field"
-            label="Type a message"
-            variant="outlined"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) =>
-              e.key === "Enter" ? handleSendMessage(e) : null
-            }
-            className={styles.messageInputBox}
-            disabled={!selectedConversation && !selectedUser}
-          />
-          <Box display={"flex"}>
-            <IconButton
-              type="submit"
-              sx={{ p: "10px" }} // padding around the icon
-              aria-label="send"
-              disabled={!selectedConversation && !selectedUser}
-            >
-              <SendIcon />
-            </IconButton>
-            <IconButton
-              className={styles.addConversationButton}
-              onClick={() => setDialogOpen(true)}
-            >
-              <AddIcon />
-            </IconButton>
-          </Box>
-        </Box>
       </Box>
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Select a user to start a conversation</DialogTitle>

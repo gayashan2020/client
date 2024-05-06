@@ -1,6 +1,7 @@
 // pages/index.js
 import { getSession } from '../lib/session';
 import LandingPage from './landingPage';
+import LandingPage2 from './landingPage2'
 
 export default function Home() {
   // Render your landing page content here
