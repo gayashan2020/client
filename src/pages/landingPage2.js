@@ -10,8 +10,8 @@ import {
 import { HeroSection } from "@/components/landingPageComponents/hero";
 export default function landingPage() {
     return (
-        <div>
+        <>
             <HeroSection />
-        </div>
+        </>
     )
 }
