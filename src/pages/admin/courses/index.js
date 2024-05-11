@@ -15,6 +15,7 @@ import Layout from "@/components/Layout";
 import { fetchCategories, addCategories } from "@/services/courseCategories";
 import { fetchCurrentUser } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
+import { userRoles } from "@/assets/constants/authConstants";
 
 export default function Index() {
   const [categories, setCategories] = useState([]);
@@ -112,19 +113,26 @@ export default function Index() {
             </Grid>
           </Grid>
         ))}
-        <Grid item key={"addCategory"} xs={12} sm={6} md={4} lg={3}>
-          <Grid item>
-            <Card sx={cardStyle} onClick={handleOpen}>
-              <CardActionArea sx={{ height: "100%", minHeight: "100px" }}>
-                <CardContent>
-                  <Typography variant="h5" component="div">
-                    Add a New Category
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          </Grid>
-        </Grid>
+        {user &&
+          [
+            userRoles.SUPER_ADMIN,
+            userRoles.ADMIN,
+            userRoles.CPD_PROVIDER,
+          ].includes(user.role) && (
+            <Grid item key={"addCategory"} xs={12} sm={6} md={4} lg={3}>
+              <Grid item>
+                <Card sx={cardStyle} onClick={handleOpen}>
+                  <CardActionArea sx={{ height: "100%", minHeight: "100px" }}>
+                    <CardContent>
+                      <Typography variant="h5" component="div">
+                        Add a New Category
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+            </Grid>
+          )}
       </Grid>
 
       {/* Add Category Modal */}
