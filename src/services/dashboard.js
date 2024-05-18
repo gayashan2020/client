@@ -53,3 +53,23 @@ export async function fetchRegisteredCoursesByUser(userId) {
     throw error;
   }
 }
+
+export const getUserCount = async () => {
+  try {
+    const response = await axios.get("/api/dashboard/userCount");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user count:", error);
+    throw error;
+  }
+};
+
+export const getUserCoursesCount = async () => {
+  try {
+    const response = await axios.get("/api/dashboard/userCoursesCount");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user count:", error);
+    throw error;
+  }
+};

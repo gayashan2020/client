@@ -31,7 +31,7 @@ export default function LoginForm() {
     try {
       setLoading(true);
       const response = await loginUser(email, password);
-      setLoading(false);
+      
       if (response.status === 200) {
         // If the login is successful, store the token in a cookie
         Cookies.set("token", response.data.token, {
@@ -45,6 +45,7 @@ export default function LoginForm() {
   
         // Then redirect to the dashboard
         await router.push(routes.ADMIN);
+        setLoading(false);
       }
     } catch (error) {
       console.error("An error occurred while logging in:", error);
