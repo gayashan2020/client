@@ -47,4 +47,7 @@ export const routes = {
 
   //admin chat------------------------------
   ADMIN_CHAT: "/admin/chat",
+
+  //admin setting------------------------------
+  ADMIN_SETTING: "/admin/settings",
 };

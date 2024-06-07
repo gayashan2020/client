@@ -12,6 +12,12 @@ import {
   Container,
   Typography,
   ListItemButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  FormHelperText,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import citiesAndPostalCodes from "../../assets/constants/cities-and-postalcode-by-district.json";
@@ -28,12 +34,14 @@ import { sendEmail } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { Email } from "../../../emails/basicTemplate";
 import { render } from "@react-email/render";
+import { createSetting } from "@/services/setting";
+import { errorOutlineStyle } from "@/styles/theme";
 
 export default function RegisterForm() {
   const router = useRouter();
 
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [lastName, setLastName] = useState("");
   const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
@@ -47,9 +55,33 @@ export default function RegisterForm() {
   const [faculty, setFaculty] = useState("");
   const [facultyRegNumber, setFacultyRegNumber] = useState("");
   const { setLoading } = useContext(LoadingContext);
+  const [errors, setErrors] = useState({});
+  const [open, setOpen] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const newErrors = {};
+    if (!password) newErrors.password = true;
+    if (!fullName) newErrors.fullName = true;
+    // if (!lastName) newErrors.lastName = true;
+    if (!gender) newErrors.gender = true;
+    if (!email) newErrors.email = true;
+    if (!occupation) newErrors.occupation = true;
+    if (!district) newErrors.district = true;
+    if (!city) newErrors.city = true;
+    if (!currentStation) newErrors.currentStation = true;
+    if (!nicOrPassport) newErrors.nicOrPassport = true;
+    if (!contactNumber) newErrors.contactNumber = true;
+    if (!batch) newErrors.batch = true;
+    if (!faculty) newErrors.faculty = true;
+    if (!facultyRegNumber) newErrors.facultyRegNumber = true;
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setOpen(true);
+      return;
+    }
 
     // Send a POST request to the /api/register endpoint with the form data
     const response = await fetch("/api/register", {
@@ -57,8 +89,8 @@ export default function RegisterForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         password,
-        firstName,
-        lastName,
+        fullName,
+        // lastName,
         gender,
         email,
         occupation,
@@ -74,13 +106,18 @@ export default function RegisterForm() {
       }),
     });
 
+    if (!response.ok) {
+      throw new Error(`Error registering: ${response.status}`);
+    }
+
     if (response.ok) {
+      const data = await response.json();
       // Show a toast message
       toast.success("Registration successful!");
 
       // Clear the form
       setPassword("");
-      setFirstName("");
+      setFullName("");
       setLastName("");
       setGender("");
       setEmail("");
@@ -99,7 +136,7 @@ export default function RegisterForm() {
         <Email
           email={email}
           password={password}
-          fullName={firstName + " " + lastName}
+          fullName={fullName + " " + lastName}
         />
       );
       const options = {
@@ -109,6 +146,7 @@ export default function RegisterForm() {
       };
 
       await sendEmail(options);
+      await createSetting(data.userId);
       setLoading(false);
 
       // Navigate to the login page
@@ -120,6 +158,10 @@ export default function RegisterForm() {
     }
   };
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="s">
@@ -129,20 +171,23 @@ export default function RegisterForm() {
           </Typography>
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  label="Name in Full"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  //required
+                  fullWidth
+                  error={!!errors.fullName}
+                  helperText={errors.fullName ? "Name in Full is required" : ""}
+                  sx={errors.fullName ? errorOutlineStyle : {}}
+                />
+              </Grid>
               {/*Column 1*/}
               <Grid item xs={12} sm={6}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      label="First Name"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      required
-                      fullWidth
-                    />
-                  </Grid>
                   <Grid item xs={12}>
                     <TextField
                       variant="outlined"
@@ -151,17 +196,25 @@ export default function RegisterForm() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      required
+                      error={!!errors.email}
+                      helperText={errors.email ? "Email is required" : ""}
+                      sx={errors.email ? errorOutlineStyle : {}}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={6}>
-                    <FormControl fullWidth variant="outlined" margin="normal">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      margin="normal"
+                      error={!!errors.district}
+                    >
                       <InputLabel>District</InputLabel>
                       <Select
                         value={district}
                         onChange={(e) => setDistrict(e.target.value)}
                         label="District"
+                        sx={errors.district ? errorOutlineStyle : {}}
                       >
                         <MenuItem value="">
                           <em>None</em>
@@ -172,16 +225,27 @@ export default function RegisterForm() {
                           </MenuItem>
                         ))}
                       </Select>
+                      {errors.district && (
+                        <FormHelperText error>
+                          district is required
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
 
                   <Grid item xs={6}>
-                    <FormControl fullWidth variant="outlined" margin="normal">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      margin="normal"
+                      error={!!errors.city}
+                    >
                       <InputLabel>City</InputLabel>
                       <Select
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         label="City"
+                        sx={errors.city ? errorOutlineStyle : {}}
                       >
                         <MenuItem value="">
                           <em>None</em>
@@ -195,6 +259,9 @@ export default function RegisterForm() {
                             )
                           )}
                       </Select>
+                      {errors.city && (
+                        <FormHelperText error>city is required</FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12}>
@@ -204,7 +271,13 @@ export default function RegisterForm() {
                       label="NIC/Passport Number"
                       value={nicOrPassport}
                       onChange={(e) => setNicOrPassport(e.target.value)}
-                      required
+                      error={!!errors.nicOrPassport}
+                      helperText={
+                        errors.nicOrPassport
+                          ? "NIC or Passport is required"
+                          : ""
+                      }
+                      sx={errors.nicOrPassport ? errorOutlineStyle : {}}
                       fullWidth
                     />
                   </Grid>
@@ -221,13 +294,17 @@ export default function RegisterForm() {
                           <InputAdornment position="start">+94</InputAdornment>
                         ),
                       }}
-                      required
+                      error={!!errors.contactNumber}
+                      helperText={
+                        errors.contactNumber ? "Contact Number is required" : ""
+                      }
+                      sx={errors.contactNumber ? errorOutlineStyle : {}}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <FormControl
-                      required
+                      error={!!errors.batch}
                       fullWidth
                       variant="outlined"
                       margin="normal"
@@ -236,6 +313,7 @@ export default function RegisterForm() {
                       <Select
                         value={batch}
                         onChange={(e) => setBatch(e.target.value)}
+                        sx={errors.batch ? errorOutlineStyle : {}}
                       >
                         {BATCH_OPTIONS.map((option) => (
                           <MenuItem key={option.value} value={option.value}>
@@ -243,6 +321,9 @@ export default function RegisterForm() {
                           </MenuItem>
                         ))}
                       </Select>
+                      {errors.batch && (
+                        <FormHelperText error>batch is required</FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12}>
@@ -252,7 +333,13 @@ export default function RegisterForm() {
                       label="Faculty registration number"
                       value={facultyRegNumber}
                       onChange={(e) => setFacultyRegNumber(e.target.value)}
-                      required
+                      error={!!errors.facultyRegNumber}
+                      helperText={
+                        errors.facultyRegNumber
+                          ? "Faculty Registration Number is required"
+                          : ""
+                      }
+                      sx={errors.facultyRegNumber ? errorOutlineStyle : {}}
                       fullWidth
                     />
                   </Grid>
@@ -261,17 +348,21 @@ export default function RegisterForm() {
               {/*Column 2*/}
               <Grid item xs={12} sm={6}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12}>
+                  {/* <Grid item xs={12}>
                     <TextField
                       variant="outlined"
                       margin="normal"
                       label="Last Name"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      required
+                      error={!!errors.lastName}
+                      helperText={
+                        errors.lastName ? "Last Name is required" : ""
+                      }
+                      sx={errors.lastName ? errorOutlineStyle : {}}
                       fullWidth
                     />
-                  </Grid>
+                  </Grid> */}
                   <Grid item xs={12}>
                     <TextField
                       variant="outlined"
@@ -280,19 +371,22 @@ export default function RegisterForm() {
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      required
+                      error={!!errors.password}
+                      helperText={errors.password ? "Password is required" : ""}
+                      sx={errors.password ? errorOutlineStyle : {}}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <FormControl
-                      required
+                      error={!!errors.gender}
                       fullWidth
                       variant="outlined"
                       margin="normal"
                     >
                       <InputLabel>Gender</InputLabel>
                       <Select
+                        sx={errors.gender ? errorOutlineStyle : {}}
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
                       >
@@ -302,6 +396,11 @@ export default function RegisterForm() {
                           </MenuItem>
                         ))}
                       </Select>
+                      {errors.gender && (
+                        <FormHelperText error>
+                          Gender is required
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
                   <Grid item xs={12}>
@@ -311,7 +410,11 @@ export default function RegisterForm() {
                       label="Occupation"
                       value={occupation}
                       onChange={(e) => setOccupation(e.target.value)}
-                      required
+                      error={!!errors.occupation}
+                      helperText={
+                        errors.occupation ? "Occupation is required" : ""
+                      }
+                      sx={errors.occupation ? errorOutlineStyle : {}}
                       fullWidth
                     />
                   </Grid>
@@ -322,13 +425,19 @@ export default function RegisterForm() {
                       label="Current Station"
                       value={currentStation}
                       onChange={(e) => setCurrentStation(e.target.value)}
-                      required
+                      error={!!errors.currentStation}
+                      helperText={
+                        errors.currentStation
+                          ? "Current Station is required"
+                          : ""
+                      }
+                      sx={errors.currentStation ? errorOutlineStyle : {}}
                       fullWidth
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <FormControl
-                      required
+                      error={!!errors.faculty}
                       fullWidth
                       variant="outlined"
                       margin="normal"
@@ -337,6 +446,7 @@ export default function RegisterForm() {
                       <Select
                         value={faculty}
                         onChange={(e) => setFaculty(e.target.value)}
+                        sx={errors.faculty ? errorOutlineStyle : {}}
                       >
                         {FACULTY_OPTIONS.map((option) => (
                           <MenuItem key={option.value} value={option.value}>
@@ -344,6 +454,11 @@ export default function RegisterForm() {
                           </MenuItem>
                         ))}
                       </Select>
+                      {errors.faculty && (
+                        <FormHelperText error>
+                          Faculty is required
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   </Grid>
                 </Grid>
@@ -359,6 +474,26 @@ export default function RegisterForm() {
                 </ListItemButton>
               </Grid>
             </Grid>
+            <Dialog open={open} onClose={handleClose}>
+              <DialogTitle sx={{ fontWeight: "bold", textAlign: "center" }}>
+                {"Can't leave required fields empty"}
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText sx={{ textAlign: "center", mb: 2 }}>
+                  Please fill in all the required fields.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions sx={{ justifyContent: "center" }}>
+                <Button
+                  onClick={handleClose}
+                  color="primary"
+                  autoFocus
+                  variant="contained"
+                >
+                  Okay
+                </Button>
+              </DialogActions>
+            </Dialog>
           </form>
         </Card>
       </Container>

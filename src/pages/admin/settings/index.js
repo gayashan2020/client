@@ -1,12 +1,10 @@
 // pages/admin/dashboard.js
-import styles from "../../styles/Dashboard.module.css";
+
 import {
   Box,
   Grid,
   Card,
-  CardActionArea,
   CardContent,
-  CardMedia,
   Typography,
   Avatar,
   LinearProgress,
@@ -32,7 +30,7 @@ import {
   CloudUpload,
   CameraAlt,
 } from "@mui/icons-material";
-import Layout from "../../components/Layout";
+import Layout from "../../../components/Layout";
 import { useEffect, useState, useContext } from "react";
 import { fetchCurrentUser } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
@@ -51,13 +49,10 @@ import {
   getUserData,
   fetchRegisteredCourses,
   fetchRegisteredCoursesByUser,
-  getUserCount,
-  getUserCoursesCount,
 } from "@/services/dashboard";
-import { set } from "mongoose";
-import { getSettingByID } from "@/services/setting";
+import { getSettingByID, updateSetting } from "@/services/setting";
 
-export default function AdminDashboard() {
+export default function index() {
   const [user, setUser] = useState(null);
   const { setLoading } = useContext(LoadingContext);
   const router = useRouter();
@@ -89,23 +84,11 @@ export default function AdminDashboard() {
     names: [],
     counts: [],
   });
-
-  const [onlineUserCountByRole, setOnlineUserCountByRole] = useState({
-    admin: 0,
-    mentor: 0,
-    student: 0,
-    cpd_provider: 0,
-  });
-
-  const [coursesCount, setCoursesCount] = useState({
-    totalEnrolledCourses: 0,
-    totalApprovedCourses: 0,
-    courseDetails: [],
-  });
-
   const [setting, setSetting] = useState(null);
   const [yearlyCPD, setYearlyCPD] = useState(0);
   const [monthlyCPD, setMonthlyCPD] = useState(0);
+
+  const [cpdOpen, setCPDOpen] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -115,7 +98,8 @@ export default function AdminDashboard() {
         if (currentUser?._id) {
           fetchRegisteredCoursesData(currentUser._id, currentUser.role);
         }
-        fetchSettings(currentUser?._id)
+        fetchSettings(currentUser?._id);
+        handleEditOpen(currentUser);
       })
       .catch((error) => {
         console.error("Failed to fetch current user", error);
@@ -130,11 +114,6 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       const data = await getUserData();
-      const countData = await getUserCount();
-      const courseCountData = await getUserCoursesCount();
-      console.log(courseCountData, "courseCountData");
-      setOnlineUserCountByRole(countData?.onlineUserCountByRole);
-      setCoursesCount(courseCountData);
       setLoading(false);
       if (data) {
         setPendingApprovalCount(data?.pendingApprovalByRole);
@@ -182,7 +161,21 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleAvatarChange = (event) => {
+  const fetchSettings = async (id) => {
+    const settings = await getSettingByID(id);
+    setSetting(settings?.body);
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+
+    const monthlyTarget =
+      settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.monthly || 0;
+    const yearlyTarget =
+      settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.yearly || 0;
+    setMonthlyCPD(monthlyTarget);
+    setYearlyCPD(yearlyTarget);
+  };
+
+  const handleAvatarChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
       setAvatar(file);
@@ -191,6 +184,18 @@ export default function AdminDashboard() {
         setAvatarPreview(reader.result);
       };
       reader.readAsDataURL(file);
+      setLoading(true);
+      const response = await updateAvatar(user._id, file);
+      console.log(response);
+      setLoading(false);
+      if (response.status === 200) {
+        // Handle successful upload
+        toast.success("Avatar updated successfully!");
+        // Optionally, fetch the updated user data to refresh the avatar preview
+      } else {
+        // Handle errors
+        toast.error("Failed to update avatar.");
+      }
     }
   };
 
@@ -207,7 +212,6 @@ export default function AdminDashboard() {
     setContactNumber(user.contactNumber); // Update the contactNumber state
     setBatch(user.batch); // Update the batch state
     setFaculty(user.faculty); // Update the faculty state
-    setEditOpen(true); // Open the modal
   };
 
   const handleAvatarSubmit = async () => {
@@ -246,23 +250,6 @@ export default function AdminDashboard() {
     setLoading(false);
 
     if (response.ok) {
-      await handleAvatarSubmit();
-      // Show a toast message
-      toast.success("Update successful!");
-
-      // Clear the form
-      setFirstName("");
-      setGender("");
-      setEmail("");
-      setOccupation("");
-      setDistrict("");
-      setCity("");
-      setCurrentStation("");
-      setNicOrPassport("");
-      setContactNumber("");
-      setBatch("");
-      setFaculty("");
-
       // Update the table
       fetchCurrentUser()
         .then((currentUser) => {
@@ -278,26 +265,56 @@ export default function AdminDashboard() {
       // Close the modal
       setEditOpen(false);
 
-      // Navigate to the login page
       toast.success("Update successful!");
-      //   router.push("/login");
     } else {
       console.log("Failed to update");
       toast.error("Update failed.");
     }
   };
 
-  const handleEditClose = () => setEditOpen(false);
+  const handleSubmitAvatar = async (event) => {
+    event.preventDefault();
+
+    try {
+      setLoading(true);
+      await handleAvatarSubmit();
+      setLoading(false);
+      toast.success("Update successful!");
+    } catch (error) {
+      toast.error("Update failed.");
+    }
+  };
+
+  const handleSubmitCPD = async (event) => {
+    event.preventDefault();
+
+    try {
+      const year = new Date().getFullYear();
+      const month = new Date().getMonth() + 1; // JavaScript months are 0-based
+      const value = { monthly: monthlyCPD, yearly: yearlyCPD };
+      try {
+        setLoading(true);
+        await updateSetting(user._id, year, month, value);
+        setLoading(false);
+        setCPDOpen(false);
+        toast.success("Update successful!");
+      } catch (error) {
+        setLoading(false);
+        toast.success("Update Failed!");
+      }
+    } catch (error) {
+      toast.error("Update failed.");
+    }
+  };
+
+  const handleCPDClose = () => setCPDOpen(false);
 
   const CPDProgressBar = ({ label, value, max }) => (
     <Box>
-      <Typography
-        variant="body2"
-        style={{ fontWeight: "bold", marginTop: "10px" }}
-      >
+      <Typography variant="body2" style={{ fontWeight: "bold" }}>
         {label}
       </Typography>
-      <Box display="flex" alignItems="center">
+      <Box display="flex" alignItems="center" style={{ padding: "10px" }}>
         <Box width="100%" mr={1}>
           <LinearProgress
             color="primary"
@@ -315,19 +332,6 @@ export default function AdminDashboard() {
       </Box>
     </Box>
   );
-
-  const fetchSettings = async (id) => {
-    const settings = await getSettingByID(id);
-    setSetting(settings?.body);
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-
-    const monthlyTarget =
-      settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.monthly || 0;
-    const yearlyTarget = settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.yearly || 0;
-    setMonthlyCPD(monthlyTarget);
-    setYearlyCPD(yearlyTarget);
-  };
 
   const contactInfo = [
     { icon: Phone, text: user?.contactNumber, key: "phone" },
@@ -444,26 +448,147 @@ export default function AdminDashboard() {
     </Card>
   );
 
-  const navigateToCourse = (course) => {
-    // Navigate to the dynamic route for course details
-    // router.push(`/admin/courses/${categoryId}/${coursesCount?.courseDetails?._id}`);
-    console.log("route");
-  };
-
-  const cardStyle = {
-    width: 250, // You can set this to the size you desire
-    height: 400, // Making the height the same as width to create a square
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center", // This centers the content horizontally
-    textAlign: "center", // Ensures text is centered within the content area
-    margin: "20px", // Add some space between the content and the card
-  };
-
   return (
-    <div className={styles.layout}>
-      <div className={styles.topRow}>
-        <div className={styles.profile}>
+    <Layout>
+      <Grid container style={{ minHeight: "100vh" }} spacing={4}>
+        <Grid item xs={12} md={12} lg={7} container>
+          <Card
+            style={{
+              backgroundColor: "#121212",
+              color: "white",
+              marginTop: "60px",
+              marginBottom: "10px",
+            }}
+          >
+            <CardContent>
+              <Typography id="edit-modal-title" variant="h6" component="h2">
+                Edit User Details
+              </Typography>
+              <form>
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="fullName"
+                  label="Full Name"
+                  name="fullName"
+                  value={fullName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="gender"
+                  label="Gender"
+                  name="gender"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="email"
+                  label="Email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="occupation"
+                  label="Occupation"
+                  name="occupation"
+                  value={occupation}
+                  onChange={(e) => setOccupation(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="district"
+                  label="District"
+                  name="district"
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="city"
+                  label="City"
+                  name="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="currentStation"
+                  label="Current Station"
+                  name="currentStation"
+                  value={currentStation}
+                  onChange={(e) => setCurrentStation(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="nicOrPassport"
+                  label="NIC or Passport"
+                  name="nicOrPassport"
+                  value={nicOrPassport}
+                  onChange={(e) => setNicOrPassport(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="contactNumber"
+                  label="Contact Number"
+                  name="contactNumber"
+                  value={contactNumber}
+                  onChange={(e) => setContactNumber(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="batch"
+                  label="Batch"
+                  name="batch"
+                  value={batch}
+                  onChange={(e) => setBatch(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="faculty"
+                  label="Faculty"
+                  name="faculty"
+                  value={faculty}
+                  onChange={(e) => setFaculty(e.target.value)}
+                  required
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSubmit}
+                >
+                  Update
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={6} lg={4}>
           <Card
             style={{
               backgroundColor: "#121212",
@@ -536,9 +661,9 @@ export default function AdminDashboard() {
                 variant="h5"
                 component="div"
                 align="center"
-                style={{ paddingTop: "15%" }}
+                style={{ paddingTop: "120px" }}
               >
-                {user?.fullName || user?.firstName + " " + user?.lastName}
+                {user?.fullName}
               </Typography>
               <Typography
                 variant="subtitle1"
@@ -547,6 +672,20 @@ export default function AdminDashboard() {
               >
                 {user?.role}
               </Typography>
+              {/* <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={<CloudUpload />}
+                style={{ alignContent: "center" }}
+              >
+                Upload New Avatar
+                <VisuallyHiddenInput
+                  type="file"
+                  onChange={handleAvatarChange}
+                />
+              </Button> */}
               <List dense style={{ position: "relative", marginTop: "20px" }}>
                 {/* Vertical line container */}
                 <Box
@@ -593,19 +732,17 @@ export default function AdminDashboard() {
               </List>
             </CardContent>
           </Card>
-        </div>
-        <div className={styles.cpd}>
-          <div className={styles.cpdItem}>
+          <Grid item xs={12} md={12} lg={12}>
             <Card
               style={{
-                backgroundColor: "#2e2e2e",
+                backgroundColor: "#121212",
                 color: "white",
-                height: "100%",
-                width: "100%",
+                marginTop: "60px",
+                marginBottom: "10px",
               }}
             >
               <CardContent>
-              <CPDProgressBar
+                <CPDProgressBar
                   label="Monthly CPD target"
                   value={setting?.currentCPD}
                   max={monthlyCPD}
@@ -615,156 +752,93 @@ export default function AdminDashboard() {
                   value={setting?.currentCPD}
                   max={yearlyCPD}
                 />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="monthlyCPD"
+                  label="Monthly CPD Target"
+                  name="monthlyCPD"
+                  value={monthlyCPD}
+                  onChange={(e) => setMonthlyCPD(e.target.value)}
+                  required
+                />
+                <TextField
+                  margin="normal"
+                  fullWidth
+                  id="yearlyCPD"
+                  label="Yearly CPD Target"
+                  name="yearlyCPD"
+                  value={yearlyCPD}
+                  onChange={(e) => setYearlyCPD(e.target.value)}
+                  required
+                />
               </CardContent>
             </Card>
-          </div>
-          <div className={styles.cpdItem}>
-            <p>CPD Chart</p>
-          </div>
-        </div>
-        <div className={styles.cards}>
-          <div className={styles.card}>
-            <p className={styles.roleName}>Mentors</p>
-            <p className={styles.roleCount}>
-              {onlineUserCountByRole.mentor || 0}
-            </p>
-          </div>
-          <div className={styles.card}>
-            <p className={styles.roleName}>Students</p>
-            <p className={styles.roleCount}>
-              {onlineUserCountByRole.student || 0}
-            </p>
-          </div>
-          <div className={styles.card}>
-            <p className={styles.roleName}>Admins</p>
-            <p className={styles.roleCount}>
-              {onlineUserCountByRole.admin || 0}
-            </p>
-          </div>
-          <div className={styles.card}>
-            <p className={styles.roleName}>CPD Providers</p>
-            <p className={styles.roleCount}>
-              {onlineUserCountByRole.cpd_provider || 0}
-            </p>
-          </div>
-          <div className={styles.card}>
-            <p className={styles.roleName}>Total Approved Courses</p>
-            <p className={styles.roleCount}>
-              {coursesCount.totalApprovedCourses}
-            </p>
-          </div>
-          <div className={styles.card}>
-            <p className={styles.roleName}>Total Enrolled Courses</p>
-            <p className={styles.roleCount}>
-              {coursesCount.totalEnrolledCourses}
-            </p>
-          </div>
-        </div>
-      </div>
-      <div className={styles.bottomRow}>
-        <div className={styles.info}>
-          <p>Mentor Info Section</p>
-        </div>
-        <div className={styles.chart}>
-          {coursesCount?.courseDetails?.map((course, index) => (
-            <Card
-              key={index}
-              sx={cardStyle}
-              onClick={() => navigateToCourse(course)}
-            >
-              <CardActionArea
+          </Grid>
+          <Grid item xs={12} md={12} lg={12}>
+            <Box display="flex" justifyContent="space-between" padding={2}>
+              {/* <Button
+                variant="contained"
+                color="secondary"
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                  height: "100%",
+                  backgroundColor: "red",
                 }}
               >
-                {course.courseImage && (
-                  <CardMedia
-                    component="img"
-                    image={course.courseImage}
-                    alt={course.courseName}
-                  />
-                )}
-                <CardContent>
-                  <Typography variant="h5" component="div" gutterBottom>
-                    {course.courseName}
-                  </Typography>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={2}
-                  >
-                    <Typography variant="body2" color="text.secondary" mr={1}>
-                      Duration:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontWeight="fontWeightMedium"
-                    >
-                      {course.courseDuration} hours
-                    </Typography>
-                  </Box>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={1}
-                  >
-                    <Typography variant="body2" color="text.secondary" mr={1}>
-                      CPD Total:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontWeight="fontWeightMedium"
-                    >
-                      {course.courseCpdTotal} points
-                    </Typography>
-                  </Box>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={1}
-                  >
-                    <Typography variant="body2" color="text.secondary" mr={1}>
-                      CPD Minimum:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontWeight="fontWeightMedium"
-                    >
-                      {course.courseCpdMin} points
-                    </Typography>
-                  </Box>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={1}
-                  >
-                    <Typography variant="body2" color="text.secondary" mr={1}>
-                      Type:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontWeight="fontWeightMedium"
-                    >
-                      {course.courseCategory}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </div>
+                Reset Password
+              </Button> */}
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => setCPDOpen(true)}
+                sx={{
+                  backgroundColor: "green",
+                }}
+              >
+                Update CPD Targets
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Modal
+        open={cpdOpen}
+        onClose={handleCPDClose}
+        aria-labelledby="cpd-modal-title"
+        aria-describedby="cpd-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+            textAlign: "center",
+          }}
+        >
+          <Box sx={{ mb: 2 }}>
+            Do you wish to set your monthly CPD target to {monthlyCPD} and
+            yearly CPD target to {yearlyCPD}?
+          </Box>
+          <Box sx={{ display: "flex", justifyContent: "space-around", mt: 3 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleSubmitCPD}
+              sx={{ bgcolor: "blue", color: "white" }}
+            >
+              Yes
+            </Button>
+            <Button variant="contained" color="secondary" onClick={handleCPDClose} sx={{ bgcolor: "red", color: "white" }}>
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+    </Layout>
   );
 }

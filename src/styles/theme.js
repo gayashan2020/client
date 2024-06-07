@@ -96,5 +96,16 @@ const getTheme = (mode) =>
     },
   });
 
+export const errorOutlineStyle = {
+  "& .MuiOutlinedInput-root": {
+    "&.Mui-focused fieldset": {
+      borderColor: "red",
+    },
+    "&.Mui-error fieldset": {
+      borderColor: "red",
+    },
+  },
+};
+
 export const lightTheme = getTheme("light");
 export const darkTheme = getTheme("dark");

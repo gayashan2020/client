@@ -1,13 +1,15 @@
 import { MongoClient } from 'mongodb';
 
 let client;
+let clientPromise;
 
 async function dbConnect() {
-  if (!client) {
+  if (!clientPromise) {
     client = new MongoClient(process.env.MONGODB_URI);
-    await client.connect();
+    clientPromise = client.connect();
   }
-  const db = client.db(process.env.MONGODB_DB); // database name
+  await clientPromise;
+  const db = client.db(process.env.MONGODB_DB);
   return { db, client };
 }
 

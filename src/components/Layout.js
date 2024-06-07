@@ -116,6 +116,11 @@ export default function Layout({ children }) {
         <ListItemText primary="Chat" />
       </ListItemButton>
 
+      {/* Settings*/}
+      <ListItemButton component="a" href={routes.ADMIN_SETTING}>
+        <ListItemText primary="Settings" />
+      </ListItemButton>
+
       {/* Logout Button */}
       <ListItemButton onClick={handleLogout}>
         <ListItemIcon>

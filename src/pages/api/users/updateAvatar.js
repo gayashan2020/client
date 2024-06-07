@@ -45,7 +45,7 @@ router.put(async (req, res) => {
       { $set: { image: imageUrl } }
     );
 
-    if (result.modifiedCount > 0) {
+    if (result) {
       res
         .status(200)
         .send({ message: "Avatar updated successfully", imageUrl });

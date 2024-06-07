@@ -63,6 +63,7 @@ export default function RegisterForm() {
       setCpdProviderRegNumber("");
 
       toast.success("Registration successful!");
+      router.push("/login");
     } else {
       console.log("Failed to register");
       toast.error("Registration failed.");
