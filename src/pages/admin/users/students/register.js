@@ -34,6 +34,7 @@ import { useRouter } from "next/router";
 import { routes } from "@/assets/constants/routeConstants";
 import { registerUser } from "@/services/auth";
 import { LoadingContext } from "@/contexts/LoadingContext";
+import { Email } from "../../../../../emails/basicTemplate";
 
 export default function RegisterForm() {
   const router = useRouter();
