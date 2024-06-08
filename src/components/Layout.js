@@ -72,7 +72,7 @@ export default function Layout({ children }) {
       </ListItemButton>
       {/* admin Registration */}
       {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
-        <ListItemButton component="a" href={routes.ADMIN_USERS}>
+        <ListItemButton component="a" href={routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT}>
           <ListItemText primary="Users" />
         </ListItemButton>
       )}

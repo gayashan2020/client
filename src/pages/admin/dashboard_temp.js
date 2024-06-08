@@ -31,6 +31,7 @@ import {
   Business,
   CloudUpload,
   CameraAlt,
+  AssignmentInd,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
 import { useEffect, useState, useContext } from "react";
@@ -115,7 +116,7 @@ export default function AdminDashboard() {
         if (currentUser?._id) {
           fetchRegisteredCoursesData(currentUser._id, currentUser.role);
         }
-        fetchSettings(currentUser?._id)
+        fetchSettings(currentUser?._id);
       })
       .catch((error) => {
         console.error("Failed to fetch current user", error);
@@ -324,7 +325,8 @@ export default function AdminDashboard() {
 
     const monthlyTarget =
       settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.monthly || 0;
-    const yearlyTarget = settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.yearly || 0;
+    const yearlyTarget =
+      settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.yearly || 0;
     setMonthlyCPD(monthlyTarget);
     setYearlyCPD(yearlyTarget);
   };
@@ -605,7 +607,7 @@ export default function AdminDashboard() {
               }}
             >
               <CardContent>
-              <CPDProgressBar
+                <CPDProgressBar
                   label="Monthly CPD target"
                   value={setting?.currentCPD}
                   max={monthlyCPD}
@@ -615,6 +617,35 @@ export default function AdminDashboard() {
                   value={setting?.currentCPD}
                   max={yearlyCPD}
                 />
+              </CardContent>
+              <CardContent>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    "&:hover .icon, &:hover .text": {
+                      color: "primary.main", // Change to your desired hover color
+                      transform: "scale(1.1)", // Scale the icon and text on hover
+                      transition: "transform 0.3s ease-in-out", // Smooth transition
+                    },
+                  }}
+                  onClick={() => {
+                    router.push(routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT);
+                  }}
+                >
+                  <AssignmentInd
+                    className="icon"
+                    sx={{
+                      fontSize: 60,
+                      marginBottom: 1,
+                    }}
+                  />
+                  <Typography className="text" align="center">
+                    Manage Users
+                  </Typography>
+                </Box>
               </CardContent>
             </Card>
           </div>
