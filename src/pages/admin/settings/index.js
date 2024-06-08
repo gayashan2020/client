@@ -52,7 +52,7 @@ import {
 } from "@/services/dashboard";
 import { getSettingByID, updateSetting } from "@/services/setting";
 
-export default function index() {
+export default function Index() {
   const [user, setUser] = useState(null);
   const { setLoading } = useContext(LoadingContext);
   const router = useRouter();
