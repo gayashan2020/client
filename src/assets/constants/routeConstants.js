@@ -50,4 +50,7 @@ export const routes = {
 
   //admin setting------------------------------
   ADMIN_SETTING: "/admin/settings",
+
+  //profile------------------------------
+  PROFILE: "/admin/profile",
 };

@@ -2,6 +2,7 @@ import dbConnect from '../../lib/dbConnect';
 import { comparePasswords, generateToken } from '../../lib/auth';
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie'; // Ensure you have this package for setting cookies
+import { userStatus } from '@/assets/constants/authConstants';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -11,12 +12,13 @@ export default async function handler(req, res) {
     const user = await db.collection('users').findOne({ email });
 
     if (user && await comparePasswords(password, user.password)) {
-      if (user.approval) {
+      if (user.status === userStatus.ACTIVE.value) {
         const token = generateToken(user);
-        res.status(200).json({ token });
+        res.status(200).json({ token, approval: true });
       } else {
-        res.status(403).json({ message: 'Approval has not been given by admin' });
-      }
+        const token = generateToken(user);
+        res.status(200).json({ token, approval: false });
+      } 
     } else {
       res.status(401).json({ message: 'Invalid username or password' });
     }

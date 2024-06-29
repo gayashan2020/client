@@ -64,10 +64,7 @@ export async function approveUser(user) {
   const response = await fetch("/api/users/approveUser", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: user.email,
-      approval: true,
-    }),
+    body: JSON.stringify(user),
   });
 
   return response;

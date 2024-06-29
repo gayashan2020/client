@@ -22,10 +22,13 @@ import {
   CardContent,
   CardMedia,
   Grid,
+  Chip,
 } from "@mui/material";
 import Layout from "@/components/Layout";
-import { userRoles } from "@/assets/constants/authConstants";
+import { userRoles, userStatus } from "@/assets/constants/authConstants";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
 import { toast } from "react-toastify";
 import { LoadingContext } from "@/contexts/LoadingContext";
@@ -38,6 +41,8 @@ import {
 } from "@mui/icons-material";
 import { routes } from "@/assets/constants/routeConstants";
 import { useRouter } from "next/router";
+import { approveUser } from "@/services/users";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 export default function UserManagement() {
   const { setLoading } = useContext(LoadingContext);
@@ -64,6 +69,9 @@ export default function UserManagement() {
   const [faculty, setFaculty] = useState("");
 
   const [selectedRole, setSelectedRole] = useState("");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogState, setDialogState] = useState("");
 
   useEffect(() => {
     fetchData("");
@@ -178,6 +186,41 @@ export default function UserManagement() {
 
   const handleAddClose = () => setAddUser(false);
 
+  const handleConfirm = async (reason) => {
+    if (selectedUser && dialogState) {
+      setLoading(true);
+      let approval = {
+        email: selectedUser.email,
+        status: dialogState === 'reject' ? userStatus.DELETED_NO_APPEAL.value : userStatus.ACTIVE.value,
+        reason: dialogState === 'reject' ? reason : null
+      };
+      const response = await approveUser(approval);
+      setLoading(false);
+
+      if (response.ok) {
+        toast.success(`User ${dialogState}ed successfully!`);
+        fetchData();
+      } else {
+        toast.error(`Failed to ${dialogState} user.`);
+      }
+      setDialogOpen(false);
+      setSelectedUser(null);
+      setDialogState('');
+    }
+  };
+
+  const openConfirmationDialog = (user, state) => {
+    setSelectedUser(user);
+    setDialogOpen(true);
+    setDialogState(state);
+  };
+
+  const closeConfirmationDialog = () => {
+    setDialogOpen(false);
+    setSelectedUser(null);
+    setDialogState('');
+  };
+
   return (
     <Layout>
       <Grid container alignItems="center">
@@ -233,37 +276,74 @@ export default function UserManagement() {
               {/* <TableCell>Last Name</TableCell> */}
               <TableCell>Occupation</TableCell>
               <TableCell>District</TableCell>
-              <TableCell>Current Station</TableCell>
+              {/* <TableCell>Current Station</TableCell> */}
               <TableCell>Contact Number</TableCell>
               <TableCell>Batch</TableCell>
               <TableCell>Faculty</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user._id}>
-                <TableCell>{user.fullName}</TableCell>
-                {/* <TableCell>{user.lastName}</TableCell> */}
-                <TableCell>{user.occupation}</TableCell>
-                <TableCell>{user.district}</TableCell>
-                <TableCell>{user.currentStation}</TableCell>
-                <TableCell>{user.contactNumber}</TableCell>
-                <TableCell>{user.batch}</TableCell>
-                <TableCell>{user.faculty}</TableCell>
-                <TableCell>
-                  <IconButton color="primary" onClick={() => handleOpen(user)}>
-                    <VisibilityIcon />
-                  </IconButton>
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleEditOpen(user)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {users.map((user) => {
+              const statusKey = user.status ? user.status.toUpperCase() : "";
+              const statusInfo = userStatus[statusKey];
+              return (
+                <TableRow key={user._id}>
+                  <TableCell>{user.fullName}</TableCell>
+                  {/* <TableCell>{user.lastName}</TableCell> */}
+                  <TableCell>{user.occupation}</TableCell>
+                  <TableCell>{user.district}</TableCell>
+                  {/* <TableCell>{user.currentStation}</TableCell> */}
+                  <TableCell>{user.contactNumber}</TableCell>
+                  <TableCell>{user.batch}</TableCell>
+                  <TableCell>{user.faculty}</TableCell>
+                  <TableCell>
+                    {statusInfo ? (
+                      <Chip
+                        label={statusInfo?.label}
+                        style={statusInfo?.style}
+                      />
+                    ) : (
+                      <></>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleOpen(user)}
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEditOpen(user)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    {(!user.status ||
+                      user.status !== userStatus.ACTIVE.value) && (
+                      <IconButton
+                        color="primary"
+                        onClick={() => openConfirmationDialog(user, "approve")}
+                      >
+                        <CheckCircleIcon style={{ color: "green" }} />
+                      </IconButton>
+                    )}
+                    {(!user.status ||
+                      user.status !== userStatus.ACTIVE.value) &&
+                      user.status !== userStatus.DELETED_NO_APPEAL.value && (
+                        <IconButton
+                          color="primary"
+                          onClick={() => openConfirmationDialog(user, "reject")}
+                        >
+                          <CancelIcon style={{ color: "red" }} />
+                        </IconButton>
+                      )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
@@ -525,9 +605,7 @@ export default function UserManagement() {
               display="flex"
               flexDirection="column"
               alignItems="center"
-              onClick={() =>
-                router.push(routes.ADMIN_USERS_STUDENTS_REGISTER)
-              }
+              onClick={() => router.push(routes.ADMIN_USERS_STUDENTS_REGISTER)}
               className="roleBox"
             >
               <School fontSize="large" />
@@ -537,9 +615,7 @@ export default function UserManagement() {
               display="flex"
               flexDirection="column"
               alignItems="center"
-              onClick={() =>
-                router.push(routes.ADMIN_USERS_MENTORS_REGISTER)
-              }
+              onClick={() => router.push(routes.ADMIN_USERS_MENTORS_REGISTER)}
               className="roleBox"
             >
               <People fontSize="large" />
@@ -559,14 +635,15 @@ export default function UserManagement() {
             </Box>
           </Card>
         </Box>
-        {/* <Button
-          onClick={() => {
-            handleAddClose(false)
-          }}
-        >
-          Close
-        </Button> */}
       </Modal>
+      <ConfirmationDialog
+        open={dialogOpen}
+        handleClose={closeConfirmationDialog}
+        handleConfirm={handleConfirm}
+        title="Confirmation"
+        content={`Do you really want to ${dialogState} this user?`}
+        dialogState={dialogState}
+      />
     </Layout>
   );
 }

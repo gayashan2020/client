@@ -1,17 +1,15 @@
 import React from "react";
-import {
-  Box,
-  Card,
-  CardContent,
-  Grid,
-  Button,
-  Typography,
-} from "@mui/material";
 import { HeroSection } from "@/components/landingPageComponents/hero";
+import { Navbar } from "@/components/landingPageComponents/navbar";
+import { LearningSection } from "@/components/landingPageComponents/learningSection";
+import { FeaturedCourses } from "@/components/landingPageComponents/featuredCourse";
 export default function landingPage() {
-    return (
-        <>
-            <HeroSection />
-        </>
-    )
+  return (
+    <>
+      <Navbar />
+      <HeroSection />
+      <LearningSection/>
+      <FeaturedCourses/>
+    </>
+  );
 }

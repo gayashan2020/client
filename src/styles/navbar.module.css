@@ -1,0 +1,54 @@
+.navbar {
+  background-color: white;
+  color: black;
+  box-shadow: 0px 7px 3px -1px rgba(0,0,0,0.2);
+  padding: 10px 20px;
+  position: relative; /* Ensure it is above other elements */
+  z-index: 10; /* Ensure it is above the hero section */
+  border-radius: 10px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.logo {
+  margin-right: 10px;
+}
+
+.title {
+  flex-grow: 1;
+  font-weight: bold;
+  color: #333;
+}
+
+.menu {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.rightMenu {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.signupButton {
+  background-color: #ff9800;
+  color: white;
+  border-radius: 25px;
+  padding: 10px 20px;
+  font-size: 1em;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+}
+
+.signupButton:hover {
+  background-color: #e68a00;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
+}

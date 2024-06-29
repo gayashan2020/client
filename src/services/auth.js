@@ -1,6 +1,6 @@
 // services/auth.js
 
-import axios from 'axios';
+import axios from "axios";
 
 export async function loginUser(email, password) {
   const response = await axios.post(
@@ -15,20 +15,15 @@ export async function loginUser(email, password) {
       },
     }
   );
-
   return response;
 }
 
 export async function registerUser(userData) {
-  const response = await axios.post(
-    "/api/register",
-    userData,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await axios.post("/api/register", userData, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
   return response;
 }

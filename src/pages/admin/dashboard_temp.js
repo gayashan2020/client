@@ -32,6 +32,7 @@ import {
   CloudUpload,
   CameraAlt,
   AssignmentInd,
+  Message,
 } from "@mui/icons-material";
 import Layout from "../../components/Layout";
 import { useEffect, useState, useContext } from "react";
@@ -55,8 +56,8 @@ import {
   getUserCount,
   getUserCoursesCount,
 } from "@/services/dashboard";
-import { set } from "mongoose";
 import { getSettingByID } from "@/services/setting";
+import { fetchCourses } from "@/services/courses";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
@@ -80,6 +81,8 @@ export default function AdminDashboard() {
   const [contactNumber, setContactNumber] = useState("");
   const [batch, setBatch] = useState("");
   const [faculty, setFaculty] = useState("");
+
+  const [courses, setCourses] = useState([]);
 
   const [pendingApprovalCount, setPendingApprovalCount] = useState(0);
   const [enrolledUsersPerCourse, setEnrolledUsersPerCourse] = useState({
@@ -125,6 +128,7 @@ export default function AdminDashboard() {
         setLoading(false);
       });
     fetchData();
+    getAllCourses();
   }, [setLoading]);
 
   const fetchData = async () => {
@@ -133,7 +137,6 @@ export default function AdminDashboard() {
       const data = await getUserData();
       const countData = await getUserCount();
       const courseCountData = await getUserCoursesCount();
-      console.log(courseCountData, "courseCountData");
       setOnlineUserCountByRole(countData?.onlineUserCountByRole);
       setCoursesCount(courseCountData);
       setLoading(false);
@@ -152,6 +155,18 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error("Failed to fetch user data:", error);
       // Handle error appropriately, perhaps set some error state
+    }
+  };
+
+  const getAllCourses = async () => {
+    setLoading(true);
+    const response = await fetchCourses();
+    console.log(response, "response");
+    setLoading(false);
+    if (response) {
+      setCourses(response);
+    } else {
+      console.error("Failed to fetch courses");
     }
   };
 
@@ -618,13 +633,16 @@ export default function AdminDashboard() {
                   max={yearlyCPD}
                 />
               </CardContent>
-              <CardContent>
+              <CardContent
+                style={{ display: "flex", justifyContent: "center" }}
+              >
                 <Box
                   sx={{
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     cursor: "pointer",
+                    paddingX: "2vh",
                     "&:hover .icon, &:hover .text": {
                       color: "primary.main", // Change to your desired hover color
                       transform: "scale(1.1)", // Scale the icon and text on hover
@@ -644,6 +662,62 @@ export default function AdminDashboard() {
                   />
                   <Typography className="text" align="center">
                     Manage Users
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    paddingX: "2vh",
+                    "&:hover .icon, &:hover .text": {
+                      color: "primary.main", // Change to your desired hover color
+                      transform: "scale(1.1)", // Scale the icon and text on hover
+                      transition: "transform 0.3s ease-in-out", // Smooth transition
+                    },
+                  }}
+                  onClick={() => {
+                    router.push(routes.ADMIN_COURSES_MANAGE_COURSE);
+                  }}
+                >
+                  <School
+                    className="icon"
+                    sx={{
+                      fontSize: 60,
+                      marginBottom: 1,
+                    }}
+                  />
+                  <Typography className="text" align="center">
+                    Manage Courses
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    paddingX: "2vh",
+                    "&:hover .icon, &:hover .text": {
+                      color: "primary.main", // Change to your desired hover color
+                      transform: "scale(1.1)", // Scale the icon and text on hover
+                      transition: "transform 0.3s ease-in-out", // Smooth transition
+                    },
+                  }}
+                  onClick={() => {
+                    router.push(routes.ADMIN_CHAT);
+                  }}
+                >
+                  <Message
+                    className="icon"
+                    sx={{
+                      fontSize: 60,
+                      marginBottom: 1,
+                    }}
+                  />
+                  <Typography className="text" align="center">
+                    Messages
                   </Typography>
                 </Box>
               </CardContent>
@@ -678,18 +752,32 @@ export default function AdminDashboard() {
               {onlineUserCountByRole.cpd_provider || 0}
             </p>
           </div>
-          <div className={styles.card}>
-            <p className={styles.roleName}>Total Approved Courses</p>
-            <p className={styles.roleCount}>
-              {coursesCount.totalApprovedCourses}
-            </p>
-          </div>
-          <div className={styles.card}>
-            <p className={styles.roleName}>Total Enrolled Courses</p>
-            <p className={styles.roleCount}>
-              {coursesCount.totalEnrolledCourses}
-            </p>
-          </div>
+          {user?.role && user?.role === userRoles.STUDENT && (
+            <>
+              <div className={styles.card}>
+                <p className={styles.roleName}>Total Approved Courses</p>
+                <p className={styles.roleCount}>
+                  {coursesCount.totalApprovedCourses}
+                </p>
+              </div>
+              <div className={styles.card}>
+                <p className={styles.roleName}>Total Enrolled Courses</p>
+                <p className={styles.roleCount}>
+                  {coursesCount.totalEnrolledCourses}
+                </p>
+              </div>
+            </>
+          )}
+          {user?.role &&
+            (user?.role === userRoles.SUPER_ADMIN ||
+              user?.role === userRoles.ADMIN) && (
+              <>
+                <div className={styles.card}>
+                  <p className={styles.roleName}>Total Courses</p>
+                  <p className={styles.roleCount}>{courses?.length}</p>
+                </div>
+              </>
+            )}
         </div>
       </div>
       <div className={styles.bottomRow}>

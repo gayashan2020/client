@@ -14,10 +14,9 @@ import {
 import { ThemeProvider } from "@mui/material/styles";
 import Cookies from "js-cookie";
 import { lightTheme as theme } from "@/styles/theme";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { loginUser } from "@/services/auth";
 import { LoadingContext } from "@/contexts/LoadingContext";
-
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -27,31 +26,44 @@ export default function LoginForm() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     try {
       setLoading(true);
       const response = await loginUser(email, password);
-      
       if (response.status === 200) {
         // If the login is successful, store the token in a cookie
         Cookies.set("token", response.data.token, {
           expires: 7, // Cookie will expire in 7 days
-          path: '/', // Cookie will be accessible for the whole site
+          path: "/", // Cookie will be accessible for the whole site
           secure: true, // Cookie will only be transmitted over secure protocol as HTTPS
-          sameSite: 'Strict', // Strict SameSite policy to mitigate CSRF attacks
+          sameSite: "Strict", // Strict SameSite policy to mitigate CSRF attacks
         });
 
         toast.success("Login successful");
-  
-        // Then redirect to the dashboard
-        await router.push(routes.ADMIN);
+
+        if (response.data.approval === true) {
+          // Then redirect to the dashboard
+          await router.push(routes.ADMIN);
+        } else {
+          // Then redirect to the profile
+          await router.push(routes.PROFILE);
+        }
+
         setLoading(false);
+      } else {
+        // Display the error message from the API response
+        toast.error(
+          response.data.message || "An error occurred while logging in"
+        );
       }
     } catch (error) {
       console.error("An error occurred while logging in:", error);
       setLoading(false);
-      // Display the error message from the API
-      toast.error("An error occurred while logging in");
+
+      // Display a general error message if there's no specific message from the API
+      toast.error(
+        error.response?.data?.message || "An error occurred while logging in"
+      );
     }
   };
 

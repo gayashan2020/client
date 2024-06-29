@@ -1,0 +1,173 @@
+.heroContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background: radial-gradient(circle, #2C666E, #161B33);
+  background-size: 200%;
+  background-position: center;
+  color: white;
+  text-align: left;
+  min-height: 80vh;
+  height: 80vh;
+  flex-wrap: wrap;
+  margin-top: -20px;
+  overflow: hidden;
+  position: relative;
+  transition: background-position 0.1s ease-out;
+}
+
+.heroContent {
+  max-width: 400px;
+  width: 100%;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  z-index: 1;
+}
+
+.heroImage {
+  max-width: 600px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heroImage img {
+  width: 100%;
+  height: auto;
+}
+
+.title {
+  font-size: 3em;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.highlight {
+  color: #ffd600;
+  text-decoration: underline;
+  font-style: italic;
+  font-size: 1.2em;
+}
+
+.subtitle {
+  font-size: 1.4em;
+  margin-bottom: 40px;
+}
+
+.exploreButton {
+  background-color: #ff9800;
+  color: white;
+  margin-bottom: 20px;
+  padding: 15px 30px;
+  font-size: 1em;
+  border-radius: 25px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+}
+
+.exploreButton:hover {
+  background-color: #e68a00;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.reviews {
+  margin-top: 20px;
+  font-size: 1em;
+  font-weight: bold;
+  color: #ffd600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+.reviews span {
+  font-size: 1.2em;
+  color: white;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 1200px) {
+  .heroContent {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .heroImage {
+    max-width: 100%;
+    margin-top: 20px;
+  }
+
+  .title {
+    font-size: 2.5em;
+  }
+
+  .subtitle {
+    font-size: 1.2em;
+  }
+
+  .exploreButton {
+    font-size: 0.9em;
+  }
+
+  .reviews {
+    font-size: 0.9em;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroContainer {
+    flex-direction: column;
+    justify-content: center;
+    height: auto;
+    padding: 40px 20px;
+  }
+
+  .heroContent {
+    padding: 0;
+  }
+
+  .title {
+    font-size: 2em;
+  }
+
+  .subtitle {
+    font-size: 1em;
+    margin-bottom: 20px;
+  }
+
+  .exploreButton {
+    font-size: 0.8em;
+    padding: 10px 20px;
+  }
+
+  .reviews {
+    font-size: 0.8em;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.5em;
+  }
+
+  .subtitle {
+    font-size: 0.9em;
+  }
+
+  .exploreButton {
+    font-size: 0.7em;
+    padding: 8px 16px;
+  }
+
+  .reviews {
+    font-size: 0.7em;
+  }
+}
