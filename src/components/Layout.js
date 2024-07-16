@@ -29,7 +29,7 @@ import { logoutUser } from "@/services/auth";
 export default function Layout({ children }) {
   const router = useRouter();
   const [user, setUser] = useState(null);
-  const drawerWidth = 250;
+  const drawerWidth = 200;
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -164,7 +164,7 @@ export default function Layout({ children }) {
               aria-label="open drawer"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: isMobile ? "block" : "none", mb: 1 }}
+              sx={{ mr: 1, display: isMobile ? "block" : "none", mb: 1 }}
             >
               <MenuIcon />
             </IconButton>

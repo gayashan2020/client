@@ -1,3 +1,5 @@
+/* Existing CSS */
+
 .heroContainer {
   display: flex;
   align-items: center;
@@ -169,5 +171,9 @@
 
   .reviews {
     font-size: 0.7em;
+  }
+
+  .heroImage {
+    display: none;
   }
 }
