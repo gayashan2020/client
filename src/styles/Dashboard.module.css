@@ -3,8 +3,9 @@
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: #1e1e1e;
+  height: auto;
 }
 
 .topRow {
@@ -102,6 +103,7 @@
 .bottomRow {
   display: flex;
   gap: 10px;
+  min-height: 200px;
 }
 
 .info {

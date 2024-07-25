@@ -6,11 +6,11 @@ export default async function handler(req, res) {
     const { db } = await dbConnect();
 
   if (req.method === "POST") {
-    const { categoryIds } = req.body;
+    const { categoryNames } = req.body;
 
     try {
       const courses = await db.collection('courses').find({
-        categoryId: { $in: categoryIds },
+        category: { $in: categoryNames },
       }).toArray();
     //   console.log('courses', courses);
       res.status(200).json(courses);

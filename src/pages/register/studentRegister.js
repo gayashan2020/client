@@ -209,7 +209,7 @@ export default function RegisterForm() {
                       margin="normal"
                       error={!!errors.district}
                     >
-                      <InputLabel>District</InputLabel>
+                      <InputLabel>Home District</InputLabel>
                       <Select
                         value={district}
                         onChange={(e) => setDistrict(e.target.value)}
@@ -240,7 +240,7 @@ export default function RegisterForm() {
                       margin="normal"
                       error={!!errors.city}
                     >
-                      <InputLabel>City</InputLabel>
+                      <InputLabel>Home City</InputLabel>
                       <Select
                         value={city}
                         onChange={(e) => setCity(e.target.value)}

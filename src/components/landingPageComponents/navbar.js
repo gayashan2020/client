@@ -27,9 +27,9 @@ export const Navbar = () => {
           <IconButton color="inherit">
             <SearchIcon />
           </IconButton>
-          <IconButton color="inherit">
+          {/* <IconButton color="inherit">
             <ShoppingCartIcon />
-          </IconButton>
+          </IconButton> */}
           <Link href={routes.LOGIN} passHref>
             <Button color="inherit">Login</Button>
           </Link>

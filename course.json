@@ -1,0 +1,942 @@
+[
+  {
+    "id": 1,
+    "event": "Advanced Airway Management",
+    "organizing_body": "College of Anesthesiologists & Intensivists of Sri Lanka",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in performance"
+    ],
+    "dates": "2024.01.18",
+    "contact": {
+      "name": "",
+      "email": "anascolsl@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 2,
+    "event": "40th Annual Academic Congress: Moving forward amidst challenge",
+    "organizing_body": "College of Anesthesiologists & Intensivists of Sri Lanka",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in performance"
+    ],
+    "dates": "2024.01.20 – 2024.01.21",
+    "contact": {
+      "name": "",
+      "email": "anascolsl@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 10
+  },
+  {
+    "id": 3,
+    "event": "NCMC Congress: Dr. G.M Heennilame Oration",
+    "organizing_body": "College of General Practitioners of Sri Lanka with collaboration of North Colombo Medical College",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in performance"
+    ],
+    "dates": "2024.01.05",
+    "contact": {
+      "name": "Dr. Dilini Baranage",
+      "email": "cgpsloffice@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 4,
+    "event": "One-day Essentials for Primary Care Respiratory Health",
+    "organizing_body": "Ceylon College of Family Physicians with collaboration of SL College of Pulmonologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in performance"
+    ],
+    "dates": "2024.01.13",
+    "contact": {
+      "name": "Dr. Chiranthi Liyanage",
+      "email": "secretary@ccp.lk",
+      "phone": "0112888146"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 5,
+    "event": "Lights Camera Action: Brain Imaging taking the lead in Neuro-Diagnosis",
+    "organizing_body": "Association of Sri Lankan Neurologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in performance"
+    ],
+    "dates": "2024.01.11",
+    "contact": {
+      "name": "Dr. Tharindunie Senanayake",
+      "email": "office@asn.lk",
+      "phone": "0768709587"
+    },
+    "category": "Default",
+    "total_cpd_points": 1
+  },
+  {
+    "id": 6,
+    "event": "Pediatric Updates for Pediatricians 2024",
+    "organizing_body": "Sri Lanka College of Pediatricians",
+    "competency_assessed": [
+      "Knowledge Skill development",
+      "Change in performance"
+    ],
+    "dates": "2024.01.14",
+    "contact": {
+      "name": "Dr. Srilal De Silva",
+      "email": "desrilal@yahoo.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 7,
+    "event": "Precision in Airway Mastery: Workshop on Airway Management (46th Annual Academic Sessions Pre-congress Workshop)",
+    "organizing_body": "Kandy Society of Medicine",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Leadership & Teamwork skills"
+    ],
+    "dates": "2024.01.29",
+    "contact": {
+      "name": "Dr. Keerthi Dissanayake",
+      "email": "keerthi.dissanayake@med.pdn.ac.lk",
+      "phone": "0773-554939"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 8,
+    "event": "ASNAC 2024 (17th Annual Congress)",
+    "organizing_body": "Association of Sri Lanka Neurologists",
+    "competency_assessed": [
+      "Knowledge & skill development",
+      "Leadership & Teamwork skills",
+      "Research innovation & publication"
+    ],
+    "dates": "2024.03.01 to 2024.03.04",
+    "contact": {
+      "name": "Dr. Tharindunie Senanayake",
+      "email": "office@asn.lk",
+      "phone": "0768709587"
+    },
+    "category": "Default",
+    "total_cpd_points": 20
+  },
+  {
+    "id": 9,
+    "event": "Urology Basics for Doctors (46th Annual Academic Sessions Pre-congress Workshop)",
+    "organizing_body": "Kandy Society of Medicine",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.02.01",
+    "contact": {
+      "name": "Dr. Keerthi Dissanayake",
+      "email": "keerthi.dissanayake@med.pdn.ac.lk",
+      "phone": "0773-554939"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 10,
+    "event": "High flow Nasal Canula Oxygen Therapy in Children (46th Annual Academic Sessions Pre-congress Workshop)",
+    "organizing_body": "Kandy Society of Medicine",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change",
+      "Leadership & Teamwork skills"
+    ],
+    "dates": "2024.02.04",
+    "contact": {
+      "name": "Dr. Keerthi Dissanayake",
+      "email": "keerthi.dissanayake@med.pdn.ac.lk",
+      "phone": "0773-554939"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 11,
+    "event": "Ischemic Heart Disease (46th Annual Academic Sessions Pre-congress Workshop)",
+    "organizing_body": "Kandy Society of Medicine",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.02.05",
+    "contact": {
+      "name": "Dr. Keerthi Dissanayake",
+      "email": "keerthi.dissanayake@med.pdn.ac.lk",
+      "phone": "0773-554939"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 12,
+    "event": "Essentials in Nutrition for Nurses (46th Annual Academic Sessions Pre-congress Workshop)",
+    "organizing_body": "Kandy Society of Medicine",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.02.06",
+    "contact": {
+      "name": "Dr. Keerthi Dissanayake",
+      "email": "keerthi.dissanayake@med.pdn.ac.lk",
+      "phone": "0773-554939"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 13,
+    "event": "A Walk to Remember through the Emergency Medicine Department (46th Annual Academic Sessions Pre-congress Workshop)",
+    "organizing_body": "Kandy Society of Medicine",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change",
+      "Leadership & Teamwork skills"
+    ],
+    "dates": "2024.02.07",
+    "contact": {
+      "name": "Dr. Keerthi Dissanayake",
+      "email": "keerthi.dissanayake@med.pdn.ac.lk",
+      "phone": "0773-554939"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 14,
+    "event": "Workshop on STD and HIV counseling for doctors nurses and PHIs",
+    "organizing_body": "NSACP",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change",
+      "Leadership & Teamwork skills"
+    ],
+    "dates": "2024.02.26 to 2024.03.01",
+    "contact": {
+      "name": "Dr. Piyumi Perera",
+      "email": "tcapacitybuildingunit@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 25
+  },
+  {
+    "id": 15,
+    "event": "Pre-Congress Workshops on Pulmonary Rehabilitation",
+    "organizing_body": "Sri Lanka College of Pulmonologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change",
+      "Leadership & Teamwork skills"
+    ],
+    "dates": "2024.02.16",
+    "contact": {
+      "name": "Ms. Sonali Lakma",
+      "email": "pulmonologychest@gmail.com",
+      "phone": "0112678201"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 16,
+    "event": "Pre-Congress Workshops on Interventional Pulmonology",
+    "organizing_body": "Sri Lanka College of Pulmonologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change",
+      "Leadership & Teamwork skills"
+    ],
+    "dates": "2024.02.17",
+    "contact": {
+      "name": "Ms. Sonali Lakma",
+      "email": "pulmonologychest@gmail.com",
+      "phone": "0112678201"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 17,
+    "event": "Annual Scientific Sessions of College of Pulmonologists",
+    "organizing_body": "Sri Lanka College of Pulmonologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change",
+      "Leadership & Teamwork skills"
+    ],
+    "dates": "2024.02.18 to 2024.02.20",
+    "contact": {
+      "name": "Ms. Sonali Lakma",
+      "email": "pulmonologychest@gmail.com",
+      "phone": "0112678201"
+    },
+    "category": "Default",
+    "total_cpd_points": 10
+  },
+  {
+    "id": 18,
+    "event": "Bowel Complications in a Neutropenic Patient",
+    "organizing_body": "Sri Lanka College of Oncologists",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.03.16",
+    "contact": {
+      "name": "Dr. Buddhika Somawardana",
+      "email": "info@slco.lk",
+      "phone": "0760830979"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 19,
+    "event": "Insights into the Management of Acute Oncological Issues",
+    "organizing_body": "Sri Lanka College of Oncologists with Ceylon College of Physicians & Sri Lanka College of Internal Medicine",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.04.07",
+    "contact": {
+      "name": "Dr. Buddhika Somawardana",
+      "email": "info@slco.lk",
+      "phone": "0760830979"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 20,
+    "event": "Unusual Cause of Facial Pain and A Lady with Dysphagia",
+    "organizing_body": "Association of Sri Lanka Neurologists",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.03.21",
+    "contact": {
+      "name": "Dr. Tharindunie Senanayake",
+      "email": "office@asn.lk",
+      "phone": "0768709587"
+    },
+    "category": "Default",
+    "total_cpd_points": 1
+  },
+  {
+    "id": 21,
+    "event": "Regional Academic Sessions (Doctor’s Program)",
+    "organizing_body": "Ceylon College of Physicians with Jaffna Medical Association",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.03.29",
+    "contact": {
+      "name": "Dr. Chiranthi Liyanage",
+      "email": "secretary@ccp.lk",
+      "phone": "0112888146"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 22,
+    "event": "Regional Academic Sessions (Nurses’ Program)",
+    "organizing_body": "Ceylon College of Physicians with Jaffna Medical Association",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.03.29",
+    "contact": {
+      "name": "Dr. Chiranthi Liyanage",
+      "email": "secretary@ccp.lk",
+      "phone": "0112888146"
+    },
+    "category": "Default",
+    "total_cpd_points": 4
+  },
+  {
+    "id": 23,
+    "event": "Peer Learning: Periphery to the Fore (Hybrid event held every 2 months)",
+    "organizing_body": "Ceylon College of Physicians",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": [
+      "2024.03.25",
+      "2024.05.27",
+      "2024.06.29",
+      "2024.09.23",
+      "2024.11.25"
+    ],
+    "contact": {
+      "name": "Dr. Chiranthi Liyanage",
+      "email": "secretary@ccp.lk",
+      "phone": "0112888146"
+    },
+    "category": "Default",
+    "total_cpd_points": 1
+  },
+  {
+    "id": 24,
+    "event": "Regional Sessions on Colorectal Cancer",
+    "organizing_body": "Sri Lanka College of Oncologists & Batticaloa Medical Association",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.05.17",
+    "contact": {
+      "name": "Dr. Buddhika Somawardana",
+      "email": "info@slco.lk",
+      "phone": "0760830979"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 25,
+    "event": "Sports Injuries & the role of the Family Physician",
+    "organizing_body": "Ceylon College of Family Physicians",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.03.31",
+    "contact": {
+      "name": "Dr. Oshani Illanagasekara",
+      "email": "oshani09@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 1
+  },
+  {
+    "id": 26,
+    "event": "Dermatological Essentials for the Family Physicians",
+    "organizing_body": "Ceylon College of Family Physicians",
+    "competency_assessed": ["Knowledge Skill Development", "Change"],
+    "dates": "2024.04.03",
+    "contact": {
+      "name": "Dr. Oshani Illanagasekara",
+      "email": "oshani09@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 27,
+    "event": "Advanced Pediatric Life Support",
+    "organizing_body": "College of Pediatricians",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Leadership & Teamwork Skills"
+    ],
+    "dates": "TBD",
+    "contact": {
+      "name": "Dr. Srilal De Silva",
+      "email": "desrilal@yahoo.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 15
+  },
+  {
+    "id": 28,
+    "event": "Academic Sessions Kalutara",
+    "organizing_body": "College of Specialists in Rheumatology & Rehabilitation with Kalutara Clinical Society & TH Kalutara",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.05.06",
+    "contact": {
+      "name": "Dr. Chathurika Dandeniya",
+      "email": "rheumatology@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 4
+  },
+  {
+    "id": 30,
+    "event": "Reflux & Non-Ulcer Dyspepsia",
+    "organizing_body": "Ceylon College of Family Physicians",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.04.28",
+    "contact": {
+      "name": "Dr. Buddhika Munasinghe",
+      "email": "buddhipini@yahoo.co.uk"
+    },
+    "category": "Default",
+    "total_cpd_points": 1
+  },
+  {
+    "id": 31,
+    "event": "Young Physicians Forum & College Lecture",
+    "organizing_body": "Ceylon College of Physicians",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.04.09",
+    "contact": {
+      "name": "Dr. Chiranthi Liyanage",
+      "email": "secretary@ccp.lk",
+      "phone": "0112888146"
+    },
+    "category": "Default",
+    "total_cpd_points": 1.5
+  },
+  {
+    "id": 32,
+    "event": "Grand Round 01 – The Point of No Return",
+    "organizing_body": "Association of Sri Lanka Neurologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.05.16",
+    "contact": {
+      "name": "Dr. Dilini Jayawardena",
+      "email": "office@asn.lk"
+    },
+    "category": "Default",
+    "total_cpd_points": 1
+  },
+  {
+    "id": 33,
+    "event": "World Asthma Day Academic Program",
+    "organizing_body": "Sri Lanka College of Pulmonologists in collaboration with Indian Chest Society",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.05.06",
+    "contact": {
+      "name": "Dr. Upul Pathirana",
+      "email": "pulmonologychest@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 34,
+    "event": "Joint Regional Symposium at DGH Ampara (For Doctors)",
+    "organizing_body": "Sri Lanka College of Pulmonologists in collaboration with Galoya Nimna Clinical Society",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.05.16",
+    "contact": {
+      "name": "Dr. Upul Pathirana",
+      "email": "pulmonologychest@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 4
+  },
+  {
+    "id": 35,
+    "event": "Joint Regional Symposium at DGH Ampara (For Nurses & Physiotherapists)",
+    "organizing_body": "Sri Lanka College of Pulmonologists in collaboration with Galoya Nimna Clinical Society",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.05.16",
+    "contact": {
+      "name": "Dr. Upul Pathirana",
+      "email": "pulmonologychest@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 2
+  },
+  {
+    "id": 36,
+    "event": "SAPA & SLCP Pediatric Congress 2024",
+    "organizing_body": "Sri Lanka College of Pediatricians",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovation & Publication"
+    ],
+    "dates": "2024.06.10 – 2024.06.11",
+    "contact": {
+      "name": "Dr. Srilal De Silva",
+      "email": "desrilal@yahoo.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 10
+  },
+  {
+    "id": 37,
+    "event": "Pulmo Cricare 2024",
+    "organizing_body": "Sri Lanka College of Pulmonologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.05.22",
+    "contact": {
+      "name": "Dr. Upul Pathirana",
+      "email": "pulmonologychest@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 38,
+    "event": "ECG Day 2024",
+    "organizing_body": "Sri Lanka College of Cardiologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.05.26",
+    "contact": {
+      "name": "Dr. Prabha Vithanage",
+      "email": "presidentslha@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 39,
+    "event": "Neurology Update: Neuromuscular Disorders",
+    "organizing_body": "Association of Sri Lanka Neurologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.05.30",
+    "contact": {
+      "name": "Dr. Dilini Jayawardena",
+      "email": "office@asn.lk"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 40,
+    "event": "CTO Workshop (2 Day Program)",
+    "organizing_body": "Sri Lanka College of Cardiologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.06.03 and 2024.06.04",
+    "contact": {
+      "name": "Dr. Prabha Vithanage",
+      "email": "presidentslha@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 10
+  },
+  {
+    "id": 41,
+    "event": "HIPEC Workshop at TH-Kurunegala (2 Day Program)",
+    "organizing_body": "Young Oncologists Forum of Sri Lanka College of Oncologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.07.05 and 2024.07.06",
+    "contact": {
+      "name": "Dr. Buddhika Somawardana",
+      "email": "info@slco.lk",
+      "phone": "0760830979"
+    },
+    "category": "Default",
+    "total_cpd_points": 10
+  },
+  {
+    "id": 42,
+    "event": "International Stroke Conference of Sri Lanka",
+    "organizing_body": "National Stroke Association of Sri Lanka",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.06.14",
+    "contact": {
+      "name": "Dr. Anoma Vidanagamage",
+      "email": "asvidanagamage@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 43,
+    "event": "DENTISTREE CONGRESS: Symposium on Medical Problems in Dental Practice",
+    "organizing_body": "Government Dental Surgeons Associations",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.06.21",
+    "contact": {
+      "name": "Dr. Manjula Herath",
+      "email": "gdsanews@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 44,
+    "event": "DENTISTREE CONGRESS: Symposium on Full Mouth Rehabilitation",
+    "organizing_body": "Government Dental Surgeons Associations",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.06.21",
+    "contact": {
+      "name": "Dr. Manjula Herath",
+      "email": "gdsanews@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 45,
+    "event": "DENTISTREE CONGRESS: Hands On Workshops",
+    "organizing_body": "Government Dental Surgeons Associations",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Leadership & Teamwork Skills"
+    ],
+    "dates": "2024.06.21 and 2024.06.22",
+    "contact": {
+      "name": "Dr. Manjula Herath",
+      "email": "gdsanews@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 10
+  },
+  {
+    "id": 46,
+    "event": "Annual Academic Sessions",
+    "organizing_body": "Kurunegala Medical Association",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.06.20",
+    "contact": {
+      "name": "Dr. Lalith Rasnayake",
+      "email": "medicalassociationkurunegala@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 47,
+    "event": "Annual Sessions of AASL 2024",
+    "organizing_body": "Anatomical Association of Sri Lanka",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovations & Publications"
+    ],
+    "dates": "2024.06.30",
+    "contact": {
+      "name": "Dr. Udari Liyanage",
+      "email": "anatomicalsocietysrilanka@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 48,
+    "event": "Neurology Update 2024",
+    "organizing_body": "Association of Sri Lankan Neurologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.06.28",
+    "contact": {
+      "name": "Dr. Dilini Jayawardene",
+      "email": "office@asn.lk"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 49,
+    "event": "SLENDO 2024 (Pre Congress)",
+    "organizing_body": "Sri Lankan Endocrine Society",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovations & Publications"
+    ],
+    "dates": "2024.08.08 – 2024.08.11",
+    "contact": {
+      "name": "Ms. Sachi Subasinghe",
+      "email": "endocrinesl@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 50,
+    "event": "SLENDO 2024",
+    "organizing_body": "Sri Lankan Endocrine Society",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovations & Publications"
+    ],
+    "dates": "2024.08.08 – 2024.08.11",
+    "contact": {
+      "name": "Ms. Sachi Subasinghe",
+      "email": "endocrinesl@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 15
+  },
+  {
+    "id": 51,
+    "event": "Joint Regional Symposium",
+    "organizing_body": "Sri Lanka College of Pulmonologists with Galle Medical Association",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.06.28",
+    "contact": {
+      "name": "Dr. Upul Pathirana",
+      "email": "pulmonologychest@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 4
+  },
+  {
+    "id": 52,
+    "event": "Management of Thromboembolism in Cancer Patients",
+    "organizing_body": "Sri Lanka College of Oncologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance"
+    ],
+    "dates": "2024.06.29",
+    "contact": {
+      "name": "Dr. Buddhika Somawardana",
+      "email": "info@slco.lk",
+      "phone": "0760830979"
+    },
+    "category": "Default",
+    "total_cpd_points": 3
+  },
+  {
+    "id": 53,
+    "event": "Annual Academic Sessions (Five Day Program - Day 1)",
+    "organizing_body": "Sri Lanka College of Cardiologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovations & Publications"
+    ],
+    "dates": "2024.07.05 – 2024.07.09",
+    "contact": {
+      "name": "Dr. Tanya Perera",
+      "email": "presidentslha@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 54,
+    "event": "Annual Academic Sessions (Five Day Program - Day 2)",
+    "organizing_body": "Sri Lanka College of Cardiologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovations & Publications"
+    ],
+    "dates": "2024.07.05 – 2024.07.09",
+    "contact": {
+      "name": "Dr. Tanya Perera",
+      "email": "presidentslha@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 55,
+    "event": "Annual Academic Sessions (Five Day Program - Day 3)",
+    "organizing_body": "Sri Lanka College of Cardiologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovations & Publications"
+    ],
+    "dates": "2024.07.05 – 2024.07.09",
+    "contact": {
+      "name": "Dr. Tanya Perera",
+      "email": "presidentslha@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 56,
+    "event": "Annual Academic Sessions (Five Day Program - Day 4)",
+    "organizing_body": "Sri Lanka College of Cardiologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovations & Publications"
+    ],
+    "dates": "2024.07.05 – 2024.07.09",
+    "contact": {
+      "name": "Dr. Tanya Perera",
+      "email": "presidentslha@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 57,
+    "event": "Annual Academic Sessions (Five Day Program - Day 5)",
+    "organizing_body": "Sri Lanka College of Cardiologists",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovations & Publications"
+    ],
+    "dates": "2024.07.05 – 2024.07.09",
+    "contact": {
+      "name": "Dr. Tanya Perera",
+      "email": "presidentslha@gmail.com"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 58,
+    "event": "Annual Academic Sessions (Two Day Program - Day 1)",
+    "organizing_body": "Sri Lanka Association of Clinical Pharmacology & Therapeutics",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovations & Publications"
+    ],
+    "dates": "2024.07.11 – 2024.07.12",
+    "contact": {
+      "name": "Prof. Priyanga Ranasinghe",
+      "email": "office@slcpt.lk"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  },
+  {
+    "id": 59,
+    "event": "Annual Academic Sessions (Two Day Program - Day 2)",
+    "organizing_body": "Sri Lanka Association of Clinical Pharmacology & Therapeutics",
+    "competency_assessed": [
+      "Knowledge Skill Development",
+      "Change in Performance",
+      "Research Innovations & Publications"
+    ],
+    "dates": "2024.07.11 – 2024.07.12",
+    "contact": {
+      "name": "Prof. Priyanga Ranasinghe",
+      "email": "office@slcpt.lk"
+    },
+    "category": "Default",
+    "total_cpd_points": 5
+  }
+]

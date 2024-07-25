@@ -12,6 +12,7 @@ import {
   Checkbox,
   FormControlLabel,
   CardMedia,
+  Tooltip
 } from "@mui/material";
 import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
@@ -20,6 +21,8 @@ import { fetchCoursesByCategoryIds } from "@/services/courses";
 import { fetchCurrentUser } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { userRoles } from "@/assets/constants/authConstants";
+import { routes } from "@/assets/constants/routeConstants";
+// import placeholderImage from "static/placeholderImage.webp";
 
 export default function Index() {
   const [categories, setCategories] = useState([]);
@@ -32,7 +35,6 @@ export default function Index() {
   const router = useRouter();
 
   useEffect(() => {
-    
     async function fetchData() {
       setLoading(true);
       let categoriesData = await fetchCategoriesAndUser();
@@ -49,15 +51,14 @@ export default function Index() {
       setUser(currentUser);
     } catch (error) {
       console.error("Failed to fetch current user", error);
-    } 
+    }
     try {
       const categoriesData = await fetchCategories();
       setCategories(categoriesData);
       return categoriesData;
     } catch (error) {
       console.error("Failed to fetch categories:", error);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -66,9 +67,11 @@ export default function Index() {
     try {
       setLoading(true);
       // console.log('selectedCategories',selectedCategories);
-      const categoryIds = selectedCategories.map((category) => category._id);
-      const coursesData = await fetchCoursesByCategoryIds(categoryIds);
-      // console.log('coursesData',coursesData);
+      const categoryNames = selectedCategories.map(
+        (category) => category.category
+      );
+      const coursesData = await fetchCoursesByCategoryIds(categoryNames);
+      console.log("coursesData", categoryNames);
       setCourses(coursesData);
     } catch (error) {
       console.error("Failed to fetch courses:", error);
@@ -96,9 +99,14 @@ export default function Index() {
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategories((prevSelected) => {
-      const updatedCategories = prevSelected.find((category) => category._id === categoryId)
+      const updatedCategories = prevSelected.find(
+        (category) => category._id === categoryId
+      )
         ? prevSelected.filter((category) => category._id !== categoryId)
-        : [...prevSelected, categories.find((category) => category._id === categoryId)];
+        : [
+            ...prevSelected,
+            categories.find((category) => category._id === categoryId),
+          ];
       fetchCourses(updatedCategories); // Call fetchCourses with updated categories
       return updatedCategories;
     });
@@ -115,19 +123,6 @@ export default function Index() {
     p: 4,
   };
 
-  const cardStyle = {
-    width: 250, // You can set this to the size you desire
-    height: 400, // Making the height the same as width to create a square
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center", // This centers the content horizontally
-    textAlign: "center", // Ensures text is centered within the content area
-  };
-
-  const navigateToCourse = (course) => {
-    router.push(`/admin/courses/${course.category}/${course._id}`);
-  };
-
   return (
     <Layout>
       <Grid container spacing={1} style={{ minHeight: "100vh" }}>
@@ -139,7 +134,9 @@ export default function Index() {
                 key={index}
                 control={
                   <Checkbox
-                    checked={selectedCategories.some((selected) => selected._id === category._id)}
+                    checked={selectedCategories.some(
+                      (selected) => selected._id === category._id
+                    )}
                     onChange={() => handleCategoryChange(category._id)}
                   />
                 }
@@ -161,6 +158,21 @@ export default function Index() {
                   Add Category
                 </Button>
               )}
+            {user &&
+              [
+                userRoles.SUPER_ADMIN,
+                userRoles.ADMIN,
+                userRoles.CPD_PROVIDER,
+              ].includes(user.role) && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => router.push(routes.ADMIN_COURSES_ADD_COURSE)}
+                  style={{ marginTop: "20px" }}
+                >
+                  Add Courses
+                </Button>
+              )}
           </Box>
         </Grid>
         <Grid item xs={12} md={9} lg={10}>
@@ -173,102 +185,37 @@ export default function Index() {
           >
             {courses.map((course, index) => (
               <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-                <Card sx={cardStyle} onClick={() => navigateToCourse(course)}>
-                  <CardActionArea
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "100%",
-                      justifyContent: "flex-start",
-                    }}
-                  >
-                    {course.image && (
-                      <CardMedia
-                        component="img"
-                        height="140"
-                        image={course.image}
-                        alt={course.name}
-                      />
-                    )}
-                    <CardContent>
-                      <Typography variant="h5" component="div" gutterBottom>
-                        {course.name}
-                      </Typography>
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        mt={2}
-                      >
-                        <Typography variant="body2" color="text.secondary" mr={1}>
-                          Duration:
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.primary"
-                          fontWeight="fontWeightMedium"
-                        >
-                          {course.duration} hours
-                        </Typography>
-                      </Box>
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        mt={1}
-                      >
-                        <Typography variant="body2" color="text.secondary" mr={1}>
-                          CPD Total:
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.primary"
-                          fontWeight="fontWeightMedium"
-                        >
-                          {course.cpdTotal} points
-                        </Typography>
-                      </Box>
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        mt={1}
-                      >
-                        <Typography variant="body2" color="text.secondary" mr={1}>
-                          CPD Minimum:
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.primary"
-                          fontWeight="fontWeightMedium"
-                        >
-                          {course.cpdMin} points
-                        </Typography>
-                      </Box>
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        mt={1}
-                      >
-                        <Typography variant="body2" color="text.secondary" mr={1}>
-                          Type:
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.primary"
-                          fontWeight="fontWeightMedium"
-                        >
-                          {course.type}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
+                <CourseCard course={course} />
               </Grid>
             ))}
           </Grid>
         </Grid>
+        {/* <Grid>
+          {user &&
+            [
+              userRoles.SUPER_ADMIN,
+              userRoles.ADMIN,
+              userRoles.CPD_PROVIDER,
+            ].includes(user.role) && (
+              <Grid item>
+                <Card
+                  sx={cardStyle}
+                  onClick={() => router.push(routes.ADMIN_COURSES_ADD_COURSE)}
+                >
+                  <CardActionArea sx={{ height: "100%", minHeight: "250px" }}>
+                    <CardContent>
+                      <Typography variant="h5" component="div">
+                        Add Courses
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Click here to add new courses
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+            )}
+        </Grid> */}
       </Grid>
 
       {/* Add Category Modal */}
@@ -304,3 +251,130 @@ export default function Index() {
     </Layout>
   );
 }
+
+const CourseCard = ({ course }) => {
+  const router = useRouter();
+  const cardStyle = {
+    width: 250,
+    height: 400,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    textAlign: "center",
+    borderRadius: "15px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+    transition: "transform 0.2s ease-in-out",
+    backgroundColor: "#fff",
+    "&:hover": {
+      transform: "scale(1.05)",
+    },
+  };
+
+  const navigateToCourse = (course) => {
+    router.push(`/admin/courses/${course.category}/${course._id}`);
+  };
+
+  const truncateText = (text, length) => {
+    if (text.length <= length) return text;
+    return `${text.substring(0, length)}...`;
+  };
+
+  const { image, event, dates, total_cpd_points, category, organizing_body } =
+    course;
+  return (
+    <Card sx={cardStyle} onClick={() => navigateToCourse(course)}>
+      <CardActionArea
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          justifyContent: "flex-start",
+          color: "black",
+        }}
+      >
+        <CardMedia
+          component="img"
+          height="140"
+          image={image || "/static/placeholderImage.webp"}
+          alt={event}
+        />
+        <CardContent>
+          <Typography component="div" gutterBottom>
+            {event}
+          </Typography>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mt={2}
+          >
+            <Typography variant="body2" color="dark-gray" mr={1}>
+              Dates:
+            </Typography>
+            <Typography
+              variant="body2"
+              color="gray"
+              fontWeight="fontWeightMedium"
+            >
+              {dates}
+            </Typography>
+          </Box>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mt={1}
+          >
+            <Typography variant="body2" color="dark-gray" mr={1}>
+              CPD Total:
+            </Typography>
+            <Typography
+              variant="body2"
+              color="gray"
+              fontWeight="fontWeightMedium"
+            >
+              {total_cpd_points}
+            </Typography>
+          </Box>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mt={1}
+          >
+            <Typography variant="body2" color="dark-gray" mr={1}>
+              Type:
+            </Typography>
+            <Typography
+              variant="body2"
+              color="gray"
+              fontWeight="fontWeightMedium"
+            >
+              {category}
+            </Typography>
+          </Box>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+            <Typography variant="body2" color="dark-gray" mr={1}>
+              By:
+            </Typography>
+            <Tooltip title={organizing_body} arrow>
+              <Typography
+                variant="body2"
+                color="gray"
+                fontWeight="fontWeightMedium"
+                sx={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '150px', // Adjust as needed
+                }}
+              >
+                {truncateText(organizing_body, 30)}
+              </Typography>
+            </Tooltip>
+          </Box>
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  );
+};

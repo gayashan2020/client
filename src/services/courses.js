@@ -118,15 +118,15 @@ export const fetchCoursesByCategoryId = async (categoryId) => {
   return await response.json();
 };
 
-export const fetchCoursesByCategoryIds = async (categoryIds) => {
-  console.log('test 2',categoryIds);
+export const fetchCoursesByCategoryIds = async (categoryNames) => {
+
   try {
     const response = await fetch('/api/courses/byCategoryIds', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({categoryIds}),
+      body: JSON.stringify({categoryNames}),
     });
   
     if (!response.ok) {

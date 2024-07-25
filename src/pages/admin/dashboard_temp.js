@@ -467,6 +467,14 @@ export default function AdminDashboard() {
     console.log("route");
   };
 
+  const navigateShortCuts = (type) => {
+    if (type === "course" && user?.role === userRoles.SITE_ADMIN) {
+      router.push(routes.ADMIN_COURSES);
+    } else if (type === "course" && user?.role === userRoles.STUDENT) {
+      router.push(routes.ADMIN_COURSES);
+    } 
+  };
+
   const cardStyle = {
     width: 250, // You can set this to the size you desire
     height: 400, // Making the height the same as width to create a square
@@ -553,16 +561,16 @@ export default function AdminDashboard() {
                 variant="h5"
                 component="div"
                 align="center"
-                style={{ paddingTop: "15%" }}
+                style={{ paddingTop: "18%" }}
               >
-                {user?.fullName || user?.firstName + " " + user?.lastName}
+                {user?.fullName?user.fullName:user?.firstName?user.firstName + " " + user.lastName:user?.institution}
               </Typography>
               <Typography
                 variant="subtitle1"
                 style={{ color: "#aaaaaa" }}
                 align="center"
               >
-                {user?.role}
+                {user?.role.replace('_', ' ')}
               </Typography>
               <List dense style={{ position: "relative", marginTop: "20px" }}>
                 {/* Vertical line container */}
@@ -619,9 +627,10 @@ export default function AdminDashboard() {
                 color: "white",
                 height: "100%",
                 width: "100%",
+                alignContent: "center",
               }}
             >
-              <CardContent>
+              {user?.role&& user.role === userRoles.STUDENT && (<CardContent>
                 <CPDProgressBar
                   label="Monthly CPD target"
                   value={setting?.currentCPD}
@@ -632,11 +641,11 @@ export default function AdminDashboard() {
                   value={setting?.currentCPD}
                   max={yearlyCPD}
                 />
-              </CardContent>
+              </CardContent>)}
               <CardContent
                 style={{ display: "flex", justifyContent: "center" }}
               >
-                <Box
+                {user?.role&& user.role === userRoles.ADMIN && (<Box
                   sx={{
                     display: "flex",
                     flexDirection: "column",
@@ -663,7 +672,7 @@ export default function AdminDashboard() {
                   <Typography className="text" align="center">
                     Manage Users
                   </Typography>
-                </Box>
+                </Box>)}
                 <Box
                   sx={{
                     display: "flex",
@@ -678,7 +687,7 @@ export default function AdminDashboard() {
                     },
                   }}
                   onClick={() => {
-                    router.push(routes.ADMIN_COURSES_MANAGE_COURSE);
+                    navigateShortCuts("course");
                   }}
                 >
                   <School
@@ -689,7 +698,7 @@ export default function AdminDashboard() {
                     }}
                   />
                   <Typography className="text" align="center">
-                    Manage Courses
+                    Courses
                   </Typography>
                 </Box>
                 <Box

@@ -18,9 +18,6 @@ import {
   FormControl,
   InputLabel,
   Card,
-  CardActionArea,
-  CardContent,
-  CardMedia,
   Grid,
   Chip,
 } from "@mui/material";
@@ -32,13 +29,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import EditIcon from "@mui/icons-material/Edit";
 import { toast } from "react-toastify";
 import { LoadingContext } from "@/contexts/LoadingContext";
-import {
-  PersonAdd,
-  AccountBox,
-  People,
-  School,
-  Business,
-} from "@mui/icons-material";
+import { PersonAdd, AccountBox, People, School, Business } from "@mui/icons-material";
 import { routes } from "@/assets/constants/routeConstants";
 import { useRouter } from "next/router";
 import { approveUser } from "@/services/users";
@@ -52,9 +43,7 @@ export default function UserManagement() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
-
   const [addUser, setAddUser] = useState(false);
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [gender, setGender] = useState("");
@@ -67,17 +56,16 @@ export default function UserManagement() {
   const [contactNumber, setContactNumber] = useState("");
   const [batch, setBatch] = useState("");
   const [faculty, setFaculty] = useState("");
-
   const [selectedRole, setSelectedRole] = useState("");
-
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogState, setDialogState] = useState("");
 
   useEffect(() => {
-    fetchData("");
-  }, []);
+    fetchData(selectedRole);
+  }, [selectedRole]);
 
   const fetchData = async (role) => {
+    console.log("fetching data", role);
     try {
       setLoading(true);
       const response = await fetch("/api/users/allUsers", {
@@ -102,13 +90,11 @@ export default function UserManagement() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Send a PUT request to the /api/updateUser endpoint with the form data
     const response = await fetch("/api/users/updateUser", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email, // Include the email to identify the user to update
+        email,
         firstName,
         lastName,
         gender,
@@ -124,10 +110,7 @@ export default function UserManagement() {
     });
 
     if (response.ok) {
-      // Show a toast message
       toast.success("Update successful!");
-
-      // Clear the form
       setFirstName("");
       setLastName("");
       setGender("");
@@ -140,16 +123,8 @@ export default function UserManagement() {
       setContactNumber("");
       setBatch("");
       setFaculty("");
-
-      // Update the table
-      fetchData();
-
-      // Close the modal
+      fetchData(selectedRole);
       setEditOpen(false);
-
-      // Navigate to the login page
-      toast.success("Update successful!");
-      //   router.push("/login");
     } else {
       console.log("Failed to update");
       toast.error("Update failed.");
@@ -157,20 +132,20 @@ export default function UserManagement() {
   };
 
   const handleEditOpen = (user) => {
-    setEditUser(user); // Set the user to be edited
-    setFirstName(user.firstName); // Update the firstName state
-    setLastName(user.lastName); // Update the lastName state
-    setGender(user.gender); // Update the gender state
-    setEmail(user.email); // Update the email state
-    setOccupation(user.occupation); // Update the occupation state
-    setDistrict(user.district); // Update the district state
-    setCity(user.city); // Update the city state
-    setCurrentStation(user.currentStation); // Update the currentStation state
-    setNicOrPassport(user.nicOrPassport); // Update the nicOrPassport state
-    setContactNumber(user.contactNumber); // Update the contactNumber state
-    setBatch(user.batch); // Update the batch state
-    setFaculty(user.faculty); // Update the faculty state
-    setEditOpen(true); // Open the modal
+    setEditUser(user);
+    setFirstName(user.firstName);
+    setLastName(user.lastName);
+    setGender(user.gender);
+    setEmail(user.email);
+    setOccupation(user.occupation);
+    setDistrict(user.district);
+    setCity(user.city);
+    setCurrentStation(user.currentStation);
+    setNicOrPassport(user.nicOrPassport);
+    setContactNumber(user.contactNumber);
+    setBatch(user.batch);
+    setFaculty(user.faculty);
+    setEditOpen(true);
   };
 
   const handleEditClose = () => setEditOpen(false);
@@ -191,21 +166,21 @@ export default function UserManagement() {
       setLoading(true);
       let approval = {
         email: selectedUser.email,
-        status: dialogState === 'reject' ? userStatus.DELETED_NO_APPEAL.value : userStatus.ACTIVE.value,
-        reason: dialogState === 'reject' ? reason : null
+        status: dialogState === "reject" ? userStatus.DELETED_NO_APPEAL.value : userStatus.ACTIVE.value,
+        reason: dialogState === "reject" ? reason : null,
       };
       const response = await approveUser(approval);
       setLoading(false);
 
       if (response.ok) {
         toast.success(`User ${dialogState}ed successfully!`);
-        fetchData();
+        fetchData(selectedRole);
       } else {
         toast.error(`Failed to ${dialogState} user.`);
       }
       setDialogOpen(false);
       setSelectedUser(null);
-      setDialogState('');
+      setDialogState("");
     }
   };
 
@@ -218,30 +193,22 @@ export default function UserManagement() {
   const closeConfirmationDialog = () => {
     setDialogOpen(false);
     setSelectedUser(null);
-    setDialogState('');
+    setDialogState("");
   };
 
   return (
     <Layout>
       <Grid container alignItems="center">
-        <Grid
-          item
-          xs={6}
-          md={4}
-          lg={1}
-          sx={{ display: "flex", justifyContent: "center" }}
-        >
+        <Grid item xs={6} md={4} lg={1} sx={{ display: "flex", justifyContent: "center" }}>
           <PersonAdd
-            onClick={() => {
-              handleAddOpen();
-            }}
+            onClick={() => handleAddOpen()}
             sx={{
               cursor: "pointer",
               fontSize: 40,
               "&:hover": {
-                color: "primary.main", // Change to your desired hover color
-                transform: "scale(1.1)", // Scale the icon on hover
-                transition: "transform 0.3s ease-in-out", // Smooth transition
+                color: "primary.main",
+                transform: "scale(1.1)",
+                transition: "transform 0.3s ease-in-out",
               },
             }}
           />
@@ -251,10 +218,7 @@ export default function UserManagement() {
             <InputLabel>Filter by Role</InputLabel>
             <Select
               value={selectedRole}
-              onChange={(e) => {
-                setSelectedRole(e.target.value);
-                fetchData(e.target.value);
-              }}
+              onChange={(e) => setSelectedRole(e.target.value)}
               label="Filter by Role"
             >
               <MenuItem value="">All</MenuItem>
@@ -262,7 +226,6 @@ export default function UserManagement() {
               <MenuItem value={userRoles.STUDENT}>Student</MenuItem>
               <MenuItem value={userRoles.MENTOR}>Mentor</MenuItem>
               <MenuItem value={userRoles.CPD_PROVIDER}>CPD Provider</MenuItem>
-              {/* <MenuItem value={userRoles.SUPER_ADMIN}>Super Admin</MenuItem> */}
             </Select>
           </FormControl>
         </Grid>
@@ -273,10 +236,8 @@ export default function UserManagement() {
           <TableHead>
             <TableRow>
               <TableCell>Full Name</TableCell>
-              {/* <TableCell>Last Name</TableCell> */}
-              <TableCell>Occupation</TableCell>
+              <TableCell>Role</TableCell>
               <TableCell>District</TableCell>
-              {/* <TableCell>Current Station</TableCell> */}
               <TableCell>Contact Number</TableCell>
               <TableCell>Batch</TableCell>
               <TableCell>Faculty</TableCell>
@@ -290,53 +251,30 @@ export default function UserManagement() {
               const statusInfo = userStatus[statusKey];
               return (
                 <TableRow key={user._id}>
-                  <TableCell>{user.fullName}</TableCell>
-                  {/* <TableCell>{user.lastName}</TableCell> */}
-                  <TableCell>{user.occupation}</TableCell>
+                  <TableCell>{user.fullName ? user.fullName : user.institution}</TableCell>
+                  <TableCell>{user?.role?.replace("_", " ")}</TableCell>
                   <TableCell>{user.district}</TableCell>
-                  {/* <TableCell>{user.currentStation}</TableCell> */}
                   <TableCell>{user.contactNumber}</TableCell>
                   <TableCell>{user.batch}</TableCell>
                   <TableCell>{user.faculty}</TableCell>
                   <TableCell>
-                    {statusInfo ? (
-                      <Chip
-                        label={statusInfo?.label}
-                        style={statusInfo?.style}
-                      />
-                    ) : (
-                      <></>
-                    )}
+                    {statusInfo ? <Chip label={statusInfo.label} style={statusInfo.style} /> : <></>}
                   </TableCell>
                   <TableCell>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleOpen(user)}
-                    >
+                    <IconButton color="primary" onClick={() => handleOpen(user)}>
                       <VisibilityIcon />
                     </IconButton>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleEditOpen(user)}
-                    >
+                    <IconButton color="primary" onClick={() => handleEditOpen(user)}>
                       <EditIcon />
                     </IconButton>
-                    {(!user.status ||
-                      user.status !== userStatus.ACTIVE.value) && (
-                      <IconButton
-                        color="primary"
-                        onClick={() => openConfirmationDialog(user, "approve")}
-                      >
+                    {(!user.status || user.status !== userStatus.ACTIVE.value) && (
+                      <IconButton color="primary" onClick={() => openConfirmationDialog(user, "approve")}>
                         <CheckCircleIcon style={{ color: "green" }} />
                       </IconButton>
                     )}
-                    {(!user.status ||
-                      user.status !== userStatus.ACTIVE.value) &&
+                    {(!user.status || user.status !== userStatus.ACTIVE.value) &&
                       user.status !== userStatus.DELETED_NO_APPEAL.value && (
-                        <IconButton
-                          color="primary"
-                          onClick={() => openConfirmationDialog(user, "reject")}
-                        >
+                        <IconButton color="primary" onClick={() => openConfirmationDialog(user, "reject")}>
                           <CancelIcon style={{ color: "red" }} />
                         </IconButton>
                       )}
@@ -347,13 +285,8 @@ export default function UserManagement() {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* View model */}
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+
+      <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
         <Box
           sx={{
             position: "absolute",
@@ -382,13 +315,7 @@ export default function UserManagement() {
         </Box>
       </Modal>
 
-      {/* Edit model */}
-      <Modal
-        open={editOpen}
-        onClose={handleEditClose}
-        aria-labelledby="edit-modal-title"
-        aria-describedby="edit-modal-description"
-      >
+      <Modal open={editOpen} onClose={handleEditClose} aria-labelledby="edit-modal-title" aria-describedby="edit-modal-description">
         <Box
           sx={{
             position: "absolute",
@@ -396,8 +323,8 @@ export default function UserManagement() {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 400,
-            maxHeight: "90vh", // 90% of the viewport height
-            overflow: "auto", // Add a scrollbar when the content exceeds the maxHeight
+            maxHeight: "90vh",
+            overflow: "auto",
             bgcolor: "background.paper",
             border: "2px solid #000",
             boxShadow: 24,
@@ -529,26 +456,15 @@ export default function UserManagement() {
                 onChange={(e) => setFaculty(e.target.value)}
                 required
               />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-              >
+              <Button type="submit" fullWidth variant="contained" color="primary" onClick={handleSubmit}>
                 Update
               </Button>
             </form>
           )}
         </Box>
       </Modal>
-      {/* Add User model */}
-      <Modal
-        open={addUser}
-        onClose={handleAddClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+
+      <Modal open={addUser} onClose={handleAddClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
         <Box
           sx={{
             position: "absolute",
@@ -577,65 +493,37 @@ export default function UserManagement() {
               justifyContent: "space-around",
               padding: "40px 20px",
               "& .roleBox": {
-                // Adding a className for reference
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                transition: "transform 0.4s ease-in-out", // Smooth transition for transform
+                transition: "transform 0.4s ease-in-out",
                 "&:hover": {
-                  transform: "scale(1.1)", // Scale up box slightly on hover
-                  cursor: "pointer", // Change cursor to indicate clickable
+                  transform: "scale(1.1)",
+                  cursor: "pointer",
                 },
               },
             }}
           >
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              onClick={() =>
-                router.push(routes.ADMIN_USERS_SITE_ADMIN_REGISTER)
-              }
-              className="roleBox"
-            >
+            <Box display="flex" flexDirection="column" alignItems="center" onClick={() => router.push(routes.ADMIN_USERS_SITE_ADMIN_REGISTER)} className="roleBox">
               <AccountBox fontSize="large" />
               <Typography>Admin</Typography>
             </Box>
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              onClick={() => router.push(routes.ADMIN_USERS_STUDENTS_REGISTER)}
-              className="roleBox"
-            >
+            <Box display="flex" flexDirection="column" alignItems="center" onClick={() => router.push(routes.ADMIN_USERS_STUDENTS_REGISTER)} className="roleBox">
               <School fontSize="large" />
               <Typography>Mentee</Typography>
             </Box>
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              onClick={() => router.push(routes.ADMIN_USERS_MENTORS_REGISTER)}
-              className="roleBox"
-            >
+            <Box display="flex" flexDirection="column" alignItems="center" onClick={() => router.push(routes.ADMIN_USERS_MENTORS_REGISTER)} className="roleBox">
               <People fontSize="large" />
               <Typography>Mentor</Typography>
             </Box>
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              onClick={() =>
-                router.push(routes.ADMIN_USERS_CPD_PROVIDERS_REGISTER)
-              }
-              className="roleBox"
-            >
+            <Box display="flex" flexDirection="column" alignItems="center" onClick={() => router.push(routes.ADMIN_USERS_CPD_PROVIDERS_REGISTER)} className="roleBox">
               <Business fontSize="large" />
               <Typography>CPD Provider</Typography>
             </Box>
           </Card>
         </Box>
       </Modal>
+      
       <ConfirmationDialog
         open={dialogOpen}
         handleClose={closeConfirmationDialog}
