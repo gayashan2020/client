@@ -1,3 +1,4 @@
+// src/pages/admin/courses/index.js
 import React, { useEffect, useState, useContext } from "react";
 import {
   Card,
@@ -12,17 +13,18 @@ import {
   Checkbox,
   FormControlLabel,
   CardMedia,
-  Tooltip
+  Tooltip,
+  useMediaQuery,
 } from "@mui/material";
 import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
+import CourseCard from "@/components/CourseCard"; // Updated import
 import { fetchCategories, addCategories } from "@/services/courseCategories";
 import { fetchCoursesByCategoryIds } from "@/services/courses";
 import { fetchCurrentUser } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { userRoles } from "@/assets/constants/authConstants";
 import { routes } from "@/assets/constants/routeConstants";
-// import placeholderImage from "static/placeholderImage.webp";
 
 export default function Index() {
   const [categories, setCategories] = useState([]);
@@ -66,7 +68,6 @@ export default function Index() {
   const fetchCourses = async (selectedCategories) => {
     try {
       setLoading(true);
-      // console.log('selectedCategories',selectedCategories);
       const categoryNames = selectedCategories.map(
         (category) => category.category
       );
@@ -125,10 +126,27 @@ export default function Index() {
 
   return (
     <Layout>
-      <Grid container spacing={1} style={{ minHeight: "100vh" }}>
+      <Grid
+        container
+        spacing={2}
+        style={{
+          minHeight: "100vh",
+        }}
+      >
         <Grid item xs={12} md={3} lg={2}>
-          <Box style={{ padding: "10px" }}>
-            <Typography variant="h6">Categories</Typography>
+          <Box
+            sx={{
+              padding: "20px",
+              backgroundColor: "#333",
+              borderRadius: "10px",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+              color: "#fff",
+              marginTop: "20px",
+            }}
+          >
+            <Typography variant="h6" gutterBottom>
+              Categories
+            </Typography>
             {categories.map((category, index) => (
               <FormControlLabel
                 key={index}
@@ -138,9 +156,20 @@ export default function Index() {
                       (selected) => selected._id === category._id
                     )}
                     onChange={() => handleCategoryChange(category._id)}
+                    sx={{
+                      color: "#fff",
+                      "&.Mui-checked": {
+                        color: "#fff",
+                      },
+                    }}
                   />
                 }
                 label={category.category}
+                sx={{
+                  "& .MuiTypography-root": {
+                    color: "#fff",
+                  },
+                }}
               />
             ))}
             {user &&
@@ -153,7 +182,15 @@ export default function Index() {
                   variant="contained"
                   color="primary"
                   onClick={handleOpen}
-                  style={{ marginTop: "20px" }}
+                  sx={{
+                    marginTop: "20px",
+                    width: "100%",
+                    backgroundColor: "#007bff",
+                    color: "#fff",
+                    "&:hover": {
+                      backgroundColor: "#0056b3",
+                    },
+                  }}
                 >
                   Add Category
                 </Button>
@@ -168,7 +205,15 @@ export default function Index() {
                   variant="contained"
                   color="primary"
                   onClick={() => router.push(routes.ADMIN_COURSES_ADD_COURSE)}
-                  style={{ marginTop: "20px" }}
+                  sx={{
+                    marginTop: "20px",
+                    backgroundColor: "#007bff",
+                    color: "#fff",
+                    width: "100%",
+                    "&:hover": {
+                      backgroundColor: "#0056b3",
+                    },
+                  }}
                 >
                   Add Courses
                 </Button>
@@ -178,10 +223,10 @@ export default function Index() {
         <Grid item xs={12} md={9} lg={10}>
           <Grid
             container
-            spacing={2}
-            alignItems="start"
+            spacing={3}
+            alignItems="flex-start"
             justifyContent="flex-start"
-            style={{ padding: "5px" }}
+            sx={{ padding: "20px" }}
           >
             {courses.map((course, index) => (
               <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
@@ -190,32 +235,6 @@ export default function Index() {
             ))}
           </Grid>
         </Grid>
-        {/* <Grid>
-          {user &&
-            [
-              userRoles.SUPER_ADMIN,
-              userRoles.ADMIN,
-              userRoles.CPD_PROVIDER,
-            ].includes(user.role) && (
-              <Grid item>
-                <Card
-                  sx={cardStyle}
-                  onClick={() => router.push(routes.ADMIN_COURSES_ADD_COURSE)}
-                >
-                  <CardActionArea sx={{ height: "100%", minHeight: "250px" }}>
-                    <CardContent>
-                      <Typography variant="h5" component="div">
-                        Add Courses
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Click here to add new courses
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              </Grid>
-            )}
-        </Grid> */}
       </Grid>
 
       {/* Add Category Modal */}
@@ -251,130 +270,3 @@ export default function Index() {
     </Layout>
   );
 }
-
-const CourseCard = ({ course }) => {
-  const router = useRouter();
-  const cardStyle = {
-    width: 250,
-    height: 400,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    textAlign: "center",
-    borderRadius: "15px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-    transition: "transform 0.2s ease-in-out",
-    backgroundColor: "#fff",
-    "&:hover": {
-      transform: "scale(1.05)",
-    },
-  };
-
-  const navigateToCourse = (course) => {
-    router.push(`/admin/courses/${course.category}/${course._id}`);
-  };
-
-  const truncateText = (text, length) => {
-    if (text.length <= length) return text;
-    return `${text.substring(0, length)}...`;
-  };
-
-  const { image, event, dates, total_cpd_points, category, organizing_body } =
-    course;
-  return (
-    <Card sx={cardStyle} onClick={() => navigateToCourse(course)}>
-      <CardActionArea
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-          justifyContent: "flex-start",
-          color: "black",
-        }}
-      >
-        <CardMedia
-          component="img"
-          height="140"
-          image={image || "/static/placeholderImage.webp"}
-          alt={event}
-        />
-        <CardContent>
-          <Typography component="div" gutterBottom>
-            {event}
-          </Typography>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mt={2}
-          >
-            <Typography variant="body2" color="dark-gray" mr={1}>
-              Dates:
-            </Typography>
-            <Typography
-              variant="body2"
-              color="gray"
-              fontWeight="fontWeightMedium"
-            >
-              {dates}
-            </Typography>
-          </Box>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mt={1}
-          >
-            <Typography variant="body2" color="dark-gray" mr={1}>
-              CPD Total:
-            </Typography>
-            <Typography
-              variant="body2"
-              color="gray"
-              fontWeight="fontWeightMedium"
-            >
-              {total_cpd_points}
-            </Typography>
-          </Box>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mt={1}
-          >
-            <Typography variant="body2" color="dark-gray" mr={1}>
-              Type:
-            </Typography>
-            <Typography
-              variant="body2"
-              color="gray"
-              fontWeight="fontWeightMedium"
-            >
-              {category}
-            </Typography>
-          </Box>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-            <Typography variant="body2" color="dark-gray" mr={1}>
-              By:
-            </Typography>
-            <Tooltip title={organizing_body} arrow>
-              <Typography
-                variant="body2"
-                color="gray"
-                fontWeight="fontWeightMedium"
-                sx={{
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: '150px', // Adjust as needed
-                }}
-              >
-                {truncateText(organizing_body, 30)}
-              </Typography>
-            </Tooltip>
-          </Box>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-};

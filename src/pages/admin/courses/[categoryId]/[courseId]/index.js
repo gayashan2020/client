@@ -26,7 +26,7 @@ import {
   getEnrolledDataByCourse,
 } from "@/services/courses";
 import { LoadingContext } from "@/contexts/LoadingContext";
-import { fetchCurrentUser, fetchUsers } from "@/services/users";
+import { fetchCurrentUser, fetchUsers, updateUser } from "@/services/users";
 import { toast } from "react-toastify";
 import { userRoles } from "@/assets/constants/authConstants";
 import { fetchReflectiveLogByUsersCourses } from "@/services/reflectiveLog";
@@ -130,6 +130,12 @@ export default function CourseDetail() {
     try {
       setLoading(true);
       await enrollToCourse(user._id, courseId, selectedMentor);
+      let payload = {
+        email: user.email,
+        mentorId: selectedMentor,
+        mentorApprovalStatus: false,
+      }
+      await updateUser(payload);
 
       setLoading(false);
       setMentorDialogOpen(false); // Close dialog after enrollment
@@ -284,19 +290,16 @@ export default function CourseDetail() {
           </Grid>
           <Grid item xs={12} md={6}>
             <Typography variant="h4" sx={{ mb: 4 }}>
-              {course.name}
+              {course.event}
             </Typography>
             <Typography variant="body1" sx={{ mb: 2 }} gutterBottom>
-              {course.description}
+              {course.organizing_body}
             </Typography>
             <Typography variant="body2" sx={{ mb: 2 }} gutterBottom>
-              Max CPD Points: {course.cpdTotal}
+              Max CPD Points: {course.total_cpd_points}
             </Typography>
             <Typography variant="body2" sx={{ mb: 2 }} gutterBottom>
-              Min CPD Points: {course.cpdMin}
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 2 }} gutterBottom>
-              Duration: {course.duration} hours
+              Dates: {course.dates}
             </Typography>
             <Button
               variant="contained"

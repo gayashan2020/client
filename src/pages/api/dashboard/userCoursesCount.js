@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
 export default async (req, res) => {
   if (req.method === "GET") {
@@ -19,26 +20,25 @@ export default async (req, res) => {
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      const userId = user._id;
 
-      // Get total enrolled courses for the current user
+      // Check if the user has mentor approval status
+      if (!user.mentorApprovalStatus || !user.mentorId) {
+        return res.status(403).json({ message: "Mentor approval required" });
+      }
+
+      const userId = user._id;
+      const mentorId = new ObjectId(user.mentorId);
+
+      // Get total enrolled courses for the current user with mentor approval
       const totalEnrolledCourses = await db
         .collection("users_courses")
         .countDocuments({
           userId: userId,
           enrollStatus: true,
+          mentorId: mentorId,
         });
 
-      // Get total approved courses for the current user
-      const totalApprovedCourses = await db
-        .collection("users_courses")
-        .countDocuments({
-          userId: userId,
-          enrollStatus: true,
-          mentor_approved: true,
-        });
-
-      // Get currently enrolled and approved course details
+      // Get currently enrolled and approved course details with mentor approval
       const courseDetails = await db
         .collection("users_courses")
         .aggregate([
@@ -46,7 +46,21 @@ export default async (req, res) => {
             $match: {
               userId: userId,
               enrollStatus: true,
-              mentor_approved: true,
+              mentorId: mentorId,
+            },
+          },
+          {
+            $lookup: {
+              from: "users",
+              localField: "userId",
+              foreignField: "_id",
+              as: "userDetails",
+            },
+          },
+          { $unwind: "$userDetails" },
+          {
+            $match: {
+              "userDetails.mentorApprovalStatus": true,
             },
           },
           {
@@ -82,7 +96,6 @@ export default async (req, res) => {
 
       res.status(200).json({
         totalEnrolledCourses,
-        totalApprovedCourses,
         courseDetails,
       });
     } catch (error) {

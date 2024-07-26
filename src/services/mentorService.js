@@ -81,3 +81,24 @@ export async function approveMentee(userId, courseId) {
     throw error; // Re-throw the error to be handled by the calling code
   }
 }
+
+export async function fetchMentorByCurrentUser() {
+  try {
+    const response = await fetch("/api/mentors/getMentorByCurrentUser", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error fetching mentor details: ${response.statusText}`);
+    }
+
+    const mentor = await response.json();
+    return mentor;
+  } catch (error) {
+    console.error("fetchMentorByCurrentUser error:", error);
+    throw error;
+  }
+}

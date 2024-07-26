@@ -44,55 +44,25 @@ import { styled } from "@mui/material/styles";
 import { toast } from "react-toastify";
 import { updateUser, updateAvatar } from "@/services/users";
 import { userRoles } from "@/assets/constants/authConstants";
-// import { useTheme } from "@mui/material/styles";
-// import { PieChartComponent } from "@/components/PieChartComponent";
-import { BarChartComponent } from "@/components/BarChartComponent";
+import CourseCard from "@/components/CourseCard"; // Import CourseCard component
 import {
-  getOccupationData,
-  getCityData,
   getUserData,
-  fetchRegisteredCourses,
-  fetchRegisteredCoursesByUser,
   getUserCount,
   getUserCoursesCount,
+  fetchRegisteredCourses,
+  fetchRegisteredCoursesByUser,
 } from "@/services/dashboard";
 import { getSettingByID } from "@/services/setting";
 import { fetchCourses } from "@/services/courses";
+import { fetchMentorByCurrentUser } from "@/services/mentorService";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
   const { setLoading } = useContext(LoadingContext);
   const router = useRouter();
 
-  const [editOpen, setEditOpen] = useState(false);
-  const [editUser, setEditUser] = useState(null);
-
   const [avatar, setAvatar] = useState(null); // State to store the selected file
   const [avatarPreview, setAvatarPreview] = useState(null); // State to store the preview URL
-
-  const [fullName, setFirstName] = useState("");
-  const [gender, setGender] = useState("");
-  const [email, setEmail] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [district, setDistrict] = useState("");
-  const [city, setCity] = useState("");
-  const [currentStation, setCurrentStation] = useState("");
-  const [nicOrPassport, setNicOrPassport] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-  const [batch, setBatch] = useState("");
-  const [faculty, setFaculty] = useState("");
-
-  const [courses, setCourses] = useState([]);
-
-  const [pendingApprovalCount, setPendingApprovalCount] = useState(0);
-  const [enrolledUsersPerCourse, setEnrolledUsersPerCourse] = useState({
-    names: [],
-    counts: [],
-  });
-  const [registeredCourses, setRegisteredCourses] = useState({
-    names: [],
-    counts: [],
-  });
 
   const [onlineUserCountByRole, setOnlineUserCountByRole] = useState({
     admin: 0,
@@ -111,6 +81,10 @@ export default function AdminDashboard() {
   const [yearlyCPD, setYearlyCPD] = useState(0);
   const [monthlyCPD, setMonthlyCPD] = useState(0);
 
+  const [mentor, setMentor] = useState(null);
+
+  const [approvedCourses, setApprovedCourses] = useState([]);
+
   useEffect(() => {
     setLoading(true);
     fetchCurrentUser()
@@ -118,6 +92,7 @@ export default function AdminDashboard() {
         setUser(currentUser);
         if (currentUser?._id) {
           fetchRegisteredCoursesData(currentUser._id, currentUser.role);
+          fetchMentorDetails();
         }
         fetchSettings(currentUser?._id);
       })
@@ -131,12 +106,25 @@ export default function AdminDashboard() {
     getAllCourses();
   }, [setLoading]);
 
+  const fetchMentorDetails = async () => {
+    try {
+      const mentorDetails = await fetchMentorByCurrentUser();
+      console.log("mentorDetails", mentorDetails);
+      setMentor(mentorDetails);
+      console.log("Mentor Details:", mentorDetails);
+    } catch (error) {
+      console.error("Failed to fetch mentor details", error);
+    }
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
       const data = await getUserData();
       const countData = await getUserCount();
       const courseCountData = await getUserCoursesCount();
+      courseCountData.totalApprovedCourses = courseCountData.courseDetails.length;
+      console.log("courseCountData", courseCountData);
       setOnlineUserCountByRole(countData?.onlineUserCountByRole);
       setCoursesCount(courseCountData);
       setLoading(false);
@@ -161,14 +149,24 @@ export default function AdminDashboard() {
   const getAllCourses = async () => {
     setLoading(true);
     const response = await fetchCourses();
-    console.log(response, "response");
     setLoading(false);
     if (response) {
-      setCourses(response);
+      // Use a loop instead of map to merge the course details
+      const updatedCourseDetails = [];
+      for (const courseDetail of coursesCount.courseDetails) {
+        const fullCourse = response.find((course) => course._id === courseDetail.courseId);
+        if (fullCourse) {
+          updatedCourseDetails.push(fullCourse);
+        }
+      }
+      setApprovedCourses(updatedCourseDetails);
     } else {
       console.error("Failed to fetch courses");
+      return [];
     }
   };
+  
+  
 
   const fetchRegisteredCoursesData = async (userId, role) => {
     try {
@@ -210,100 +208,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleEditOpen = (user) => {
-    setEditUser(user); // Set the user to be edited
-    setFirstName(user.fullName); // Update the firstName state
-    setGender(user.gender); // Update the gender state
-    setEmail(user.email); // Update the email state
-    setOccupation(user.occupation); // Update the occupation state
-    setDistrict(user.district); // Update the district state
-    setCity(user.city); // Update the city state
-    setCurrentStation(user.currentStation); // Update the currentStation state
-    setNicOrPassport(user.nicOrPassport); // Update the nicOrPassport state
-    setContactNumber(user.contactNumber); // Update the contactNumber state
-    setBatch(user.batch); // Update the batch state
-    setFaculty(user.faculty); // Update the faculty state
-    setEditOpen(true); // Open the modal
-  };
-
-  const handleAvatarSubmit = async () => {
-    // Send a PUT or POST request to the endpoint handling file uploads
-    const response = await updateAvatar(user._id, avatar);
-
-    // Handle the response from the file upload endpoint
-    if (response.ok) {
-      // Handle successful upload
-      toast.success("Avatar updated successfully!");
-      // Optionally, fetch the updated user data to refresh the avatar preview
-    } else {
-      // Handle errors
-      toast.error("Failed to update avatar.");
-    }
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    const userData = {
-      email,
-      fullName,
-      gender,
-      occupation,
-      city,
-      district,
-      currentStation,
-      nicOrPassport,
-      contactNumber,
-      batch,
-      faculty,
-    };
-    setLoading(true);
-    const response = await updateUser(userData);
-    setLoading(false);
-
-    if (response.ok) {
-      await handleAvatarSubmit();
-      // Show a toast message
-      toast.success("Update successful!");
-
-      // Clear the form
-      setFirstName("");
-      setGender("");
-      setEmail("");
-      setOccupation("");
-      setDistrict("");
-      setCity("");
-      setCurrentStation("");
-      setNicOrPassport("");
-      setContactNumber("");
-      setBatch("");
-      setFaculty("");
-
-      // Update the table
-      fetchCurrentUser()
-        .then((currentUser) => {
-          setUser(currentUser);
-        })
-        .catch((error) => {
-          console.error("Failed to fetch current user", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-
-      // Close the modal
-      setEditOpen(false);
-
-      // Navigate to the login page
-      toast.success("Update successful!");
-      //   router.push("/login");
-    } else {
-      console.log("Failed to update");
-      toast.error("Update failed.");
-    }
-  };
-
-  const handleEditClose = () => setEditOpen(false);
 
   const CPDProgressBar = ({ label, value, max }) => (
     <Box>
@@ -373,116 +277,12 @@ export default function AdminDashboard() {
     width: 1,
   });
 
-  const RoleCard = () => (
-    <Card
-      variant="outlined"
-      style={{
-        display: "flex",
-        justifyContent: "space-around",
-        padding: "40px 20px",
-      }}
-      sx={{
-        display: "flex",
-        justifyContent: "space-around",
-        padding: "40px 20px",
-        "& .roleBox": {
-          // Adding a className for reference
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          transition: "transform 0.4s ease-in-out", // Smooth transition for transform
-          "&:hover": {
-            transform: "scale(1.1)", // Scale up box slightly on hover
-            cursor: "pointer", // Change cursor to indicate clickable
-          },
-        },
-      }}
-    >
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        onClick={() =>
-          router.push(routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT)
-        }
-        className="roleBox"
-      >
-        <AccountBox fontSize="large" />
-        <Typography>Admin</Typography>
-      </Box>
-      <Badge
-        badgeContent={pendingApprovalCount.student}
-        color="error"
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          onClick={() =>
-            router.push(routes.ADMIN_USERS_STUDENTS_USER_MANAGEMENT)
-          }
-          className="roleBox"
-        >
-          <School fontSize="large" />
-          <Typography>Mentee</Typography>
-        </Box>
-      </Badge>
-      <Badge
-        badgeContent={pendingApprovalCount.mentor}
-        color="error"
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          onClick={() =>
-            router.push(routes.ADMIN_USERS_MENTORS_USER_MANAGEMENT)
-          }
-          className="roleBox"
-        >
-          <People fontSize="large" />
-          <Typography>Mentor</Typography>
-        </Box>
-      </Badge>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        onClick={() =>
-          router.push(routes.ADMIN_USERS_CPD_PROVIDERS_USER_MANAGEMENT)
-        }
-        className="roleBox"
-      >
-        <Business fontSize="large" />
-        <Typography>CPD Provider</Typography>
-      </Box>
-    </Card>
-  );
-
-  const navigateToCourse = (course) => {
-    // Navigate to the dynamic route for course details
-    // router.push(`/admin/courses/${categoryId}/${coursesCount?.courseDetails?._id}`);
-    console.log("route");
-  };
-
   const navigateShortCuts = (type) => {
     if (type === "course" && user?.role === userRoles.SITE_ADMIN) {
       router.push(routes.ADMIN_COURSES);
     } else if (type === "course" && user?.role === userRoles.STUDENT) {
       router.push(routes.ADMIN_COURSES);
-    } 
-  };
-
-  const cardStyle = {
-    width: 250, // You can set this to the size you desire
-    height: 400, // Making the height the same as width to create a square
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center", // This centers the content horizontally
-    textAlign: "center", // Ensures text is centered within the content area
-    margin: "20px", // Add some space between the content and the card
+    }
   };
 
   return (
@@ -563,14 +363,18 @@ export default function AdminDashboard() {
                 align="center"
                 style={{ paddingTop: "18%" }}
               >
-                {user?.fullName?user.fullName:user?.firstName?user.firstName + " " + user.lastName:user?.institution}
+                {user?.fullName
+                  ? user.fullName
+                  : user?.firstName
+                  ? user.firstName + " " + user.lastName
+                  : user?.institution}
               </Typography>
               <Typography
                 variant="subtitle1"
                 style={{ color: "#aaaaaa" }}
                 align="center"
               >
-                {user?.role.replace('_', ' ')}
+                {user?.role.replace("_", " ")}
               </Typography>
               <List dense style={{ position: "relative", marginTop: "20px" }}>
                 {/* Vertical line container */}
@@ -630,49 +434,55 @@ export default function AdminDashboard() {
                 alignContent: "center",
               }}
             >
-              {user?.role&& user.role === userRoles.STUDENT && (<CardContent>
-                <CPDProgressBar
-                  label="Monthly CPD target"
-                  value={setting?.currentCPD}
-                  max={monthlyCPD}
-                />
-                <CPDProgressBar
-                  label="Yearly CPD target"
-                  value={setting?.currentCPD}
-                  max={yearlyCPD}
-                />
-              </CardContent>)}
+              {user?.role && user.role === userRoles.STUDENT && (
+                <CardContent>
+                  <CPDProgressBar
+                    label="Monthly CPD target"
+                    value={setting?.currentCPD}
+                    max={monthlyCPD}
+                  />
+                  <CPDProgressBar
+                    label="Yearly CPD target"
+                    value={setting?.currentCPD}
+                    max={yearlyCPD}
+                  />
+                </CardContent>
+              )}
               <CardContent
                 style={{ display: "flex", justifyContent: "center" }}
               >
-                {user?.role&& user.role === userRoles.ADMIN && (<Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    cursor: "pointer",
-                    paddingX: "2vh",
-                    "&:hover .icon, &:hover .text": {
-                      color: "primary.main", // Change to your desired hover color
-                      transform: "scale(1.1)", // Scale the icon and text on hover
-                      transition: "transform 0.3s ease-in-out", // Smooth transition
-                    },
-                  }}
-                  onClick={() => {
-                    router.push(routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT);
-                  }}
-                >
-                  <AssignmentInd
-                    className="icon"
+                {user?.role && user.role === userRoles.ADMIN && (
+                  <Box
                     sx={{
-                      fontSize: 60,
-                      marginBottom: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      cursor: "pointer",
+                      paddingX: "2vh",
+                      "&:hover .icon, &:hover .text": {
+                        color: "primary.main", // Change to your desired hover color
+                        transform: "scale(1.1)", // Scale the icon and text on hover
+                        transition: "transform 0.3s ease-in-out", // Smooth transition
+                      },
                     }}
-                  />
-                  <Typography className="text" align="center">
-                    Manage Users
-                  </Typography>
-                </Box>)}
+                    onClick={() => {
+                      router.push(
+                        routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT
+                      );
+                    }}
+                  >
+                    <AssignmentInd
+                      className="icon"
+                      sx={{
+                        fontSize: 60,
+                        marginBottom: 1,
+                      }}
+                    />
+                    <Typography className="text" align="center">
+                      Manage Users
+                    </Typography>
+                  </Box>
+                )}
                 <Box
                   sx={{
                     display: "flex",
@@ -792,104 +602,69 @@ export default function AdminDashboard() {
       <div className={styles.bottomRow}>
         <div className={styles.info}>
           <p>Mentor Info Section</p>
-        </div>
-        <div className={styles.chart}>
-          {coursesCount?.courseDetails?.map((course, index) => (
+          {mentor ? (
             <Card
-              key={index}
-              sx={cardStyle}
-              onClick={() => navigateToCourse(course)}
+              style={{
+                padding: "35px",
+                borderRadius: "10px",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                backgroundColor: "#fff",
+                color: "#333",
+                marginBottom: "20px",
+                position: "relative", // Needed for positioning the tag
+              }}
             >
-              <CardActionArea
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                  height: "100%",
-                }}
-              >
-                {course.courseImage && (
-                  <CardMedia
-                    component="img"
-                    image={course.courseImage}
-                    alt={course.courseName}
-                  />
-                )}
-                <CardContent>
-                  <Typography variant="h5" component="div" gutterBottom>
-                    {course.courseName}
+              <Box display="flex" alignItems="center" mb={2}>
+                <Avatar src={mentor.image} sx={{ width: 80, height: 80 }} />
+                <Box ml={2}>
+                  <Typography variant="h6">{mentor.fullName}</Typography>
+                  <Typography variant="body2" color="black">
+                    {mentor.email}
                   </Typography>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={2}
-                  >
-                    <Typography variant="body2" color="text.secondary" mr={1}>
-                      Duration:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontWeight="fontWeightMedium"
-                    >
-                      {course.courseDuration} hours
-                    </Typography>
-                  </Box>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={1}
-                  >
-                    <Typography variant="body2" color="text.secondary" mr={1}>
-                      CPD Total:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontWeight="fontWeightMedium"
-                    >
-                      {course.courseCpdTotal} points
-                    </Typography>
-                  </Box>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={1}
-                  >
-                    <Typography variant="body2" color="text.secondary" mr={1}>
-                      CPD Minimum:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontWeight="fontWeightMedium"
-                    >
-                      {course.courseCpdMin} points
-                    </Typography>
-                  </Box>
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={1}
-                  >
-                    <Typography variant="body2" color="text.secondary" mr={1}>
-                      Type:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontWeight="fontWeightMedium"
-                    >
-                      {course.courseCategory}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </CardActionArea>
+                  <Typography variant="body2" color="black">
+                    {mentor?.occupation?.replace(/_/g, " ")}
+                  </Typography>
+                </Box>
+              </Box>
+              {!user?.mentorApprovalStatus && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    backgroundColor: "orange",
+                    color: "#fff",
+                    padding: "5px 10px",
+                    borderRadius: "0 0 0 10px",
+                  }}
+                >
+                  Pending Approval
+                </Box>
+              )}
+              {user?.mentorApprovalStatus && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    backgroundColor: "green",
+                    color: "#fff",
+                    padding: "5px 10px",
+                    borderRadius: "0 0 0 10px",
+                  }}
+                >
+                  Approved
+                </Box>
+              )}
             </Card>
+          ) : (
+            <Typography>No mentor assigned or details unavailable.</Typography>
+          )}
+        </div>
+
+        <div className={styles.chart}>
+          {approvedCourses?.map((course, index) => (
+            <CourseCard key={index} course={course} />
           ))}
         </div>
       </div>

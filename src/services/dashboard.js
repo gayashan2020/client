@@ -67,6 +67,7 @@ export const getUserCount = async () => {
 export const getUserCoursesCount = async () => {
   try {
     const response = await axios.get("/api/dashboard/userCoursesCount");
+    console.log('response',response);
     return response.data;
   } catch (error) {
     console.error("Error fetching user count:", error);
