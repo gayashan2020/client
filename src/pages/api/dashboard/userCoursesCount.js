@@ -75,20 +75,15 @@ export default async (req, res) => {
           {
             $project: {
               _id: 0,
-              courseId: "$courseId",
-              courseName: "$courseDetails.name",
-              courseImage: "$courseDetails.image",
-              courseCategory: "$courseDetails.category",
-              courseDuration: "$courseDetails.duration",
-              courseCpdTotal: "$courseDetails.cpdTotal",
-              courseCpdMin: "$courseDetails.cpdMin",
-              courseType: "$courseDetails.type",
-              courseLink: "$courseDetails.link",
-              courseDescription: "$courseDetails.description",
-              courseObjectives: "$courseDetails.objectives",
-              courseAuthors: "$courseDetails.authors",
-              courseKeywords: "$courseDetails.keywords",
-              courseApproved: "$courseDetails.approved",
+              courseId: 1,
+              event: "$courseDetails.event", // Changed field name to match your sample data
+              image: "$courseDetails.image", // Ensure this field exists in the `courses` collection
+              category: "$courseDetails.category",
+              dates: "$courseDetails.dates", // Ensure this field exists in the `courses` collection
+              total_cpd_points: "$courseDetails.total_cpd_points",
+              organizing_body: "$courseDetails.organizing_body", // Ensure this field exists in the `courses` collection
+              competency_assessed: "$courseDetails.competency_assessed", // Ensure this field exists in the `courses` collection
+              contact: "$courseDetails.contact", // Ensure this field exists in the `courses` collection
             },
           },
         ])

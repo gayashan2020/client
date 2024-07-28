@@ -83,18 +83,17 @@ export default function AdminDashboard() {
 
   const [mentor, setMentor] = useState(null);
 
-  const [approvedCourses, setApprovedCourses] = useState([]);
-
   useEffect(() => {
     setLoading(true);
     fetchCurrentUser()
       .then((currentUser) => {
         setUser(currentUser);
         if (currentUser?._id) {
-          fetchRegisteredCoursesData(currentUser._id, currentUser.role);
+          // fetchRegisteredCoursesData(currentUser._id, currentUser.role);
           fetchMentorDetails();
         }
         fetchSettings(currentUser?._id);
+        fetchData();
       })
       .catch((error) => {
         console.error("Failed to fetch current user", error);
@@ -102,8 +101,6 @@ export default function AdminDashboard() {
       .finally(() => {
         setLoading(false);
       });
-    fetchData();
-    getAllCourses();
   }, [setLoading]);
 
   const fetchMentorDetails = async () => {
@@ -124,77 +121,16 @@ export default function AdminDashboard() {
       const countData = await getUserCount();
       const courseCountData = await getUserCoursesCount();
       courseCountData.totalApprovedCourses = courseCountData.courseDetails.length;
-      console.log("courseCountData", courseCountData);
       setOnlineUserCountByRole(countData?.onlineUserCountByRole);
       setCoursesCount(courseCountData);
       setLoading(false);
-      if (data) {
-        setPendingApprovalCount(data?.pendingApprovalByRole);
-        const courseNames = data?.enrolledUsersPerCourse.map(
-          (item) => item.courseName
-        );
-        const userCounts = data?.enrolledUsersPerCourse.map(
-          (item) => item.enrolledUsersCount
-        );
-        setEnrolledUsersPerCourse({ names: courseNames, counts: userCounts });
-      } else {
-        console.error("Failed to fetch user data");
-      }
+      console.log("data", data, countData, courseCountData);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
       // Handle error appropriately, perhaps set some error state
     }
   };
-
-  const getAllCourses = async () => {
-    setLoading(true);
-    const response = await fetchCourses();
-    setLoading(false);
-    if (response) {
-      // Use a loop instead of map to merge the course details
-      const updatedCourseDetails = [];
-      for (const courseDetail of coursesCount.courseDetails) {
-        const fullCourse = response.find((course) => course._id === courseDetail.courseId);
-        if (fullCourse) {
-          updatedCourseDetails.push(fullCourse);
-        }
-      }
-      setApprovedCourses(updatedCourseDetails);
-    } else {
-      console.error("Failed to fetch courses");
-      return [];
-    }
-  };
   
-  
-
-  const fetchRegisteredCoursesData = async (userId, role) => {
-    try {
-      setLoading(true);
-      if (role === userRoles.MENTOR) {
-        const registeredCoursesData = await fetchRegisteredCourses(userId);
-        const courseNames = registeredCoursesData.map(
-          (item) => item.courseName
-        );
-        const userCounts = registeredCoursesData.map((item) => item.userCount);
-        setRegisteredCourses({ names: courseNames, counts: userCounts });
-        setLoading(false);
-      } else {
-        const registeredCoursesData = await fetchRegisteredCoursesByUser(
-          userId
-        );
-        const courseNames = registeredCoursesData.map(
-          (item) => item.courseName
-        );
-        const userCounts = registeredCoursesData.map((item) => item.userCount);
-        setRegisteredCourses({ names: courseNames, counts: userCounts });
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
-      setLoading(false);
-    }
-  };
 
   const handleAvatarChange = (event) => {
     const file = event.target.files[0];
@@ -260,7 +196,7 @@ export default function AdminDashboard() {
     },
     {
       icon: LocationOn,
-      text: user?.officialAddress || "Hospital 1, Kollupitiya, Colombo",
+      text: user?.officialAddress,
       key: "location",
     },
   ];
@@ -663,8 +599,8 @@ export default function AdminDashboard() {
         </div>
 
         <div className={styles.chart}>
-          {approvedCourses?.map((course, index) => (
-            <CourseCard key={index} course={course} />
+          {coursesCount.courseDetails?.map((course, index) => (
+            <CourseCard key={index} course={course} margin = {3} />
           ))}
         </div>
       </div>

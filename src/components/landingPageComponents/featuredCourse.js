@@ -10,6 +10,7 @@ export const FeaturedCourses = () => {
   useEffect(() => {
     const getCourses = async () => {
       const response = await fetchCourses();
+      // console.log(response,'response');
       const selectedCourses = selectRandomCourses(response, 4);
       setCourses(selectedCourses);
     };

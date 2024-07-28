@@ -13,11 +13,12 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 
-const CourseCard = ({ course }) => {
+const CourseCard = ({ course, margin }) => {
   const router = useRouter();
   const isMobileOrTablet = useMediaQuery("(max-width:960px)");
 
   const cardStyle = {
+    margin: margin?margin:"1px",
     width: 250,
     height: 400,
     display: "flex",
@@ -34,7 +35,7 @@ const CourseCard = ({ course }) => {
   };
 
   const navigateToCourse = (course) => {
-    router.push(`/admin/courses/${course.category}/${course._id}`);
+    router.push(`/admin/courses/${course.category}/${course?._id?course?._id:course?.courseId}`);
   };
 
   const normalizeDates = (dates) => {

@@ -33,20 +33,24 @@ export async function updateCourseImage(courseId, file) {
 }
 
 export async function fetchCourses(filter = "") {
-  const response = await fetch("/api/courses/getCourses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ filter }),
-  });
+  try {
+    const response = await fetch("/api/courses/getCourses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ filter }),
+    });
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
   }
-
-  const data = await response.json();
-  return data;
 }
 
 export const fetchCourseById = async (categoryId, courseId) => {
@@ -119,20 +123,19 @@ export const fetchCoursesByCategoryId = async (categoryId) => {
 };
 
 export const fetchCoursesByCategoryIds = async (categoryNames) => {
-
   try {
-    const response = await fetch('/api/courses/byCategoryIds', {
+    const response = await fetch("/api/courses/byCategoryIds", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({categoryNames}),
+      body: JSON.stringify({ categoryNames }),
     });
-  
+
     if (!response.ok) {
       throw new Error(`Error updating course: ${response.status}`);
     }
-  
+
     return response.json();
   } catch (error) {
     throw new Error("Failed to fetch courses by category IDs");
