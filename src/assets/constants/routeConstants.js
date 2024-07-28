@@ -53,4 +53,8 @@ export const routes = {
 
   //profile------------------------------
   PROFILE: "/admin/profile",
+
+  //home------------------------------
+  HOME: "/",
+  COURSES: "/courses",
 };

@@ -1,7 +1,9 @@
 import React from "react";
 import styles from "../styles/glassCard.module.css";
+import { useRouter } from "next/router";
 
 const GlassCard = ({ course }) => {
+  const router = useRouter();
   const normalizeDates = (dates) => {
     // Check if the date string contains "and", "to", or "-"
     if (dates?.includes("and")) {
@@ -12,8 +14,12 @@ const GlassCard = ({ course }) => {
     return dates;
   };
 
+  const navigateToCourse = (course) => {
+    router.push(`/admin/courses/${course.category}/${course?._id?course?._id:course?.courseId}`);
+  };
+
   return (
-    <div className={styles.nft}>
+    <div className={styles.nft}  onClick={() => navigateToCourse(course)}>
       <div className={styles.main}>
         <img
           src={course.image || "/static/placeholderImage.webp"}

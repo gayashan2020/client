@@ -1,6 +1,4 @@
-//src\components\Layout.js
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Box,
   Drawer,
@@ -15,8 +13,8 @@ import {
   Typography,
   useTheme,
   useMediaQuery,
+  IconButton,
 } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -25,43 +23,32 @@ import { darkTheme } from "@/styles/theme";
 import { userRoles } from "@/assets/constants/authConstants";
 import { routes } from "@/assets/constants/routeConstants";
 import { logoutUser } from "@/services/auth";
+import { AuthContext } from "@/contexts/AuthContext"; 
 
 export default function Layout({ children }) {
   const router = useRouter();
-  const [user, setUser] = useState(null);
+  const { user, logout } = useContext(AuthContext); 
   const drawerWidth = 200;
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  useEffect(() => {
-    fetch("/api/users/user")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => setUser(data))
-      .catch((error) => console.error("Error:", error));
-  }, []);
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const handleLogout = () => {
-    logoutUser()
-      .then((response) => {
-        if (response.status === 204) {
-          // Assuming 204 No Content on successful logout
-          setUser(null); // Clear user state
-          router.push("/login"); // Redirect to login page
-        } else {
-          throw new Error("Logout failed");
-        }
-      })
-      .catch((error) => console.error("Logout error:", error));
+  const handleLogout = async () => {
+    try {
+      const response = await logoutUser();
+      if (response.status === 204) {
+        logout(); // Update AuthContext
+        router.push("/login"); // Redirect to login page
+      } else {
+        throw new Error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const drawerContent = (
@@ -70,7 +57,7 @@ export default function Layout({ children }) {
       <ListItemButton component="a" href={routes.ADMIN}>
         <ListItemText primary="Dashboard" />
       </ListItemButton>
-      {/* admin Registration */}
+      {/* Admin Registration */}
       {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
         <ListItemButton component="a" href={routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT}>
           <ListItemText primary="Users" />
@@ -111,12 +98,12 @@ export default function Layout({ children }) {
           </ListItemButton>
         )}
 
-      {/* Chat*/}
+      {/* Chat */}
       <ListItemButton component="a" href={routes.ADMIN_CHAT}>
         <ListItemText primary="Chat" />
       </ListItemButton>
 
-      {/* Settings*/}
+      {/* Settings */}
       <ListItemButton component="a" href={routes.ADMIN_SETTING}>
         <ListItemText primary="Settings" />
       </ListItemButton>

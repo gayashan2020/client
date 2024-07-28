@@ -1,5 +1,3 @@
-// components/LoginForm.js
-
 import { useState, useContext } from "react";
 import { useRouter } from "next/router";
 import { routes } from "@/assets/constants/routeConstants";
@@ -17,12 +15,14 @@ import { lightTheme as theme } from "@/styles/theme";
 import { toast } from "react-toastify";
 import { loginUser } from "@/services/auth";
 import { LoadingContext } from "@/contexts/LoadingContext";
+import { AuthContext } from "@/contexts/AuthContext"; // Import AuthContext
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { setLoading } = useContext(LoadingContext);
+  const { login } = useContext(AuthContext); // Destructure login from AuthContext
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -38,6 +38,9 @@ export default function LoginForm() {
           secure: true, // Cookie will only be transmitted over secure protocol as HTTPS
           sameSite: "Strict", // Strict SameSite policy to mitigate CSRF attacks
         });
+
+        // Update the auth context with user data
+        login(response.data.user);
 
         toast.success("Login successful");
 

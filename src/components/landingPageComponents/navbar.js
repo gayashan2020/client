@@ -1,27 +1,45 @@
-import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem } from "@mui/material";
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import Link from 'next/link';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import Link from "next/link";
 import styles from "../../styles/navbar.module.css";
-import Image from 'next/image';
-import {routes} from "@/assets/constants/routeConstants";
+import Image from "next/image";
+import { routes } from "@/assets/constants/routeConstants";
 
 export const Navbar = () => {
   return (
     <AppBar position="static" className={styles.navbar}>
       <Toolbar className={styles.toolbar}>
-        <Image src="/images/logo.jpg" alt="cpd Logo" width={70} height={50} className={styles.logo} />
+        <Image
+          src="/images/logo.jpg"
+          alt="cpd Logo"
+          width={70}
+          height={50}
+          className={styles.logo}
+        />
         <Typography variant="h6" className={styles.title}>
           E-CPD
         </Typography>
         <div className={styles.menu}>
-          <Button color="inherit">Home</Button>
+          <Link href={routes.HOME} passHref className={styles.linkStyle}>
+            <Button color="inherit">Home</Button>
+          </Link>
           <Button color="inherit">About</Button>
-          <Button color="inherit">Courses</Button>
-          <Button color="inherit">Pages</Button>
+          <Link href={routes.COURSES} passHref className={styles.linkStyle}>
+            <Button color="inherit">Courses</Button>
+          </Link>
+          {/* <Button color="inherit">Pages</Button>
           <Button color="inherit">Blog</Button>
-          <Button color="inherit">Contact</Button>
+          <Button color="inherit">Contact</Button> */}
         </div>
         <div className={styles.rightMenu}>
           <IconButton color="inherit">
@@ -34,7 +52,9 @@ export const Navbar = () => {
             <Button color="inherit">Login</Button>
           </Link>
           <Link href={routes.REGISTER} passHref>
-            <Button variant="contained" className={styles.signupButton}>Sign up free</Button>
+            <Button variant="contained" className={styles.signupButton}>
+              Sign up free
+            </Button>
           </Link>
         </div>
       </Toolbar>

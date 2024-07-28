@@ -1,5 +1,3 @@
-// src\pages\admin\courses\[categoryId]\[courseId]\index.js
-
 import React, { useEffect, useState, useContext } from "react";
 import {
   Button,
@@ -20,17 +18,18 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
+import { Navbar } from "@/components/landingPageComponents/navbar";
 import {
   fetchCourseById,
   enrollToCourse,
   getEnrolledDataByCourse,
 } from "@/services/courses";
 import { LoadingContext } from "@/contexts/LoadingContext";
+import { AuthContext } from "@/contexts/AuthContext"; 
 import { fetchCurrentUser, fetchUsers, updateUser } from "@/services/users";
 import { toast } from "react-toastify";
 import { userRoles } from "@/assets/constants/authConstants";
 import { fetchReflectiveLogByUsersCourses } from "@/services/reflectiveLog";
-import { set } from "mongoose";
 
 export default function CourseDetail() {
   const [course, setCourse] = useState(null);
@@ -40,7 +39,6 @@ export default function CourseDetail() {
   const [mentorDialogOpen, setMentorDialogOpen] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState("");
   const [reflectiveLog, setReflectiveLog] = useState(null);
-
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -48,37 +46,43 @@ export default function CourseDetail() {
 
   const router = useRouter();
   const { categoryId, courseId } = router.query;
-
   const { setLoading } = useContext(LoadingContext);
+  const { isAuthenticated } = useContext(AuthContext); 
 
   useEffect(() => {
     if (!router.isReady) return;
 
     setLoading(true);
     fetchCourseData();
-    fetchMentorData();
-    fetchCurrentUser()
-      .then((currentUser) => {
-        getEnrolledData(currentUser);
-        fetchReflectiveLogData(currentUser);
-        setUser(currentUser);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch current user", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [router.isReady, setLoading]);
+    console.log(isAuthenticated,'isAuthenticated');
+    if (isAuthenticated) {
+      fetchMentorData();
+      fetchCurrentUser()
+        .then((currentUser) => {
+          getEnrolledData(currentUser);
+          fetchReflectiveLogData(currentUser);
+          setUser(currentUser);
+        })
+        .catch((error) => {
+          console.error("Failed to fetch current user", error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  }, [router.isReady, isAuthenticated, setLoading]);
 
   const fetchMentorData = async () => {
     try {
       setLoading(true);
       const data = await fetchUsers("", userRoles.MENTOR);
-      setLoading(false);
       setMentors(data);
     } catch (error) {
       console.error("Failed to fetch users:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -86,10 +90,11 @@ export default function CourseDetail() {
     try {
       setLoading(true);
       const data = await fetchCourseById(categoryId, courseId);
-      setLoading(false);
       setCourse(data);
     } catch (error) {
       console.error("Failed to fetch courses:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,12 +105,13 @@ export default function CourseDetail() {
         currentUser._id,
         courseId
       );
-      setLoading(false);
       if (data) {
         setReflectiveLog(data);
       }
     } catch (error) {
       console.error("Failed to fetch reflective log:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,15 +122,12 @@ export default function CourseDetail() {
       if (data && data[0]) {
         setEnroll(data[0].enrollStatus);
       }
-      setLoading(false);
     } catch (error) {
       console.error("Failed to fetch courses:", error);
+    } finally {
+      setLoading(false);
     }
   };
-
-  if (!course) {
-    return <Typography>Loading course details...</Typography>;
-  }
 
   const handleEnroll = async () => {
     try {
@@ -134,17 +137,17 @@ export default function CourseDetail() {
         email: user.email,
         mentorId: selectedMentor,
         mentorApprovalStatus: false,
-      }
+      };
       await updateUser(payload);
 
-      setLoading(false);
       setMentorDialogOpen(false); // Close dialog after enrollment
       setEnroll(true);
       toast.success("Enrolled successfully!");
     } catch (error) {
       console.error("Enrollment failed", error.message);
-      setLoading(false);
       setMentorDialogOpen(false); // Ensure dialog is closed on error as well
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -171,9 +174,7 @@ export default function CourseDetail() {
           },
         }}
       >
-        <DialogTitle style={{ textAlign: "center" }}>
-          Select a Mentor
-        </DialogTitle>
+        <DialogTitle style={{ textAlign: "center" }}>Select a Mentor</DialogTitle>
         <DialogContent>
           <FormControl fullWidth style={{ marginTop: theme.spacing(2) }}>
             <Select
@@ -197,9 +198,7 @@ export default function CourseDetail() {
             </Select>
           </FormControl>
         </DialogContent>
-        <DialogActions
-          style={{ justifyContent: "center", padding: theme.spacing(3) }}
-        >
+        <DialogActions style={{ justifyContent: "center", padding: theme.spacing(3) }}>
           <Button
             onClick={() => setMentorDialogOpen(false)}
             variant="outlined"
@@ -207,12 +206,7 @@ export default function CourseDetail() {
           >
             Cancel
           </Button>
-          <Button
-            onClick={handleEnroll}
-            disabled={!selectedMentor}
-            variant="contained"
-            color="primary"
-          >
+          <Button onClick={handleEnroll} disabled={!selectedMentor} variant="contained" color="primary">
             Continue
           </Button>
         </DialogActions>
@@ -254,11 +248,7 @@ export default function CourseDetail() {
           </Typography>
           {reflectiveLog?.file && (
             <Typography gutterBottom>
-              <a
-                href={reflectiveLog.file}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={reflectiveLog.file} target="_blank" rel="noopener noreferrer">
                 View Attached File
               </a>
             </Typography>
@@ -271,45 +261,38 @@ export default function CourseDetail() {
     );
   };
 
-  return (
+  return isAuthenticated ? (
     <Layout>
-      <Container
-        maxWidth="lg"
-        style={{ marginTop: "2rem", minHeight: "100vh" }}
-      >
+      <Container maxWidth="lg" style={{ marginTop: "2rem", minHeight: "100vh" }}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
             <Card>
               <CardMedia
                 component="img"
-                image={course.image || "/static/placeholderImage.webp"}
-                alt={course.name}
+                image={course?.image || "/static/placeholderImage.webp"}
+                alt={course?.name}
                 style={{ height: "auto", maxWidth: "100%" }}
               />
             </Card>
           </Grid>
           <Grid item xs={12} md={6}>
             <Typography variant="h4" sx={{ mb: 4 }}>
-              {course.event}
+              {course?.event}
             </Typography>
             <Typography variant="body1" sx={{ mb: 2 }} gutterBottom>
-              {course.organizing_body}
+              {course?.organizing_body}
             </Typography>
             <Typography variant="body2" sx={{ mb: 2 }} gutterBottom>
-              Max CPD Points: {course.total_cpd_points}
+              Max CPD Points: {course?.total_cpd_points}
             </Typography>
             <Typography variant="body2" sx={{ mb: 2 }} gutterBottom>
-              Dates: {course.dates}
+              Dates: {course?.dates}
             </Typography>
             <Button
               variant="contained"
-              style={
-                !enroll
-                  ? { backgroundColor: "rgb(32 176 31)", color: "#ffffff" }
-                  : {}
-              }
+              style={!enroll ? { backgroundColor: "rgb(32 176 31)", color: "#ffffff" } : {}}
               disabled={enroll}
-              onClick={handleEnrollClick} // Changed to handleEnrollClick to open the dialog
+              onClick={handleEnrollClick}
             >
               Enroll
             </Button>
@@ -328,9 +311,7 @@ export default function CourseDetail() {
                 }
                 disabled={!enroll}
                 onClick={() =>
-                  router.push(
-                    `/admin/courses/${categoryId}/${course._id}/reflectiveLog`
-                  )
+                  router.push(`/admin/courses/${categoryId}/${course._id}/reflectiveLog`)
                 }
               >
                 Completed
@@ -354,7 +335,6 @@ export default function CourseDetail() {
               </Button>
             )}
             <Button
-              //   variant="outlined"
               style={{
                 marginLeft: "1rem",
                 backgroundColor: "rgb(234 62 155)",
@@ -364,28 +344,57 @@ export default function CourseDetail() {
             >
               Back
             </Button>
-            {user &&
-              [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
-                <Button
-                  style={{
-                    marginLeft: "1rem",
-                    backgroundColor: "rgb(240 35 35)",
-                    color: "#ffffff",
-                  }}
-                  onClick={() =>
-                    router.push(
-                      `/admin/courses/${categoryId}/${course._id}/editCourse`
-                    )
-                  }
-                >
-                  Edit Course
-                </Button>
-              )}
+            {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
+              <Button
+                style={{
+                  marginLeft: "1rem",
+                  backgroundColor: "rgb(240 35 35)",
+                  color: "#ffffff",
+                }}
+                onClick={() =>
+                  router.push(`/admin/courses/${categoryId}/${course._id}/editCourse`)
+                }
+              >
+                Edit Course
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Container>
       <MentorSelectionDialog />
       <ReflectiveLogDetailsDialog />
     </Layout>
+  ) : (
+    <>
+    <Navbar />
+    <Container maxWidth="lg" style={{ marginTop: "2rem", minHeight: "100vh" }}>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardMedia
+                component="img"
+                image={course?.image || "/static/placeholderImage.webp"}
+                alt={course?.name}
+                style={{ height: "auto", maxWidth: "100%" }}
+              />
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Typography variant="h4" sx={{ mb: 4 }}>
+              {course?.event}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 2 }} gutterBottom>
+              {course?.organizing_body}
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }} gutterBottom>
+              Max CPD Points: {course?.total_cpd_points}
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }} gutterBottom>
+              Dates: {course?.dates}
+            </Typography>
+          </Grid>
+        </Grid>
+      </Container>
+    </>
   );
 }
