@@ -2,8 +2,10 @@ import React, { useEffect } from "react";
 import { Button } from "@mui/material";
 import styles from "../../styles/heroSection.module.css";
 import Image from 'next/image';
+import { useRouter } from "next/router";
 
 export const HeroSection = () => {
+  const router = useRouter();
   useEffect(() => {
     const handleMouseMove = (event) => {
       const { clientX, clientY } = event;
@@ -32,7 +34,7 @@ export const HeroSection = () => {
         <div className={styles.subtitle}>
           Discover innovative methods to transform your skills and professional life.
         </div>
-        <Button className={styles.exploreButton} variant="contained">
+        <Button className={styles.exploreButton} variant="contained" onClick={()=>{router.push("/courses")}}>
           Explore our courses →
         </Button>
         <div className={styles.reviews}>
