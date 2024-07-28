@@ -1,4 +1,3 @@
-// src/pages/admin/courses/index.js
 import React, { useEffect, useState, useContext } from "react";
 import {
   Card,
@@ -12,15 +11,16 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
-  CardMedia,
-  Tooltip,
-  useMediaQuery,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
-import CourseCard from "@/components/CourseCard"; // Updated import
+import CourseCard from "@/components/CourseCard";
 import { fetchCategories, addCategories } from "@/services/courseCategories";
-import { fetchCoursesByCategoryIds } from "@/services/courses";
+import { fetchCoursesByCategoryIds, updateCourseCategory } from "@/services/courses";
 import { fetchCurrentUser } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { userRoles } from "@/assets/constants/authConstants";
@@ -31,8 +31,10 @@ export default function Index() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [courses, setCourses] = useState([]);
   const [user, setUser] = useState(null);
-  const [open, setOpen] = useState(false); // For modal visibility
-  const [newCategory, setNewCategory] = useState(""); // For new category name
+  const [openAddCategoryModal, setOpenAddCategoryModal] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [editedCategories, setEditedCategories] = useState({});
   const { setLoading } = useContext(LoadingContext);
   const router = useRouter();
 
@@ -72,7 +74,6 @@ export default function Index() {
         (category) => category.category
       );
       const coursesData = await fetchCoursesByCategoryIds(categoryNames);
-      console.log("coursesData", categoryNames);
       setCourses(coursesData);
     } catch (error) {
       console.error("Failed to fetch courses:", error);
@@ -81,16 +82,16 @@ export default function Index() {
     }
   };
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleAddCategoryModalOpen = () => setOpenAddCategoryModal(true);
+  const handleAddCategoryModalClose = () => setOpenAddCategoryModal(false);
 
-  const handleSubmit = async () => {
+  const handleAddCategorySubmit = async () => {
     try {
       setLoading(true);
       await addCategories({ category: newCategory });
       fetchCategoriesAndUser(); // Refresh the list of categories
       setNewCategory(""); // Clear the input field
-      handleClose(); // Close the modal
+      handleAddCategoryModalClose(); // Close the modal
     } catch (error) {
       console.error("Failed to add category:", error);
     } finally {
@@ -111,6 +112,31 @@ export default function Index() {
       fetchCourses(updatedCategories); // Call fetchCourses with updated categories
       return updatedCategories;
     });
+  };
+
+  const handleCategoryEditChange = (courseId, categoryName) => {
+    setEditedCategories((prevEdited) => ({
+      ...prevEdited,
+      [courseId]: categoryName,
+    }));
+  };
+
+  const handleCategoryUpdateSubmit = async () => {
+    try {
+      setLoading(true);
+      await Promise.all(
+        Object.keys(editedCategories).map((courseId) =>
+          updateCourseCategory(courseId, editedCategories[courseId])
+        )
+      );
+      fetchCourses(selectedCategories); // Refresh the courses list
+      setEditMode(false); // Exit edit mode
+      setEditedCategories({}); // Clear the edited categories
+    } catch (error) {
+      console.error("Failed to update course categories:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const modalStyle = {
@@ -178,45 +204,69 @@ export default function Index() {
                 userRoles.ADMIN,
                 userRoles.CPD_PROVIDER,
               ].includes(user.role) && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleOpen}
-                  sx={{
-                    marginTop: "20px",
-                    width: "100%",
-                    backgroundColor: "#007bff",
-                    color: "#fff",
-                    "&:hover": {
-                      backgroundColor: "#0056b3",
-                    },
-                  }}
-                >
-                  Add Category
-                </Button>
-              )}
-            {user &&
-              [
-                userRoles.SUPER_ADMIN,
-                userRoles.ADMIN,
-                userRoles.CPD_PROVIDER,
-              ].includes(user.role) && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => router.push(routes.ADMIN_COURSES_ADD_COURSE)}
-                  sx={{
-                    marginTop: "20px",
-                    backgroundColor: "#007bff",
-                    color: "#fff",
-                    width: "100%",
-                    "&:hover": {
-                      backgroundColor: "#0056b3",
-                    },
-                  }}
-                >
-                  Add Courses
-                </Button>
+                <>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleAddCategoryModalOpen}
+                    sx={{
+                      marginTop: "20px",
+                      width: "100%",
+                      backgroundColor: "#007bff",
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "#0056b3",
+                      },
+                    }}
+                  >
+                    Add Category
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => router.push(routes.ADMIN_COURSES_ADD_COURSE)}
+                    sx={{
+                      marginTop: "20px",
+                      backgroundColor: "#007bff",
+                      color: "#fff",
+                      width: "100%",
+                      "&:hover": {
+                        backgroundColor: "#0056b3",
+                      },
+                    }}
+                  >
+                    Add Courses
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => setEditMode(!editMode)}
+                    sx={{
+                      marginTop: "20px",
+                      width: "100%",
+                      backgroundColor: "#ffc107",
+                      color: "#000",
+                      "&:hover": {
+                        backgroundColor: "#e0a800",
+                      },
+                    }}
+                  >
+                    {editMode ? "Finish Editing" : "Edit Category"}
+                  </Button>
+                  {editMode && (
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={handleCategoryUpdateSubmit}
+                      sx={{
+                        marginTop: "20px",
+                        width: "100%",
+                      }}
+                    >
+                      Update Categories
+                    </Button>
+                  )}
+                </>
               )}
           </Box>
         </Grid>
@@ -230,7 +280,36 @@ export default function Index() {
           >
             {courses.map((course, index) => (
               <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-                <CourseCard course={course} />
+                <Box position="relative">
+                  {editMode && (
+                    <FormControl
+                      fullWidth
+                      sx={{
+                        position: "absolute",
+                        top: 8,
+                        left: 8,
+                        zIndex: 10,
+                        backgroundColor: "rgba(255, 255, 255, 0.9)",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <InputLabel>Category</InputLabel>
+                      <Select
+                        value={editedCategories[course._id] || course.category}
+                        onChange={(e) =>
+                          handleCategoryEditChange(course._id, e.target.value)
+                        }
+                      >
+                        {categories.map((category) => (
+                          <MenuItem key={category._id} value={category.category}>
+                            {category.category}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                  <CourseCard course={course} />
+                </Box>
               </Grid>
             ))}
           </Grid>
@@ -239,14 +318,14 @@ export default function Index() {
 
       {/* Add Category Modal */}
       <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        open={openAddCategoryModal}
+        onClose={handleAddCategoryModalClose}
+        aria-labelledby="modal-add-category-title"
+        aria-describedby="modal-add-category-description"
       >
         <Box sx={modalStyle}>
           <Typography
-            id="modal-modal-title"
+            id="modal-add-category-title"
             variant="h6"
             component="h2"
             marginBottom={2}
@@ -261,7 +340,7 @@ export default function Index() {
             margin="normal"
           />
           <Box textAlign="right">
-            <Button onClick={handleSubmit} variant="contained" sx={{ mt: 2 }}>
+            <Button onClick={handleAddCategorySubmit} variant="contained" sx={{ mt: 2 }}>
               Submit
             </Button>
           </Box>

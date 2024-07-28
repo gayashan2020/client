@@ -141,3 +141,23 @@ export const fetchCoursesByCategoryIds = async (categoryNames) => {
     throw new Error("Failed to fetch courses by category IDs");
   }
 };
+
+export const updateCourseCategory = async (courseId, categoryName) => {
+  try {
+    const response = await fetch(`/api/courses/${categoryName}/${courseId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ categoryName }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error updating course category: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    throw new Error("Failed to update course category");
+  }
+};

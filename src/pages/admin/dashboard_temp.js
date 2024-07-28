@@ -529,7 +529,7 @@ export default function AdminDashboard() {
               <>
                 <div className={styles.card}>
                   <p className={styles.roleName}>Total Courses</p>
-                  <p className={styles.roleCount}>{courses?.length}</p>
+                  <p className={styles.roleCount}>{coursesCount?.length}</p>
                 </div>
               </>
             )}
