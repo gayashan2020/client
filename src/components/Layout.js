@@ -47,16 +47,19 @@ export default function Layout({ children }) {
   }, [user, setLoading]);
 
   const handleLogout = async () => {
+    setLoading(true);
     try {
       const response = await logoutUser();
       if (response.status === 204) {
         logout(); // Update AuthContext
-        router.push("/login"); // Redirect to login page
+        router.push("/login");
+        setLoading(false);
       } else {
         throw new Error("Logout failed");
       }
     } catch (error) {
       console.error("Logout error:", error);
+      setLoading(false);
     }
   };
 
