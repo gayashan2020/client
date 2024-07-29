@@ -27,19 +27,17 @@ export const Navbar = () => {
           className={styles.logo}
         />
         <Typography variant="h6" className={styles.title}>
-          E-CPD
+          NCCPDM ePortal
         </Typography>
         <div className={styles.menu}>
           <Link href={routes.HOME} passHref className={styles.linkStyle}>
             <Button color="inherit">Home</Button>
           </Link>
-          <Button color="inherit">About</Button>
           <Link href={routes.COURSES} passHref className={styles.linkStyle}>
             <Button color="inherit">Courses</Button>
           </Link>
-          {/* <Button color="inherit">Pages</Button>
-          <Button color="inherit">Blog</Button>
-          <Button color="inherit">Contact</Button> */}
+          <Button color="inherit">CPD Providers</Button>
+          <Button color="inherit">Contact Us</Button>
         </div>
         <div className={styles.rightMenu}>
           <IconButton color="inherit">
@@ -53,7 +51,7 @@ export const Navbar = () => {
           </Link>
           <Link href={routes.REGISTER} passHref>
             <Button variant="contained" className={styles.signupButton}>
-              Sign up free
+              Sign up
             </Button>
           </Link>
         </div>

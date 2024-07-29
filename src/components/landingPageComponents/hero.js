@@ -29,17 +29,18 @@ export const HeroSection = () => {
     <div className={styles.heroContainer}>
       <div className={styles.heroContent}>
         <div className={styles.title}>
-          Explore tailored <span className={styles.highlight}>Courses</span> to enhance your professional <span className={styles.highlight}>Skills</span>
+          Enhance your <span className={styles.highlight}>Medical Carrier</span> with the official ePortal of the National Committee for CPD in medicine <span className={styles.highlight}>(NCCPDM)</span>
+          {/* <span className={styles.highlight}>Courses</span> to enhance your professional <span className={styles.highlight}>Skills</span> */}
         </div>
         <div className={styles.subtitle}>
-          Discover innovative methods to transform your skills and professional life.
+          Discover all accredited CPD programmes in one place.
         </div>
         <Button className={styles.exploreButton} variant="contained" onClick={()=>{router.push("/courses")}}>
           Explore our courses →
         </Button>
-        <div className={styles.reviews}>
+        {/* <div className={styles.reviews}>
           <span>★★★★★</span> Based on 1,000+ reviews from medical professionals
-        </div>
+        </div> */}
       </div>
       <div className={styles.heroImage}>
         <Image
