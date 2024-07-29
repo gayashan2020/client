@@ -24,6 +24,7 @@ import { userRoles } from "@/assets/constants/authConstants";
 import { routes } from "@/assets/constants/routeConstants";
 import { logoutUser } from "@/services/auth";
 import { AuthContext } from "@/contexts/AuthContext"; 
+import { LoadingContext } from "@/contexts/LoadingContext";
 
 export default function Layout({ children }) {
   const router = useRouter();
@@ -32,10 +33,18 @@ export default function Layout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { loading, setLoading } = useContext(LoadingContext);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  useEffect(() => {
+    console.log("Layout user:", user);
+    if (user) {
+      setLoading(false);
+    }
+  }, [user, setLoading]);
 
   const handleLogout = async () => {
     try {

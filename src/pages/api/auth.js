@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     if (user && await comparePasswords(password, user.password)) {
       if (user.status === userStatus.ACTIVE.value) {
         const token = generateToken(user);
-        res.status(200).json({ token, approval: true });
+        res.status(200).json({ token, approval: true, user });
       } else {
         const token = generateToken(user);
         res.status(200).json({ token, approval: false });

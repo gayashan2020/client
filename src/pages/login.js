@@ -38,7 +38,7 @@ export default function LoginForm() {
           secure: true, // Cookie will only be transmitted over secure protocol as HTTPS
           sameSite: "Strict", // Strict SameSite policy to mitigate CSRF attacks
         });
-
+        console.log(response.data.user, "response.data.user");
         // Update the auth context with user data
         login(response.data.user);
 
