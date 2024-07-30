@@ -74,3 +74,13 @@ export const getUserCoursesCount = async () => {
     throw error;
   }
 };
+
+export async function fetchSuperAdminData(userId) {
+  try {
+    const { data } = await axios.get(`/api/dashboard/superAdminData?userId=${userId}`);
+    return data;
+  } catch (error) {
+    console.error("Error fetching super admin data:", error);
+    throw error;
+  }
+}

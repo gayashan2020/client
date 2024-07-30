@@ -1,18 +1,21 @@
-// components/LineChartComponent.js
+// src/components/LineChartComponent.js
+import React from "react";
+import { LineChart, lineElementClasses } from "@mui/x-charts";
 
-import { LineChart } from "@mui/x-charts";
-
-export const LineChartComponent = () => {
-    return (
-        <LineChart
-            xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-            series={[
-                {
-                    data: [2, 5.5, 2, 8.5, 1.5, 5],
-                },
-            ]}
-            width={500}
-            height={300}
-        />
-    );
+const LineChartComponent = ({ data, labels }) => {
+  return (
+    <LineChart
+      width={500}
+      height={300}
+      series={[{ data, label: "CPD Points", area: true, showMark: false }]}
+      xAxis={[{ scaleType: "point", data: labels }]}
+      sx={{
+        [`& .${lineElementClasses.root}`]: {
+          display: "none",
+        },
+      }}
+    />
+  );
 };
+
+export default LineChartComponent;

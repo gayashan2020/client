@@ -4,6 +4,7 @@ import { LoadingProvider } from '@/contexts/LoadingProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LoadingBackdrop } from '@/components/LoadingBackdrop';
 import '../styles/global.css';
+import '../styles/dateRangePickerDarkMode.css';
 
 function MyApp({ Component, pageProps }) {
   return (

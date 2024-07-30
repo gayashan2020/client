@@ -1,0 +1,90 @@
+/* dateRangePickerDarkMode.css */
+.rdrCalendarWrapper {
+    background-color: #2e2e2e !important;
+    color: #e0e0e0;
+}
+
+.rdrMonthAndYearWrapper {
+    background-color: #3e3e3e !important;
+    color: #e0e0e0;
+}
+
+.rdrDayNumber,
+.rdrDayNumber span,
+.rdrDayNumber span:after {
+    color: #e0e0e0;
+}
+
+.rdrDay:hover .rdrDayNumber span,
+.rdrDay:active .rdrDayNumber span {
+    color: #000;
+}
+
+.rdrSelected,
+.rdrSelected span {
+    background: #555 !important;
+    color: #fff !important;
+}
+
+.rdrInRange,
+.rdrInRange span {
+    background: #444 !important;
+    color: #fff !important;
+}
+
+.rdrDayDisabled .rdrDayNumber span {
+    color: #555;
+}
+
+.rdrStartEdge,
+.rdrEndEdge {
+    background: #777 !important;
+    color: #fff !important;
+}
+
+.rdrDefinedRangesWrapper,
+.rdrStaticRange,
+.rdrStaticRangeLabel,
+.rdrDateDisplayItem input {
+    background-color: #2e2e2e !important;
+    color: #e0e0e0 !important;
+}
+
+.rdrDefinedRangesWrapper {
+    background-color: #1e1e1e !important;
+}
+
+.rdrDateDisplayWrapper {
+    background-color: #3e3e3e !important;
+    color: #e0e0e0 !important;
+}
+
+.rdrDateDisplayItem input {
+    background-color: #2e2e2e !important;
+    border: 1px solid #555 !important;
+    color: #e0e0e0 !important;
+}
+
+.rdrMonthPicker,
+.rdrYearPicker {
+    background-color: #3e3e3e !important;
+    color: #e0e0e0 !important;
+}
+
+.rdrMonthPicker select,
+.rdrYearPicker select {
+    background-color: #3e3e3e !important;
+    color: #e0e0e0 !important;
+}
+
+.rdrNextPrevButton {
+    filter: invert(1);
+}
+
+.rdrDayNumber span {
+    color: #e0e0e0 !important;
+}
+
+.rdrDayToday .rdrDayNumber span {
+    color: #ffa726 !important;
+}
