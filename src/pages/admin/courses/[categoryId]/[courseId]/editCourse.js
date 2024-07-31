@@ -11,6 +11,11 @@ import {
   CardMedia,
   CardActionArea,
   MenuItem,
+  InputLabel,
+  FormControl,
+  OutlinedInput,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import Layout from "@/components/Layout";
@@ -19,64 +24,52 @@ import {
   updateCourse,
   updateCourseImage,
   fetchCourseById,
-  getEnrolledDataByCourse,
 } from "@/services/courses";
 import { styled } from "@mui/material/styles";
 import { fetchCurrentUser } from "@/services/users";
 import { fetchCategories } from "@/services/courseCategories";
 import { useRouter } from "next/router";
 
-export default function Index() {
+export default function EditCourse() {
   const { setLoading } = useContext(LoadingContext);
 
-  const [name, setName] = useState("");
+  const [event, setEvent] = useState("");
   const [image, setImage] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const [category, setCategory] = useState("");
-  const [duration, setDuration] = useState("");
-  const [cpdTotal, setCpdTotal] = useState(0);
-  const [cpdMin, setCpdMin] = useState(0);
-  const [type, setType] = useState("");
-  const [link, setLink] = useState("");
-  const [creator, setCreator] = useState("");
-  const [description, setDescription] = useState("");
-  const [objectives, setObjectives] = useState("");
-  const [authors, setAuthors] = useState("");
-  const [keywords, setKeywords] = useState("");
+  const [competencyAssessed, setCompetencyAssessed] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [totalCpdPoints, setTotalCpdPoints] = useState(0);
+  const [organizingBody, setOrganizingBody] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState([]);
 
   const router = useRouter();
   const { categoryId, courseId } = router.query;
 
-  const [course, setCourse] = useState(null);
-  const [user, setUser] = useState(null);
-
   useEffect(() => {
     if (!router.isReady) return;
     setLoading(true);
     fetchCourseData();
     fetchCategoryData();
-    fetchCurrentUser()
-      .then((currentUser) => {
-        // getEnrolledData(currentUser);
-        setUser(currentUser);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch current user", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    fetchCurrentUser().then((currentUser) => {
+      setUser(currentUser);
+    }).catch((error) => {
+      console.error("Failed to fetch current user", error);
+    }).finally(() => {
+      setLoading(false);
+    });
   }, [router.isReady, setLoading]);
 
   const handleSelectChange = (event) => {
     const selectedIndex = event.target.value;
-    const Category = categories.find(
-      (category) => category._id === selectedIndex
-    );
-    setCategory(Category.category || "");
-    setSelectedCategory(Category._id);
+    const selectedCategory = categories.find((category) => category.category === selectedIndex);
+    setCategory(selectedCategory ? selectedCategory.category : "");
+    setSelectedCategory(selectedCategory ? selectedCategory.category : "");
   };
 
   const fetchCategoryData = async () => {
@@ -90,39 +83,25 @@ export default function Index() {
     try {
       setLoading(true);
       const data = await fetchCourseById(categoryId, courseId);
-      setName(data.name);
+      setEvent(data.event);
       setImagePreview(data.image ? data.image : "");
       setCategory(data.category);
-      setSelectedCategory(data.categoryId);
-      setDuration(data.duration);
-      setCpdTotal(data.cpdTotal);
-      setCpdMin(data.cpdMin);
-      setType(data.type);
-      setLink(data.link);
-      setCreator(data.creator);
-      setDescription(data.description);
-      setObjectives(data.objectives);
-      setAuthors(data.authors);
-      setKeywords(data.keywords);
-      setLoading(false);
-      setCourse(data);
+      setSelectedCategory(data.category);
+      setCompetencyAssessed(data.competency_assessed || []);
+      const datesArray = data.dates.split(" – ");
+      setStartDate(datesArray[0].split('.').join('-'));
+      setEndDate(datesArray[1] ? datesArray[1].split('.').join('-') : datesArray[0].split('.').join('-'));
+      setContactName(data.contact.name);
+      setContactEmail(data.contact.email);
+      setContactPhone(data.contact.phone);
+      setTotalCpdPoints(data.total_cpd_points);
+      setOrganizingBody(data.organizing_body);
       setImage(data.image ? data.image : "");
+      setLoading(false);
     } catch (error) {
       console.error("Failed to fetch courses:", error);
     }
   };
-
-  //   const getEnrolledData = async (currentUser) => {
-  //     try {
-  //       setLoading(true);
-  //       const data = await getEnrolledDataByCourse(currentUser._id, courseId);
-
-  //       setLoading(false);
-  //       setEnroll(data[0].enrollStatus);
-  //     } catch (error) {
-  //       console.error("Failed to fetch courses:", error);
-  //     }
-  //   };
 
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -149,16 +128,10 @@ export default function Index() {
   };
 
   const handleImageSubmit = async (course) => {
-    // Send a PUT or POST request to the endpoint handling file uploads
     const response = await updateCourseImage(course, image);
-
-    // Handle the response from the file upload endpoint
     if (response.status === 200) {
-      // Handle successful upload
       toast.success("Image updated successfully!");
-      // Optionally, fetch the updated user data to refresh the avatar preview
     } else {
-      // Handle errors
       toast.error("Failed to update Image.");
     }
   };
@@ -167,61 +140,44 @@ export default function Index() {
     e.preventDefault();
 
     const dataObject = {
-      name,
-      category: category,
-      categoryId: selectedCategory,
-      duration,
-      cpdTotal,
-      cpdMin,
-      type,
-      link,
-      creator,
-      description,
-      objectives,
-      authors,
-      keywords,
-      approved: false,
+      event,
+      category,
+      competency_assessed: competencyAssessed,
+      dates: startDate === endDate ? startDate.split('-').join('.') : `${startDate.split('-').join('.')} – ${endDate.split('-').join('.')}`,
+      contact: {
+        name: contactName,
+        email: contactEmail,
+        phone: contactPhone,
+      },
+      total_cpd_points: Number(totalCpdPoints),
+      organizing_body: organizingBody,
     };
 
     setLoading(true);
     const response = await updateCourse(courseId, dataObject);
-
     setLoading(false);
     if (response.message === "Course updated successfully") {
-      setLoading(true);
       if (image && image.type.startsWith("image/")) {
         await handleImageSubmit(courseId);
       }
-      setLoading(false);
-
       toast.success("Update successful!");
-      // Clear form
-      setName("");
-      setImage("");
-      setImagePreview("");
-      setCategory("");
-      setDuration("");
-      setCpdTotal("");
-      setCpdMin("");
-      setType("");
-      setLink("");
-      setCreator("");
-      setDescription("");
-      setObjectives("");
-      setAuthors("");
-      setKeywords("");
-
       router.push(`/admin/courses`);
     } else {
-      alert("Error adding course");
+      toast.error("Error updating course");
     }
   };
+
+  const competencies = [
+    "Knowledge Skill Development",
+    "Change in performance",
+    "Change in patient outcomes",
+  ];
 
   return (
     <Layout>
       <Container
         component="main"
-        maxWidth="s"
+        maxWidth="md"
         style={{
           minHeight: "100vh",
           display: "flex",
@@ -229,7 +185,7 @@ export default function Index() {
         }}
       >
         <Typography variant="h4" gutterBottom>
-          Add Course
+          Edit Course
         </Typography>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
@@ -238,8 +194,6 @@ export default function Index() {
                 <Grid item xs={12}>
                   <Card>
                     <CardActionArea component="label">
-                      {" "}
-                      {/* Change the component of CardActionArea to label */}
                       <CardMedia
                         component="img"
                         height="400"
@@ -248,11 +202,11 @@ export default function Index() {
                             ? imagePreview
                             : "/static/placeholderImage.webp"
                         }
-                        alt="green iguana"
+                        alt="Course Image"
                       />
                       <VisuallyHiddenInput
-                        accept="image/*" // Specify that only image files are accepted
-                        id="file-input" // Add an ID to the input for better accessibility
+                        accept="image/*"
+                        id="file-input"
                         type="file"
                         onChange={handleImageChange}
                       />
@@ -261,49 +215,58 @@ export default function Index() {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={event}
+                    onChange={(e) => setEvent(e.target.value)}
                     label="Course Name"
                     required
                     fullWidth
                   />
                 </Grid>
-                {/* <Grid item xs={12}>
-                  <TextField
-                    value={image}
-                    onChange={(e) => setImage(e.target.value)}
-                    label="Image"
-                    required
-                    fullWidth
-                  />
-                </Grid> */}
                 <Grid item xs={12}>
-                  <Select
-                    value={selectedCategory || ""}
-                    onChange={handleSelectChange}
-                    displayEmpty
-                    fullWidth
-                    renderValue={
-                      selectedCategory
-                        ? undefined
-                        : () => <em>Choose a category</em>
-                    }
-                  >
-                    {categories.map((category) => (
-                      <MenuItem key={category._id} value={category._id}>
-                        {category.category}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  <FormControl fullWidth>
+                    <InputLabel id="category-label">Category</InputLabel>
+                    <Select
+                      labelId="category-label"
+                      value={selectedCategory || ""}
+                      onChange={handleSelectChange}
+                      input={<OutlinedInput label="Category" />}
+                      renderValue={(selected) => {
+                        const category = categories.find((cat) => cat.category === selected);
+                        return category ? category.category : <em>Choose a category</em>;
+                      }}
+                    >
+                      {categories.map((cat) => (
+                        <MenuItem key={cat._id} value={cat.category}>
+                          {cat.category}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    type="number"
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                    label="Course Duration"
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    label="Start Date"
                     required
                     fullWidth
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    label="End Date"
+                    required
+                    fullWidth
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
                   />
                 </Grid>
               </Grid>
@@ -313,102 +276,73 @@ export default function Index() {
                 <Grid item xs={12}>
                   <TextField
                     type="number"
-                    value={cpdTotal}
-                    onChange={(e) => setCpdTotal(e.target.value)}
-                    label="CPD Total"
+                    value={totalCpdPoints}
+                    onChange={(e) => setTotalCpdPoints(e.target.value)}
+                    label="Total CPD Points"
                     required
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    type="number"
-                    value={cpdMin}
-                    onChange={(e) => setCpdMin(e.target.value)}
-                    label="CPD Minimum"
-                    required
-                    fullWidth
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Select
-                    value={type}
-                    onChange={(e) => setType(e.target.value)}
-                    label="Course type"
-                    required
-                    fullWidth
-                  >
-                    <option value="external">Externally Hosted</option>
-                    <option value="internal">Internally Hosted</option>
-                  </Select>
-                </Grid>
-
-                {type === "external" && (
-                  <Grid item xs={12}>
-                    <TextField
-                      value={link}
-                      onChange={(e) => setLink(e.target.value)}
-                      label="Course Link"
-                      fullWidth
-                    />
-                  </Grid>
-                )}
-
-                {type === "internal" && (
-                  <Grid item xs={12}>
-                    <TextField
-                      value={creator}
-                      onChange={(e) => setCreator(e.target.value)}
-                      label="Course Link"
-                      fullWidth
-                    />
-                  </Grid>
-                )}
-                <Grid item xs={12}>
-                  <TextField
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    multiline
-                    rows={4}
-                    label="Course Description"
-                    required
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    label="Contact Name"
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    value={objectives}
-                    onChange={(e) => setObjectives(e.target.value)}
-                    multiline
-                    rows={4}
-                    label="Course Objectives"
-                    required
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    label="Contact Email"
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    value={authors}
-                    onChange={(e) => setAuthors(e.target.value)}
-                    label="Course Authors"
-                    required
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                    label="Contact Phone"
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    value={keywords}
-                    onChange={(e) => setKeywords(e.target.value)}
-                    label="Keywords"
+                    value={organizingBody}
+                    onChange={(e) => setOrganizingBody(e.target.value)}
+                    label="Organizing Body"
                     required
                     fullWidth
                   />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel id="competency-label">Competency Assessed</InputLabel>
+                    <Select
+                      labelId="competency-label"
+                      multiple
+                      value={competencyAssessed}
+                      onChange={(e) => setCompetencyAssessed(e.target.value)}
+                      input={<OutlinedInput label="Competency Assessed" />}
+                      renderValue={(selected) => selected.join(', ')}
+                    >
+                      {competencies.map((competency) => (
+                        <MenuItem key={competency} value={competency}>
+                          <Checkbox checked={competencyAssessed.includes(competency)} />
+                          <ListItemText primary={competency} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Button type="submit">Add Course</Button>
+          <Grid item xs={12} style={{ marginTop: '20px' }}>
+            <Button type="submit" variant="contained" color="primary">
+              Update Course
+            </Button>
           </Grid>
         </form>
       </Container>

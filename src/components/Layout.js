@@ -40,7 +40,6 @@ export default function Layout({ children }) {
   };
 
   useEffect(() => {
-    console.log("Layout user:", user);
     if (user) {
       setLoading(false);
     }
@@ -65,62 +64,80 @@ export default function Layout({ children }) {
 
   const drawerContent = (
     <List sx={{ mt: "64px" }}>
-      {/* Dashboard */}
-      <ListItemButton component="a" href={routes.ADMIN}>
+      <ListItemButton
+        component="a"
+        href={routes.ADMIN}
+        selected={router.pathname === routes.ADMIN}
+      >
         <ListItemText primary="Dashboard" />
       </ListItemButton>
-      {/* Admin Registration */}
+
       {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
-        <ListItemButton component="a" href={routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT}>
+        <ListItemButton
+          component="a"
+          href={routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT}
+          selected={router.pathname === routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT}
+        >
           <ListItemText primary="Users" />
         </ListItemButton>
       )}
-      {user &&
-        [
-          userRoles.SUPER_ADMIN,
-          userRoles.ADMIN,
-          userRoles.CPD_PROVIDER,
-          userRoles.STUDENT,
-        ].includes(user.role) && (
-          <ListItemButton component="a" href={routes.ADMIN_COURSES}>
-            <ListItemText primary="Courses" />
-          </ListItemButton>
-        )}
+
+      {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN, userRoles.CPD_PROVIDER, userRoles.STUDENT].includes(user.role) && (
+        <ListItemButton
+          component="a"
+          href={routes.ADMIN_COURSES}
+          selected={router.pathname === routes.ADMIN_COURSES}
+        >
+          <ListItemText primary="Courses" />
+        </ListItemButton>
+      )}
+
       {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
-        <ListItemButton component="a" href={routes.ADMIN_COURSES_MANAGE_COURSE}>
+        <ListItemButton
+          component="a"
+          href={routes.ADMIN_COURSES_MANAGE_COURSE}
+          selected={router.pathname === routes.ADMIN_COURSES_MANAGE_COURSE}
+        >
           <ListItemText primary="Manage Courses" />
         </ListItemButton>
       )}
-      {user &&
-        [
-          userRoles.SUPER_ADMIN,
-          userRoles.ADMIN,
-          userRoles.CPD_PROVIDER,
-          userRoles.STUDENT,
-        ].includes(user.role) && (
-          <ListItemButton component="a" href={routes.ADMIN_REFLOG}>
-            <ListItemText primary="Reflective Logs" />
-          </ListItemButton>
-        )}
 
-      {user &&
-        [userRoles.SUPER_ADMIN, userRoles.MENTOR].includes(user.role) && (
-          <ListItemButton component="a" href={routes.ADMIN_MENTEEMANAGEMENT}>
-            <ListItemText primary="Mentee Management" />
-          </ListItemButton>
-        )}
+      {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN, userRoles.CPD_PROVIDER, userRoles.STUDENT].includes(user.role) && (
+        <ListItemButton
+          component="a"
+          href={routes.ADMIN_REFLOG}
+          selected={router.pathname === routes.ADMIN_REFLOG}
+        >
+          <ListItemText primary="Reflective Logs" />
+        </ListItemButton>
+      )}
 
-      {/* Chat */}
-      <ListItemButton component="a" href={routes.ADMIN_CHAT}>
+      {user && [userRoles.SUPER_ADMIN, userRoles.MENTOR].includes(user.role) && (
+        <ListItemButton
+          component="a"
+          href={routes.ADMIN_MENTEEMANAGEMENT}
+          selected={router.pathname === routes.ADMIN_MENTEEMANAGEMENT}
+        >
+          <ListItemText primary="Mentee Management" />
+        </ListItemButton>
+      )}
+
+      <ListItemButton
+        component="a"
+        href={routes.ADMIN_CHAT}
+        selected={router.pathname === routes.ADMIN_CHAT}
+      >
         <ListItemText primary="Chat" />
       </ListItemButton>
 
-      {/* Settings */}
-      <ListItemButton component="a" href={routes.ADMIN_SETTING}>
+      <ListItemButton
+        component="a"
+        href={routes.ADMIN_SETTING}
+        selected={router.pathname === routes.ADMIN_SETTING}
+      >
         <ListItemText primary="Settings" />
       </ListItemButton>
 
-      {/* Logout Button */}
       <ListItemButton onClick={handleLogout}>
         <ListItemIcon>
           <LogoutIcon />
@@ -130,8 +147,6 @@ export default function Layout({ children }) {
     </List>
   );
 
-  // The style applied to the main content should be conditional on the drawer being open
-  // in non-mobile view, otherwise it should take full width
   const mainContentStyle = {
     flexGrow: 1,
     p: 3, // Adjust padding as needed
@@ -148,7 +163,6 @@ export default function Layout({ children }) {
         duration: theme.transitions.duration.enteringScreen,
       }),
     }),
-    // marginTop: `64px`, // This height might need adjustment based on your AppBar's height
     width: isMobile ? "auto" : `calc(100% - ${drawerWidth}px)`, // Full width in mobile view
   };
 

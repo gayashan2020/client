@@ -2,30 +2,25 @@
 import dbConnect from "@/lib/dbConnect";
 
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method Not Allowed" });
+  }
+
   const { db } = await dbConnect();
 
   let {
-    name,
+    event,
     image,
     category,
-    categoryId,
-    duration,
-    cpdTotal,
-    cpdMin,
-    type,
-    link,
-    creator,
-    description,
-    objectives,
-    authors,
-    keywords,
-    approved,
+    competency_assessed,
+    dates,
+    contact,
+    total_cpd_points,
+    organizing_body,
   } = req.body;
 
-  //convert duration, cpdTotal, cpdMin to int
-  duration = parseInt(duration);
-  cpdTotal = parseInt(cpdTotal);
-  cpdMin = parseInt(cpdMin);
+  // Convert total_cpd_points to integer
+  total_cpd_points = parseInt(total_cpd_points);
 
   // Access courses collection
   const courses = db.collection("courses");
@@ -33,21 +28,14 @@ export default async function handler(req, res) {
   try {
     // Insert new course
     let response = await courses.insertOne({
-      name,
       image,
+      event,
       category,
-      categoryId,
-      duration,
-      cpdTotal,
-      cpdMin,
-      type,
-      link,
-      creator,
-      description,
-      objectives,
-      authors,
-      keywords,
-      approved,
+      competency_assessed,
+      dates,
+      contact,
+      total_cpd_points,
+      organizing_body,
     });
 
     res.status(200).json({ message: "Course added successfully", body: response });
