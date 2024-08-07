@@ -34,27 +34,28 @@ import { fetchReflectiveLogByUsersCourses } from "@/services/reflectiveLog";
 export default function CourseDetail() {
   const [course, setCourse] = useState(null);
   const [user, setUser] = useState(null);
-  const [enroll, setEnroll] = useState(false);
+  const [enroll, setEnroll] = useState(true);
   const [mentors, setMentors] = useState(null);
   const [mentorDialogOpen, setMentorDialogOpen] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState("");
   const [reflectiveLog, setReflectiveLog] = useState(null);
   const [open, setOpen] = useState(false);
-
+  const [mentorSelected, setMentorSelected] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const router = useRouter();
   const { categoryId, courseId } = router.query;
   const { setLoading } = useContext(LoadingContext);
-  const { isAuthenticated } = useContext(AuthContext); 
+  const { isAuthenticated } = useContext(AuthContext);
+
+ 
 
   useEffect(() => {
     if (!router.isReady) return;
 
     setLoading(true);
     fetchCourseData();
-    console.log(isAuthenticated,'isAuthenticated');
     if (isAuthenticated) {
       fetchMentorData();
       fetchCurrentUser()
@@ -62,6 +63,11 @@ export default function CourseDetail() {
           getEnrolledData(currentUser);
           fetchReflectiveLogData(currentUser);
           setUser(currentUser);
+          console.log(currentUser, "current user");
+          if (currentUser?.mentorApprovalStatus === true) {
+            setMentorSelected(true);
+            setSelectedMentor(currentUser?.mentorId); 
+          }
         })
         .catch((error) => {
           console.error("Failed to fetch current user", error);
@@ -120,7 +126,9 @@ export default function CourseDetail() {
       setLoading(true);
       const data = await getEnrolledDataByCourse(currentUser._id, courseId);
       if (data && data[0]) {
-        setEnroll(data[0].enrollStatus);
+        setEnroll(data[0].enrollStatus === 'pending');
+      } else {
+        setEnroll(false);
       }
     } catch (error) {
       console.error("Failed to fetch courses:", error);
@@ -136,7 +144,7 @@ export default function CourseDetail() {
       let payload = {
         email: user.email,
         mentorId: selectedMentor,
-        mentorApprovalStatus: false,
+        mentorApprovalStatus: mentorSelected?mentorSelected:false,
       };
       await updateUser(payload);
 
@@ -152,7 +160,12 @@ export default function CourseDetail() {
   };
 
   const handleEnrollClick = () => {
-    setMentorDialogOpen(true);
+    if (mentorSelected) {
+      handleEnroll()
+    } else {
+      setMentorDialogOpen(true);
+    }
+    
   };
 
   // Mentor Dialog

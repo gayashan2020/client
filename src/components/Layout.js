@@ -23,12 +23,12 @@ import { darkTheme } from "@/styles/theme";
 import { userRoles } from "@/assets/constants/authConstants";
 import { routes } from "@/assets/constants/routeConstants";
 import { logoutUser } from "@/services/auth";
-import { AuthContext } from "@/contexts/AuthContext"; 
+import { AuthContext } from "@/contexts/AuthContext";
 import { LoadingContext } from "@/contexts/LoadingContext";
 
 export default function Layout({ children }) {
   const router = useRouter();
-  const { user, logout } = useContext(AuthContext); 
+  const { user, logout } = useContext(AuthContext);
   const drawerWidth = 200;
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
@@ -76,19 +76,37 @@ export default function Layout({ children }) {
         <ListItemButton
           component="a"
           href={routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT}
-          selected={router.pathname === routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT}
+          selected={
+            router.pathname === routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT
+          }
         >
           <ListItemText primary="Users" />
         </ListItemButton>
       )}
 
-      {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN, userRoles.CPD_PROVIDER, userRoles.STUDENT].includes(user.role) && (
+      {user &&
+        [
+          userRoles.SUPER_ADMIN,
+          userRoles.ADMIN,
+          userRoles.CPD_PROVIDER,
+          userRoles.STUDENT,
+        ].includes(user.role) && (
+          <ListItemButton
+            component="a"
+            href={routes.ADMIN_COURSES}
+            selected={router.pathname === routes.ADMIN_COURSES}
+          >
+            <ListItemText primary="Courses" />
+          </ListItemButton>
+        )}
+
+      {user && [userRoles.STUDENT].includes(user.role) && (
         <ListItemButton
           component="a"
-          href={routes.ADMIN_COURSES}
-          selected={router.pathname === routes.ADMIN_COURSES}
+          href={routes.MY_COURSES}
+          selected={router.pathname === routes.MY_COURSES}
         >
-          <ListItemText primary="Courses" />
+          <ListItemText primary="My Courses" />
         </ListItemButton>
       )}
 
@@ -102,25 +120,32 @@ export default function Layout({ children }) {
         </ListItemButton>
       )}
 
-      {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN, userRoles.CPD_PROVIDER, userRoles.STUDENT].includes(user.role) && (
-        <ListItemButton
-          component="a"
-          href={routes.ADMIN_REFLOG}
-          selected={router.pathname === routes.ADMIN_REFLOG}
-        >
-          <ListItemText primary="Reflective Logs" />
-        </ListItemButton>
-      )}
+      {user &&
+        [
+          userRoles.SUPER_ADMIN,
+          userRoles.ADMIN,
+          userRoles.CPD_PROVIDER,
+          userRoles.STUDENT,
+        ].includes(user.role) && (
+          <ListItemButton
+            component="a"
+            href={routes.ADMIN_REFLOG}
+            selected={router.pathname === routes.ADMIN_REFLOG}
+          >
+            <ListItemText primary="Reflective Logs" />
+          </ListItemButton>
+        )}
 
-      {user && [userRoles.SUPER_ADMIN, userRoles.MENTOR].includes(user.role) && (
-        <ListItemButton
-          component="a"
-          href={routes.ADMIN_MENTEEMANAGEMENT}
-          selected={router.pathname === routes.ADMIN_MENTEEMANAGEMENT}
-        >
-          <ListItemText primary="Mentee Management" />
-        </ListItemButton>
-      )}
+      {user &&
+        [userRoles.SUPER_ADMIN, userRoles.MENTOR].includes(user.role) && (
+          <ListItemButton
+            component="a"
+            href={routes.ADMIN_MENTEEMANAGEMENT}
+            selected={router.pathname === routes.ADMIN_MENTEEMANAGEMENT}
+          >
+            <ListItemText primary="Mentee Management" />
+          </ListItemButton>
+        )}
 
       <ListItemButton
         component="a"

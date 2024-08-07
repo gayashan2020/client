@@ -1,4 +1,3 @@
-// pages/admin/dashboard.js
 import styles from "../../styles/Dashboard.module.css";
 import {
   Box,
@@ -26,7 +25,7 @@ import {
   getUserCount,
   getUserCoursesCount,
   getOccupationData,
-  fetchSuperAdminData
+  fetchSuperAdminData,
 } from "@/services/dashboard";
 import { fetchMentorByCurrentUser } from "@/services/mentorService";
 import { getSettingByID } from "@/services/setting";
@@ -87,7 +86,7 @@ const thisYearRange = {
 };
 
 export default function AdminDashboard() {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const { setLoading } = useContext(LoadingContext);
   const router = useRouter();
 
@@ -133,7 +132,6 @@ export default function AdminDashboard() {
   };
 
   const filterCoursesByDate = (startDate, endDate) => {
-    // console.log(coursesCount?.courseDetails,'coursesCount?.courseDetails');
     const filteredCourses = coursesCount?.courseDetails?.filter((course) => {
       const courseDate = new Date(course.dates);
       return courseDate >= startDate && courseDate <= endDate;
@@ -150,15 +148,17 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    setLoading(true);
-    fetchOccupationData();
-    fetchMentorDetails();
-    fetchSettings(user?._id);
-    fetchData();
-    filterCoursesByDate(dateRange[0].startDate, dateRange[0].endDate);
-    filterCPDByDate(dateRange[0].startDate, dateRange[0].endDate);
-    setLoading(false);
-  }, [setLoading]);
+    if (user) {
+      setLoading(true);
+      fetchOccupationData();
+      fetchMentorDetails();
+      fetchSettings(user._id);
+      fetchData();
+      filterCoursesByDate(dateRange[0].startDate, dateRange[0].endDate);
+      filterCPDByDate(dateRange[0].startDate, dateRange[0].endDate);
+      setLoading(false);
+    }
+  }, [user]);
 
   const fetchOccupationData = async () => {
     try {
@@ -187,7 +187,6 @@ export default function AdminDashboard() {
       setLoading(true);
 
       if (user?.role === "student") {
-        const data = await getUserData();
         const countData = await getUserCount();
         const courseCountData = await getUserCoursesCount();
         courseCountData.totalApprovedCourses =
@@ -195,9 +194,8 @@ export default function AdminDashboard() {
         setOnlineUserCountByRole(countData?.onlineUserCountByRole);
         setCoursesCount(courseCountData);
         setFilteredCourses(courseCountData?.courseDetails);
-      } else {
+      } else if (user?.role === "super_admin") {
         const courseCountData = await fetchSuperAdminData(user?._id);
-        console.log("courseCountData", courseCountData);
         let courseData = {
           totalEnrolledCourses: 0,
           totalApprovedCourses: 0,
@@ -264,9 +262,13 @@ export default function AdminDashboard() {
     page * rowsPerPage
   );
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className={styles.layout}>
-      {user?.role === userRoles.SUPER_ADMIN ? (
+      {user?.role === userRoles.SUPER_ADMIN && (
         <div className={styles.dashboard}>
           <div className={styles.topRow}>
             <Card className={styles.chartCard}>
@@ -365,7 +367,8 @@ export default function AdminDashboard() {
             </Card>
           </div>
         </div>
-      ) : (
+      )}
+      {user?.role === userRoles.STUDENT && (
         <>
           <div className={styles.topRow}>
             <AvatarBox
@@ -407,6 +410,19 @@ export default function AdminDashboard() {
               ))}
             </div>
           </div>
+        </>
+      )}
+
+      {user?.role === userRoles.MENTOR && (
+        <>
+          <div className={styles.topRow}>
+            <UserCards
+              onlineUserCountByRole={onlineUserCountByRole}
+              user={user}
+              coursesCount={coursesCount}
+            />
+          </div>
+          <div className={styles.bottomRow}></div>
         </>
       )}
     </div>

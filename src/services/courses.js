@@ -122,14 +122,14 @@ export const fetchCoursesByCategoryId = async (categoryId) => {
   return await response.json();
 };
 
-export const fetchCoursesByCategoryIds = async (categoryNames) => {
+export const fetchCoursesByCategoryIds = async (categoryNames, userId = null) => {
   try {
     const response = await fetch("/api/courses/byCategoryIds", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ categoryNames }),
+      body: JSON.stringify({ categoryNames, userId }),
     });
 
     if (!response.ok) {
@@ -141,6 +141,7 @@ export const fetchCoursesByCategoryIds = async (categoryNames) => {
     throw new Error("Failed to fetch courses by category IDs");
   }
 };
+
 
 export const updateCourseCategory = async (courseId, categoryName) => {
   try {

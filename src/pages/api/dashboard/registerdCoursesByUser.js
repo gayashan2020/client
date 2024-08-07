@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       {
         $match: {
           userId: new ObjectId(userId),
-          enrollStatus: true,
+          enrollStatus: 'pending',
           mentor_approved: true,
         },
       },

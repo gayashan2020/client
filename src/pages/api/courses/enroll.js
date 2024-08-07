@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       userId: new ObjectId(userId),
       courseId: new ObjectId(courseId),
       mentorId: new ObjectId(mentorId),
-      enrollStatus: true, // Assuming true means they are enrolled
+      enrollStatus: 'pending', // Assuming true means they are enrolled
     };
 
     try {

@@ -38,6 +38,7 @@ export const routes = {
   ADMIN_COURSES: "/admin/courses",
   ADMIN_COURSES_ADD_COURSE: "/admin/courses/addCourses",
   ADMIN_COURSES_MANAGE_COURSE: "/admin/courses/manageCourses",
+  MY_COURSES: "/admin/courses/myCourses",
 
   //admin reflective logs------------------------------
   ADMIN_REFLOG: "/admin/reflectiveLogs",

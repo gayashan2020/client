@@ -34,7 +34,7 @@ export default async (req, res) => {
         .collection("users_courses")
         .countDocuments({
           userId: userId,
-          enrollStatus: true,
+          enrollStatus: 'pending',
           mentorId: mentorId,
         });
 
@@ -45,7 +45,7 @@ export default async (req, res) => {
           {
             $match: {
               userId: userId,
-              enrollStatus: true,
+              enrollStatus: 'pending',
               mentorId: mentorId,
             },
           },
