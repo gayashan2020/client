@@ -73,7 +73,7 @@ export default function Index() {
       );
       const coursesData = await fetchCoursesByCategoryIds(categoryNames);
       console.log("coursesData", categoryNames);
-      setCourses(coursesData);
+      setCourses(coursesData?.otherCourses);
     } catch (error) {
       console.error("Failed to fetch courses:", error);
     } finally {
