@@ -19,14 +19,21 @@ export default async function handler(req, res) {
     // Access the reflectiveLog collection
     const reflectiveLog = db.collection("reflectiveLog");
 
-    // Update the specified reflectiveLog document with the new comment and score
+    // Find the reflectiveLog document to get the users_courses_id
+    const logEntry = await reflectiveLog.findOne({ _id: new ObjectId(logId) });
+
+    if (!logEntry) {
+      return res.status(404).json({ message: "Reflective Log not found." });
+    }
+
+    // Update the reflectiveLog document with the new comment, score, and set approval to "approved"
     const response = await reflectiveLog.updateOne(
       { _id: new ObjectId(logId) },
       {
         $set: {
           comment, // Set the comment
           score, // Set the score
-          approval: "approved", // Set the approval to true
+          approval: "approved", // Set the approval to "approved"
         },
       }
     );
@@ -36,9 +43,23 @@ export default async function handler(req, res) {
       return res.status(404).json({ message: "Reflective Log not found or no changes made." });
     }
 
-    res.status(200).json({ message: "Reflective Log updated successfully", body: response });
+    // Access the users_courses collection to update the enrollStatus
+    const usersCourses = db.collection("users_courses");
+
+    // Update the enrollStatus to "approved" for the corresponding users_courses_id
+    const updateResponse = await usersCourses.updateOne(
+      { _id: new ObjectId(logEntry.users_courses_id) },
+      { $set: { enrollStatus: "approved" } }
+    );
+
+    // Check if the enrollStatus was successfully updated
+    if (updateResponse.modifiedCount === 0) {
+      return res.status(404).json({ message: "Users Courses entry not found or no changes made." });
+    }
+
+    res.status(200).json({ message: "Reflective Log and enrollment status updated successfully", body: response });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error updating Reflective Log" });
+    res.status(500).json({ error: "Error updating Reflective Log and enrollment status" });
   }
 }

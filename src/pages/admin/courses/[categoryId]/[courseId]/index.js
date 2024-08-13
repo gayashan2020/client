@@ -25,7 +25,7 @@ import {
   getEnrolledDataByCourse,
 } from "@/services/courses";
 import { LoadingContext } from "@/contexts/LoadingContext";
-import { AuthContext } from "@/contexts/AuthContext"; 
+import { AuthContext } from "@/contexts/AuthContext";
 import { fetchCurrentUser, fetchUsers, updateUser } from "@/services/users";
 import { toast } from "react-toastify";
 import { userRoles } from "@/assets/constants/authConstants";
@@ -35,6 +35,7 @@ export default function CourseDetail() {
   const [course, setCourse] = useState(null);
   const [user, setUser] = useState(null);
   const [enroll, setEnroll] = useState(true);
+  const [approve, setApprove] = useState(true);
   const [mentors, setMentors] = useState(null);
   const [mentorDialogOpen, setMentorDialogOpen] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState("");
@@ -48,8 +49,6 @@ export default function CourseDetail() {
   const { categoryId, courseId } = router.query;
   const { setLoading } = useContext(LoadingContext);
   const { isAuthenticated } = useContext(AuthContext);
-
- 
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -66,7 +65,7 @@ export default function CourseDetail() {
           console.log(currentUser, "current user");
           if (currentUser?.mentorApprovalStatus === true) {
             setMentorSelected(true);
-            setSelectedMentor(currentUser?.mentorId); 
+            setSelectedMentor(currentUser?.mentorId);
           }
         })
         .catch((error) => {
@@ -125,10 +124,20 @@ export default function CourseDetail() {
     try {
       setLoading(true);
       const data = await getEnrolledDataByCourse(currentUser._id, courseId);
-      if (data && data[0]) {
-        setEnroll(data[0].enrollStatus === 'pending');
+      if (
+        data &&
+        data[0] &&
+        (data[0].enrollStatus === "pending" ||
+          data[0].enrollStatus === "pending approval")
+      ) {
+        setEnroll(true);
+        setApprove(false);
+      } else if (data && data[0] && data[0].enrollStatus === "approved") {
+        setEnroll(true);
+        setApprove(true);
       } else {
         setEnroll(false);
+        setApprove(false);
       }
     } catch (error) {
       console.error("Failed to fetch courses:", error);
@@ -144,7 +153,7 @@ export default function CourseDetail() {
       let payload = {
         email: user.email,
         mentorId: selectedMentor,
-        mentorApprovalStatus: mentorSelected?mentorSelected:false,
+        mentorApprovalStatus: mentorSelected ? mentorSelected : false,
       };
       await updateUser(payload);
 
@@ -161,11 +170,10 @@ export default function CourseDetail() {
 
   const handleEnrollClick = () => {
     if (mentorSelected) {
-      handleEnroll()
+      handleEnroll();
     } else {
       setMentorDialogOpen(true);
     }
-    
   };
 
   // Mentor Dialog
@@ -187,7 +195,9 @@ export default function CourseDetail() {
           },
         }}
       >
-        <DialogTitle style={{ textAlign: "center" }}>Select a Mentor</DialogTitle>
+        <DialogTitle style={{ textAlign: "center" }}>
+          Select a Mentor
+        </DialogTitle>
         <DialogContent>
           <FormControl fullWidth style={{ marginTop: theme.spacing(2) }}>
             <Select
@@ -211,7 +221,9 @@ export default function CourseDetail() {
             </Select>
           </FormControl>
         </DialogContent>
-        <DialogActions style={{ justifyContent: "center", padding: theme.spacing(3) }}>
+        <DialogActions
+          style={{ justifyContent: "center", padding: theme.spacing(3) }}
+        >
           <Button
             onClick={() => setMentorDialogOpen(false)}
             variant="outlined"
@@ -219,7 +231,12 @@ export default function CourseDetail() {
           >
             Cancel
           </Button>
-          <Button onClick={handleEnroll} disabled={!selectedMentor} variant="contained" color="primary">
+          <Button
+            onClick={handleEnroll}
+            disabled={!selectedMentor}
+            variant="contained"
+            color="primary"
+          >
             Continue
           </Button>
         </DialogActions>
@@ -259,9 +276,25 @@ export default function CourseDetail() {
             <span style={{ fontWeight: "bold" }}>How To Learn: </span>{" "}
             {reflectiveLog?.how_to_learn}
           </Typography>
+          {approve && (
+            <Typography gutterBottom>
+              <span style={{ fontWeight: "bold" }}>Mentor Comment: </span>{" "}
+              {reflectiveLog?.comment}
+            </Typography>
+          )}
+          {approve && (
+            <Typography gutterBottom>
+              <span style={{ fontWeight: "bold" }}>Score: </span>{" "}
+              {reflectiveLog?.score}
+            </Typography>
+          )}
           {reflectiveLog?.file && (
             <Typography gutterBottom>
-              <a href={reflectiveLog.file} target="_blank" rel="noopener noreferrer">
+              <a
+                href={reflectiveLog.file}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 View Attached File
               </a>
             </Typography>
@@ -276,7 +309,10 @@ export default function CourseDetail() {
 
   return isAuthenticated ? (
     <Layout>
-      <Container maxWidth="lg" style={{ marginTop: "2rem", minHeight: "100vh" }}>
+      <Container
+        maxWidth="lg"
+        style={{ marginTop: "2rem", minHeight: "100vh" }}
+      >
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
             <Card>
@@ -303,7 +339,11 @@ export default function CourseDetail() {
             </Typography>
             <Button
               variant="contained"
-              style={!enroll ? { backgroundColor: "rgb(32 176 31)", color: "#ffffff" } : {}}
+              style={
+                !enroll
+                  ? { backgroundColor: "rgb(32 176 31)", color: "#ffffff" }
+                  : {}
+              }
               disabled={enroll}
               onClick={handleEnrollClick}
             >
@@ -324,7 +364,9 @@ export default function CourseDetail() {
                 }
                 disabled={!enroll}
                 onClick={() =>
-                  router.push(`/admin/courses/${categoryId}/${course._id}/reflectiveLog`)
+                  router.push(
+                    `/admin/courses/${categoryId}/${course._id}/reflectiveLog`
+                  )
                 }
               >
                 Completed
@@ -357,20 +399,23 @@ export default function CourseDetail() {
             >
               Back
             </Button>
-            {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
-              <Button
-                style={{
-                  marginLeft: "1rem",
-                  backgroundColor: "rgb(240 35 35)",
-                  color: "#ffffff",
-                }}
-                onClick={() =>
-                  router.push(`/admin/courses/${categoryId}/${course._id}/editCourse`)
-                }
-              >
-                Edit Course
-              </Button>
-            )}
+            {user &&
+              [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
+                <Button
+                  style={{
+                    marginLeft: "1rem",
+                    backgroundColor: "rgb(240 35 35)",
+                    color: "#ffffff",
+                  }}
+                  onClick={() =>
+                    router.push(
+                      `/admin/courses/${categoryId}/${course._id}/editCourse`
+                    )
+                  }
+                >
+                  Edit Course
+                </Button>
+              )}
           </Grid>
         </Grid>
       </Container>
@@ -379,8 +424,11 @@ export default function CourseDetail() {
     </Layout>
   ) : (
     <>
-    <Navbar />
-    <Container maxWidth="lg" style={{ marginTop: "2rem", minHeight: "100vh" }}>
+      <Navbar />
+      <Container
+        maxWidth="lg"
+        style={{ marginTop: "2rem", minHeight: "100vh" }}
+      >
         <Grid container spacing={4}>
           <Grid item xs={12} md={6}>
             <Card>

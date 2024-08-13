@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   } = req.body;
 
   try {
-    // Search for the relevant entry in the users_courses table
+    // Search for the relevant entry in the users_courses collection
     const usersCourses = db.collection("users_courses");
     const userCourseEntry = await usersCourses.findOne({
       userId: new ObjectId(userId),
@@ -26,6 +26,12 @@ export default async function handler(req, res) {
     if (!userCourseEntry) {
       return res.status(404).json({ message: "User course entry not found." });
     }
+
+    // Update enrollStatus to 'pending approval'
+    await usersCourses.updateOne(
+      { _id: new ObjectId(userCourseEntry._id) },
+      { $set: { enrollStatus: "pending approval" } }
+    );
 
     // Access reflectiveLog collection
     const reflectiveLog = db.collection("reflectiveLog");

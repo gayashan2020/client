@@ -36,7 +36,7 @@ const ReflectiveLogsTable = ({ userId }) => {
   }, [userId, setLoading]);
 
   return (
-    <Container maxWidth="lg" sx={{ minHeight: "100vh" }}>
+    <div maxWidth="lg" sx={{ minHeight: "100vh" }}>
       <Typography variant="h4" gutterBottom>
         Reflective Logs
       </Typography>
@@ -50,6 +50,7 @@ const ReflectiveLogsTable = ({ userId }) => {
               <TableCell align="right">What Did I Learn</TableCell>
               <TableCell align="right">More To Learn</TableCell>
               <TableCell align="right">How To Learn</TableCell>
+              <TableCell align="right">Status</TableCell>
               <TableCell align="right">Evidence</TableCell>
             </TableRow>
           </TableHead>
@@ -67,6 +68,7 @@ const ReflectiveLogsTable = ({ userId }) => {
                 <TableCell align="right">{log.what_did_I_learn}</TableCell>
                 <TableCell align="right">{log.more_to_learn}</TableCell>
                 <TableCell align="right">{log.how_to_learn}</TableCell>
+                <TableCell align="right">{log.approval}</TableCell>
                 <TableCell align="right">
                   {log?.file && (
                     <a
@@ -83,7 +85,7 @@ const ReflectiveLogsTable = ({ userId }) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Container>
+    </div>
   );
 };
 
