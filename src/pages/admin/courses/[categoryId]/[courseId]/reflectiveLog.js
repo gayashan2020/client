@@ -269,11 +269,11 @@ export default function ReflectiveLog() {
                 label="I hereby declare that the information provided here is true and correct."
               />
             </Grid>
-            <Grid item xs={12}>
+            {agreement&&(<Grid item xs={12}>
               <Button variant="contained" color="primary" type="submit">
                 Submit
               </Button>
-            </Grid>
+            </Grid>)}
           </Grid>
         </form>
       </Box>

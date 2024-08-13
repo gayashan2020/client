@@ -236,7 +236,7 @@ export default function CourseDetail() {
         aria-describedby="reflective-log-dialog-description"
       >
         <DialogTitle id="reflective-log-dialog-title">
-          Reflective Log Details for {reflectiveLog?.courseName} ({reflectiveLog?.approval})
+          Reflective Log Details ({reflectiveLog?.approval})
         </DialogTitle>
         <DialogContent>
           <Typography gutterBottom>

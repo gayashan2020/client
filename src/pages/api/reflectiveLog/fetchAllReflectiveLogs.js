@@ -42,7 +42,7 @@ export default async function handler(req, res) {
 
       return {
         ...reflectiveLogEntry,
-        courseName: course.name,
+        courseName: course.event,
         mentorName: mentor.fullName,
       };
     });

@@ -59,7 +59,7 @@ const MentorMenteesList = () => {
       let payload = {
         email: selectedMentee.email,
         mentorApprovalStatus: true,
-      }
+      };
       console.log(payload);
       await updateUser(payload);
       setLoading(false);
@@ -126,16 +126,18 @@ const MentorMenteesList = () => {
                   <TableCell>{mentee.contactNumber}</TableCell>
                   <TableCell>{mentee.slmcRegNumber || "N/A"}</TableCell>
                   {/* <TableCell>{mentee.unapprovedCoursesCount}</TableCell> */}
-                  {mentee?.mentorApprovalStatus !== true &&(<TableCell>
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenDialog(mentee);
-                      }}
-                    >
-                      <CheckCircleIcon />
-                    </IconButton>
-                  </TableCell>)}
+                  <TableCell>
+                    {mentee?.mentorApprovalStatus !== true && (
+                      <IconButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDialog(mentee);
+                        }}
+                      >
+                        <CheckCircleIcon />
+                      </IconButton>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
               {mentees.length === 0 && !error && (
@@ -149,21 +151,19 @@ const MentorMenteesList = () => {
           </Table>
         </TableContainer>
 
-        <Dialog
-          open={openDialog}
-          onClose={() => setOpenDialog(false)}
-        >
+        <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
           <DialogTitle>Confirm Approval</DialogTitle>
           <DialogContent>
             <Typography>
               Are you sure you want to approve all courses for{" "}
               {selectedMentee?.fullName ||
-                `${selectedMentee?.firstName} ${selectedMentee?.lastName}`}?
+                `${selectedMentee?.firstName} ${selectedMentee?.lastName}`}
+              ?
             </Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-            <Button onClick={()=>handleApproveMentee()} color="primary">
+            <Button onClick={() => handleApproveMentee()} color="primary">
               Approve
             </Button>
           </DialogActions>

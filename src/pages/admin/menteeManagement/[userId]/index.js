@@ -117,7 +117,7 @@ export default function StudentDetails() {
             <TableHead>
               <TableRow>
                 <TableCell>Course Name</TableCell>
-                <TableCell align="right">Duration</TableCell>
+                <TableCell align="right">Dates</TableCell>
                 <TableCell align="right">CPD Points</TableCell>
                 <TableCell align="right">Reflective Log Status</TableCell>
                 <TableCell align="right">Actions</TableCell>
@@ -130,10 +130,10 @@ export default function StudentDetails() {
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {course.name}
+                    {course.event}
                   </TableCell>
-                  <TableCell align="right">{course.duration} hours</TableCell>
-                  <TableCell align="right">{course.cpdTotal} points</TableCell>
+                  <TableCell align="right">{course.dates}</TableCell>
+                  <TableCell align="right">{course.total_cpd_points} points</TableCell>
                   <TableCell align="right">
                     {course.reflectiveLog
                       ? course.reflectiveLog.approval
@@ -165,27 +165,23 @@ export default function StudentDetails() {
               <>
                 <DialogContentText sx={dialogContentTextStyle}>
                   <span style={{ fontWeight: "bold" }}>Name:</span>{" "}
-                  {selectedCourse.name}
+                  {selectedCourse.event}
                 </DialogContentText>
                 <DialogContentText sx={dialogContentTextStyle}>
                   <span style={{ fontWeight: "bold" }}>Category:</span>{" "}
                   {selectedCourse.category}
                 </DialogContentText>
                 <DialogContentText sx={dialogContentTextStyle}>
-                  <span style={{ fontWeight: "bold" }}>Duration:</span>{" "}
-                  {selectedCourse.duration} hours
+                  <span style={{ fontWeight: "bold" }}>Dates:</span>{" "}
+                  {selectedCourse.dates}
                 </DialogContentText>
                 <DialogContentText sx={dialogContentTextStyle}>
                   <span style={{ fontWeight: "bold" }}>CPD Total:</span>{" "}
-                  {selectedCourse.cpdTotal}
+                  {selectedCourse.total_cpd_points}
                 </DialogContentText>
                 <DialogContentText sx={dialogContentTextStyle}>
-                  <span style={{ fontWeight: "bold" }}>CPD Minimum:</span>{" "}
-                  {selectedCourse.cpdMin}
-                </DialogContentText>
-                <DialogContentText sx={dialogContentTextStyle}>
-                  <span style={{ fontWeight: "bold" }}>Type:</span>{" "}
-                  {selectedCourse.type}
+                  <span style={{ fontWeight: "bold" }}>Contact Email:</span>{" "}
+                  {selectedCourse?.contact?.email}
                 </DialogContentText>
                 <DialogContentText sx={dialogContentTextStyle}>
                   <span style={{ fontWeight: "bold" }}>Link:</span>{" "}
@@ -198,20 +194,8 @@ export default function StudentDetails() {
                   </a>
                 </DialogContentText>
                 <DialogContentText sx={dialogContentTextStyle}>
-                  <span style={{ fontWeight: "bold" }}>Authors:</span>{" "}
-                  {selectedCourse.authors}
-                </DialogContentText>
-                <DialogContentText sx={dialogContentTextStyle}>
-                  <span style={{ fontWeight: "bold" }}>Description:</span>{" "}
-                  {selectedCourse.description}
-                </DialogContentText>
-                <DialogContentText sx={dialogContentTextStyle}>
-                  <span style={{ fontWeight: "bold" }}>Objectives:</span>{" "}
-                  {selectedCourse.objectives}
-                </DialogContentText>
-                <DialogContentText sx={dialogContentTextStyle}>
-                  <span style={{ fontWeight: "bold" }}>Keywords:</span>{" "}
-                  {selectedCourse.keywords}
+                  <span style={{ fontWeight: "bold" }}>Organizing Body:</span>{" "}
+                  {selectedCourse.organizing_body}
                 </DialogContentText>
                 {selectedCourse.image && (
                   <img

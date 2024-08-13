@@ -11,6 +11,7 @@ export default async function handler(req, res) {
     how_to_learn,
     userId,
     courseId,
+    approval,
   } = req.body;
 
   try {
@@ -36,6 +37,7 @@ export default async function handler(req, res) {
       more_to_learn,
       how_to_learn,
       users_courses_id: new ObjectId(userCourseEntry._id),
+      approval,
     });
 
     res
