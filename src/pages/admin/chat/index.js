@@ -17,22 +17,20 @@ import {
   Button,
   Paper,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import SendIcon from "@mui/icons-material/Send";
-import { fetchCurrentUser, fetchUsers, fetchUserById } from "@/services/users";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import { fetchCurrentUser, fetchUsers } from "@/services/users";
 import {
   fetchConversationsWithNames,
   fetchMessages,
   sendMessage,
+  createConversation, // Import this if you have a service to create conversations
 } from "@/services/conversations";
 import Layout from "@/components/Layout";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { userRoles } from "@/assets/constants/authConstants";
-import { useTheme } from "@mui/material/styles"; // Import useTheme hook
-import { set } from "mongoose";
-
-// You need to import or define the 'fetchUsers' service function
-// which should return all users that can be messaged
+import { useTheme } from "@mui/material/styles";
+import { darkTheme } from "@/styles/theme";
 
 export default function Chat() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -48,52 +46,63 @@ export default function Chat() {
 
   const { setLoading } = useContext(LoadingContext);
 
-  const theme = useTheme();
+  const theme = darkTheme;
+
+  const formatRole = (role) => {
+    if (!role) return role;
+    return role
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
 
   const styles = {
+    container: {
+      display: "flex",
+      height: "100vh",
+      backgroundColor: theme.palette.background.default,
+    },
     sidebar: {
       width: "25%",
-      height: "100vh",
-      overflowY: "auto",
-      bgcolor: theme.palette.background.paper,
-      padding: theme.spacing(1),
-      boxSizing: "border-box", // Make sure padding doesn't affect the width
+      backgroundColor: theme.palette.background.paper,
+      borderRight: `1px solid ${theme.palette.divider}`,
+      display: "flex",
+      flexDirection: "column",
     },
-    chatWindow: {
+    chatList: {
+      overflowY: "auto",
+      flexGrow: 1,
+      padding: theme.spacing(1),
+    },
+    chatArea: {
+      flexGrow: 1,
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: theme.palette.background.default,
+    },
+    chatHeader: {
+      padding: theme.spacing(2),
+      borderBottom: `1px solid ${theme.palette.divider}`,
+      backgroundColor: theme.palette.background.paper,
+      color: theme.palette.text.primary,
+    },
+    chatMessages: {
       flexGrow: 1,
       overflowY: "auto",
-      height: `calc(100vh - ${theme.spacing(8)})`, // Adjust for input height and padding
-      paddingRight: theme.spacing(2),
-      paddingLeft: theme.spacing(2),
-      boxSizing: "border-box", // Include padding in height calculation
+      padding: theme.spacing(2),
+      backgroundColor: theme.palette.background.paper,
+      borderBottom: `1px solid ${theme.palette.divider}`,
     },
     messageInputContainer: {
-      position: "fixed",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      alignItems: "center",
       padding: theme.spacing(2),
-      background: theme.palette.background.default,
-      zIndex: 2,
-      opacity: selectedConversation ? 1 : 0.5,
-      pointerEvents: selectedConversation ? "auto" : "none",
+      display: "flex",
+      alignItems: "center",
+      backgroundColor: theme.palette.background.paper,
+      borderTop: `1px solid ${theme.palette.divider}`,
     },
-    messageInputBox: {
+    messageInput: {
       flexGrow: 1,
-    },
-    addConversationButton: {
-      position: "fixed",
-      right: theme.spacing(2),
-      bottom: theme.spacing(10), // Position above the input container
-      zIndex: 2,
-    },
-    conversationList: {
-      width: "25%", // increase width for better visibility
-      minWidth: "200px", // minimum width for the conversation list
-      height: "100vh",
-      overflowY: "auto", // enable scrolling for long lists
-      bgcolor: theme.palette.background.paper,
+      marginRight: theme.spacing(1),
     },
   };
 
@@ -103,18 +112,16 @@ export default function Chat() {
     padding: theme.spacing(1),
     borderRadius: "10px",
     bgcolor: isCurrentUser
-      ? theme.palette.primary.light
-      : theme.palette.grey[300],
-    color: isCurrentUser
-      ? theme.palette.common.white
-      : theme.palette.text.primary,
-    margin: theme.spacing(1),
-    marginLeft: isCurrentUser ? "auto" : theme.spacing(2),
-    marginRight: isCurrentUser ? theme.spacing(2) : "auto",
+      ? theme.palette.primary.main
+      : theme.palette.grey[800],
+    color: theme.palette.common.white,
+    margin: `${theme.spacing(1)} ${
+      isCurrentUser ? theme.spacing(2) : "auto"
+    } ${theme.spacing(1)} ${isCurrentUser ? "auto" : theme.spacing(2)}`,
+    alignSelf: isCurrentUser ? "flex-end" : "flex-start",
   });
 
   useEffect(() => {
-    // Define a function to fetch all required data
     const fetchAllData = async () => {
       setLoading(true);
       try {
@@ -133,12 +140,10 @@ export default function Chat() {
     fetchAllData();
   }, [setLoading]);
 
-  // A function to update the conversations list
   const updateConversations = async (userId) => {
     const conversationsWithNames = await fetchConversationsWithNames(userId);
     setConversations(conversationsWithNames);
 
-    // If a conversation is currently selected, refresh its messages
     if (selectedConversation) {
       const currentConversation = conversationsWithNames.find(
         (c) => c._id === selectedConversation._id
@@ -173,17 +178,14 @@ export default function Chat() {
           handleSelectConversation(currentConversation);
         }
       }
-      // Update the conversations list
-      setNewMessage(""); // Clear the input after sending
+      setNewMessage("");
       await updateConversations(currentUser._id);
     }
   };
 
   const handleSelectConversation = (conversation) => {
     setSelectedConversation(conversation);
-    // Fetch messages for the selected conversation
     fetchMessages(conversation._id).then(setMessages);
-    // Set responder ID based on the selected conversation
     setResponder(
       conversation.initiator === currentUser._id
         ? conversation.responder
@@ -194,79 +196,116 @@ export default function Chat() {
   const handleCreateConversation = async () => {
     if (!selectedUser) return;
 
-    setResponder(selectedUser);
-    setDialogOpen(false);
-    setSelectedConversation(null);
-  };
-
-  const handleRoleChange = (event) => {
-    const role = event.target.value;
-    setSelectedRole(role);
-    setFilteredUsers([]); // Clear the current users
-
-    if (role) {
-      setLoading(true);
-      fetchUsers("", role)
-        .then((fetchedUsers) => {
-          setFilteredUsers(fetchedUsers);
-        })
-        .catch((error) => {
-          console.error("Error fetching users by role:", error);
-          // Handle the error properly here
-        })
-        .finally(() => setLoading(false));
+    setLoading(true);
+    try {
+      const initialMessage = `Hello, ${
+        currentUser.fullName
+      } (Role: ${formatRole(currentUser.role)}) has started this conversation.`;
+      // Send the initial message
+      const conversation = await sendMessage(
+        currentUser._id,
+        selectedUser,
+        initialMessage
+      );
+      if (conversation) {
+        if (!selectedConversation) {
+          setLoading(true);
+          const conversationsWithNames = await fetchConversationsWithNames(
+            currentUser._id
+          );
+          setLoading(false);
+          const currentConversation = conversationsWithNames.find(
+            (c) => c._id === conversation.conversationId
+          );
+          setSelectedConversation(currentConversation);
+          if (currentConversation) {
+            handleSelectConversation(currentConversation);
+          }
+        }
+        setNewMessage("");
+        await updateConversations(currentUser._id);
+      }
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+    } finally {
+      setLoading(false);
+      setDialogOpen(false);
     }
   };
 
+  const handleRoleChange = async (event) => {
+    const role = event.target.value;
+    setSelectedRole(role);
+    setFilteredUsers([]);
+  
+    if (role) {
+      setLoading(true);
+      try {
+        const fetchedUsers = await fetchUsers("", role);
+  
+        const existingConversationUserIds = conversations.flatMap((conversation) => 
+          [conversation.initiator, conversation.responder]
+        );
+  
+        const usersWithoutConversation = fetchedUsers.filter(
+          (user) => !existingConversationUserIds.includes(user._id)
+        );
+  
+        setFilteredUsers(usersWithoutConversation);
+      } catch (error) {
+        console.error("Error fetching users by role:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+  
+
   return (
     <Layout>
-      <Box height="100vh">
-        <Box display="flex">
-          {/* Sidebar with Conversations */}
-          <Box className={styles.sidebar}>
-            <Typography variant="h6" component="div" sx={{ p: 1 }}>
-              Conversations
-            </Typography>
-            <Divider />
-            {/* <Box className={styles.sidebar}> */}
-            <List>
-              {conversations.map((conversation) => (
-                <ListItem
-                  button
-                  key={conversation._id}
-                  selected={selectedConversation?._id === conversation._id} // This line highlights the selected conversation
-                  onClick={() => handleSelectConversation(conversation)}
-                  sx={{
-                    bgcolor: "background.paper",
-                    my: 1,
-                    borderRadius: "4px",
-                    "&.Mui-selected": {
-                      // This style will apply when the item is selected
-                      backgroundColor: theme.palette.action.selected, // You can choose the color you prefer
-                    },
-                    "&.Mui-selected:hover": {
-                      backgroundColor: theme.palette.action.hover, // Also for hover state
-                    },
-                  }}
-                >
-                  <ListItemText primary={conversation.partnerName} />
-                </ListItem>
-              ))}
-            </List>
-            {/* </Box> */}
+      <Box style={styles.container}>
+        <Box style={styles.sidebar}>
+          <Typography variant="h6" component="div" sx={{ p: 2 }}>
+            Chats
+          </Typography>
+          <Divider />
+          <Box style={styles.chatList}>
+            {conversations.length > 0 ? (
+              <List>
+                {conversations.map((conversation) => (
+                  <ListItem
+                    button
+                    key={conversation._id}
+                    selected={selectedConversation?._id === conversation._id}
+                    onClick={() => handleSelectConversation(conversation)}
+                    sx={{
+                      "&.Mui-selected": {
+                        backgroundColor: theme.palette.action.selected,
+                      },
+                      "&.Mui-selected:hover": {
+                        backgroundColor: theme.palette.action.hover,
+                      },
+                    }}
+                  >
+                    <ListItemText primary={conversation.partnerName} />
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <List>No chats currently</List>
+            )}
           </Box>
-          <Box
-            flexGrow={1}
-            display="flex"
-            flexDirection="column"
-          >
-            {selectedConversation && (
-              <div style={{ minHeight: "40vh" }}>
-                <Typography variant="h5" gutterBottom sx={{ p: 1 }}>
+        </Box>
+        <Box style={styles.chatArea}>
+          {selectedConversation ? (
+            <>
+              <Box style={styles.chatHeader}>
+                <Typography variant="h5" gutterBottom>
                   Conversation with {selectedConversation?.partnerName}
                 </Typography>
-                <Divider />
-                <List className={styles.chatWindow}>
+              </Box>
+              <Box style={styles.chatMessages}>
+                <List>
                   {messages.map((message, index) => (
                     <ListItem key={index} disableGutters>
                       <Box
@@ -279,56 +318,56 @@ export default function Chat() {
                     </ListItem>
                   ))}
                 </List>
-              </div>
-            )}
-            {!selectedConversation && (
-              <div style={{ height: "40vh" }}>
-                <Typography variant="h5" gutterBottom sx={{ p: 1 }}>
-                  Select a Conversation
-                </Typography>
-              </div>
-            )}
-            {/* Chat Section */}
-            <Box
-              className={styles.messageInputContainer}
-              component="form"
-              onSubmit={handleSendMessage}
-              display={"flex"}
-              //   sx={{ pointerEvents: selectedConversation ? 'auto' : 'none' }}
-            >
-              <TextField
-                fullWidth
-                id="message-field"
-                label="Type a message"
-                variant="outlined"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) =>
-                  e.key === "Enter" ? handleSendMessage(e) : null
-                }
-                className={styles.messageInputBox}
-                disabled={!selectedConversation && !selectedUser}
-              />
-              <Box display={"flex"}>
-                <IconButton
-                  type="submit"
-                  sx={{ p: "10px" }} // padding around the icon
-                  aria-label="send"
-                  disabled={!selectedConversation && !selectedUser}
-                >
-                  <SendIcon />
-                </IconButton>
-                <IconButton
-                  className={styles.addConversationButton}
-                  onClick={() => setDialogOpen(true)}
-                >
-                  <AddIcon />
-                </IconButton>
               </Box>
+            </>
+          ) : (
+            <Box
+              flexGrow={1}
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              flexDirection="column"
+            >
+              <Typography variant="h4" gutterBottom sx={{ p: 1 }}>
+                Select a chat to begin messaging
+              </Typography>
+              <Typography variant="h7" gutterBottom sx={{ p: 1 }}>
+                Choose a conversation from the left sidebar.
+              </Typography>
             </Box>
+          )}
+          <Box
+            component="form"
+            onSubmit={handleSendMessage}
+            style={styles.messageInputContainer}
+          >
+            <IconButton
+              onClick={() => setDialogOpen(true)}
+              sx={{ marginRight: theme.spacing(1) }}
+            >
+              <GroupAddIcon />
+            </IconButton>
+            <TextField
+              fullWidth
+              id="message-field"
+              placeholder="Type a message"
+              variant="outlined"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              disabled={!selectedConversation && !selectedUser}
+              style={styles.messageInput}
+            />
+            <IconButton
+              type="submit"
+              color="primary"
+              disabled={!selectedConversation && !selectedUser}
+            >
+              <SendIcon />
+            </IconButton>
           </Box>
-        </Box>{" "}
+        </Box>
       </Box>
+
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Select a user to start a conversation</DialogTitle>
         <DialogContent>
@@ -340,12 +379,13 @@ export default function Chat() {
             onChange={handleRoleChange}
             fullWidth
           >
-            {Object.values(userRoles).map((role) => (
-              <MenuItem key={role} value={role}>
-                {role}
+            {Object.entries(userRoles).map(([key, value]) => (
+              <MenuItem key={key} value={value}>
+                {formatRole(value)}
               </MenuItem>
             ))}
           </Select>
+
           <InputLabel id="select-user-label">User</InputLabel>
           <Select
             labelId="select-user-label"

@@ -1,5 +1,3 @@
-//styles/theme.js
-
 import { createTheme } from "@mui/material/styles";
 
 const getTheme = (mode) =>
@@ -7,20 +5,26 @@ const getTheme = (mode) =>
     palette: {
       mode: mode,
       primary: {
-        main: mode === "dark" ? "#fff" : "#1976d2",
+        main: mode === "dark" ? "#90caf9" : "#1976d2",
       },
       secondary: {
         main: "#4a4a4a",
       },
       background: {
-        default: mode === "dark" ? "#424242" : "#e7e7e7",
+        default: mode === "dark" ? "#111111" : "#fafafa",
+        paper: mode === "dark" ? "#222222" : "#ffffff",
       },
+      text: {
+        primary: mode === "dark" ? "#ffffff" : "#000000",
+        secondary: mode === "dark" ? "#b0bec5" : "#4a4a4a",
+      },
+      divider: mode === "dark" ? "#bdbdbd" : "#e0e0e0",
     },
     components: {
       MuiTextField: {
         styleOverrides: {
           root: {
-            backgroundColor: mode === "dark" ? "#424242" : "#fff",
+            backgroundColor: mode === "dark" ? "#424242" : "#ffffff",
             borderRadius: "4px",
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
@@ -62,7 +66,7 @@ const getTheme = (mode) =>
       MuiListItemText: {
         styleOverrides: {
           primary: {
-            color: mode === "dark" ? "#fff" : "#000",
+            color: mode === "dark" ? "#ffffff" : "#000000",
             textDecoration: "none",
           },
         },
@@ -70,7 +74,7 @@ const getTheme = (mode) =>
       MuiSelect: {
         styleOverrides: {
           root: {
-            backgroundColor: mode === "dark" ? "#424242" : "#fff",
+            backgroundColor: mode === "dark" ? "#424242" : "#ffffff",
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
                 borderColor: "#1976d2",
@@ -96,16 +100,17 @@ const getTheme = (mode) =>
     },
   });
 
-export const errorOutlineStyle = {
-  "& .MuiOutlinedInput-root": {
-    "&.Mui-focused fieldset": {
-      borderColor: "red",
+  export const errorOutlineStyle = {
+    "& .MuiOutlinedInput-root": {
+      "&.Mui-focused fieldset": {
+        borderColor: "red",
+      },
+      "&.Mui-error fieldset": {
+        borderColor: "red",
+      },
     },
-    "&.Mui-error fieldset": {
-      borderColor: "red",
-    },
-  },
-};
+  };
 
+  
 export const lightTheme = getTheme("light");
 export const darkTheme = getTheme("dark");
