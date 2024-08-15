@@ -6,16 +6,17 @@
  * @param {string} initiator - The ID of the user sending the message.
  * @param {string} responder - The ID of the user receiving the message.
  * @param {string} message - The content of the message being sent.
+ * @param {string} [imageUrl] - Optional URL of an image being sent with the message.
  * @returns {Promise<Object>} The response from the server.
  */
-export async function sendMessage(initiator, responder, message) {
+export async function sendMessage(initiator, responder, message, imageUrl = null) {
   try {
     const response = await fetch("/api/message/send", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ initiator, responder, message }),
+      body: JSON.stringify({ initiator, responder, message, imageUrl }),
     });
 
     if (!response.ok) {
@@ -31,6 +32,7 @@ export async function sendMessage(initiator, responder, message) {
     throw error; // Re-throw the error to be handled by the calling code
   }
 }
+
 
 /**
  * Fetches all conversations for a given user.

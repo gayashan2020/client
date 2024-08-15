@@ -6,9 +6,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  const { initiator, responder, message } = req.body;
+  const { initiator, responder, message, imageUrl } = req.body;
 
-  if (!initiator || !responder || !message) {
+  if (!initiator || !responder || (!message && !imageUrl)) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
@@ -48,7 +48,8 @@ export default async function handler(req, res) {
     const newMessage = await db.collection("messages").insertOne({
       conversationId: conversationId,
       timestamp: new Date(),
-      message: message,
+      message: message || null,
+      imageUrl: imageUrl || null, // Store imageUrl if provided
       status: "sent",
       sender: new ObjectId(initiator),
     });

@@ -31,6 +31,8 @@ import { LoadingContext } from "@/contexts/LoadingContext";
 import { userRoles } from "@/assets/constants/authConstants";
 import { useTheme } from "@mui/material/styles";
 import { darkTheme } from "@/styles/theme";
+import PhotoIcon from "@mui/icons-material/Photo";
+import { uploadImage } from "@/services/image";
 
 export default function Chat() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -237,20 +239,20 @@ export default function Chat() {
     const role = event.target.value;
     setSelectedRole(role);
     setFilteredUsers([]);
-  
+
     if (role) {
       setLoading(true);
       try {
         const fetchedUsers = await fetchUsers("", role);
-  
-        const existingConversationUserIds = conversations.flatMap((conversation) => 
-          [conversation.initiator, conversation.responder]
+
+        const existingConversationUserIds = conversations.flatMap(
+          (conversation) => [conversation.initiator, conversation.responder]
         );
-  
+
         const usersWithoutConversation = fetchedUsers.filter(
           (user) => !existingConversationUserIds.includes(user._id)
         );
-  
+
         setFilteredUsers(usersWithoutConversation);
       } catch (error) {
         console.error("Error fetching users by role:", error);
@@ -259,7 +261,39 @@ export default function Chat() {
       }
     }
   };
+
+  const handleImageUpload = async (event) => {
+    console.log('File input changed'); // Debugging line to check if the function is called
+    const file = event.target.files[0];
+    if (!file) {
+      console.log('No file selected'); // Debugging line
+      return;
+    }
   
+    console.log('File selected:', file);
+
+    // Assuming you have an upload service that returns the uploaded image URL
+    setLoading(true);
+    try {
+      const imageUrl = await uploadImage(file); // You need to implement this function
+
+      const conversation = await sendMessage(
+        currentUser._id,
+        responder,
+        null, // No text message
+        imageUrl // Send the image URL as part of the message
+      );
+
+      if (conversation) {
+        await updateConversations(currentUser._id);
+        setSelectedConversation(conversation);
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Layout>
@@ -311,9 +345,22 @@ export default function Chat() {
                       <Box
                         sx={messageBubble(message.sender === currentUser._id)}
                       >
-                        <Typography variant="body2">
-                          {message.message}
-                        </Typography>
+                        {message.imageUrl && (
+                          <img
+                            src={message.imageUrl}
+                            alt="attachment"
+                            style={{
+                              maxWidth: "250px",
+                              borderRadius: "10px",
+                              marginBottom: theme.spacing(1),
+                            }}
+                          />
+                        )}
+                        {message.message && (
+                          <Typography variant="body2">
+                            {message.message}
+                          </Typography>
+                        )}
                       </Box>
                     </ListItem>
                   ))}
@@ -347,6 +394,21 @@ export default function Chat() {
             >
               <GroupAddIcon />
             </IconButton>
+            {selectedConversation &&(<input
+              accept="image/*"
+              style={{ display: "none" }}
+              id="file-input"
+              type="file"
+              onChange={handleImageUpload}
+            />)}
+            <label htmlFor="file-input">
+              <IconButton
+                component="span"
+                sx={{ marginRight: theme.spacing(1) }}
+              >
+                <PhotoIcon />
+              </IconButton>
+            </label>
             <TextField
               fullWidth
               id="message-field"
