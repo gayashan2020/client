@@ -46,6 +46,7 @@ export default async function handler(req, res) {
           name: "$studentDetails.fullName",
           status: "$studentDetails.status",
           courseName: "$courseDetails.event",
+          category: "$courseDetails.category",
         },
       },
     ]).toArray();

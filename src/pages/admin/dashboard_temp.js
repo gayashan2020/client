@@ -433,13 +433,6 @@ export default function AdminDashboard() {
       {/* Mentor Role */}
       {user?.role === userRoles.MENTOR && (
         <>
-          <div className={styles.topRow}>
-            <UserCards
-              onlineUserCountByRole={{}}
-              user={user}
-              coursesCount={{}}
-            />
-          </div>
           <div className={styles.bottomRow}>
             <Card className={styles.chartCard}>
               <Typography variant="h6">Your Students</Typography>
@@ -449,6 +442,7 @@ export default function AdminDashboard() {
                     <TableRow>
                       <TableCell>Name</TableCell>
                       <TableCell>Status</TableCell>
+                      <TableCell>Category</TableCell>
                       <TableCell>Course</TableCell>
                     </TableRow>
                   </TableHead>
@@ -457,6 +451,7 @@ export default function AdminDashboard() {
                       <TableRow key={student._id}>
                         <TableCell>{student.name}</TableCell>
                         <TableCell>{student.status}</TableCell>
+                        <TableCell>{student.category}</TableCell>
                         <TableCell>{student.courseName}</TableCell>
                       </TableRow>
                     ))}
