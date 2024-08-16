@@ -53,6 +53,7 @@ import {
   defaultInputRanges,
 } from "react-date-range";
 import { addYears, startOfYear, endOfYear, isSameDay } from "date-fns";
+import {fetchMentorStudents} from "@/services/mentorService";
 
 const lastYearRange = {
   label: "Last Year",
@@ -124,6 +125,8 @@ export default function AdminDashboard() {
 
   const [mentorDetails, setMentorDetails] = useState([]);
 
+  const [students, setStudents] = useState([]);
+
   const handleSelect = (ranges) => {
     const { startDate, endDate } = ranges.selection;
     setDateRange([ranges.selection]);
@@ -157,6 +160,7 @@ export default function AdminDashboard() {
       filterCoursesByDate(dateRange[0].startDate, dateRange[0].endDate);
       filterCPDByDate(dateRange[0].startDate, dateRange[0].endDate);
       setLoading(false);
+      fetchMentorStudentsDetails();
     }
   }, [user]);
 
@@ -168,6 +172,20 @@ export default function AdminDashboard() {
       console.error("Failed to fetch occupation data", error);
     }
   };
+
+  const fetchMentorStudentsDetails = async () => {
+    try {
+      const studentsData = await fetchMentorStudents(user._id); // Fetch students associated with the mentor
+      setStudents(studentsData);
+    } catch (error) {
+      console.error("Failed to fetch students for mentor", error);
+    }
+  };
+
+  const paginatedStudents = students.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage
+  );
 
   const fetchMentorDetails = async () => {
     try {
@@ -412,17 +430,52 @@ export default function AdminDashboard() {
           </div>
         </>
       )}
-
+      {/* Mentor Role */}
       {user?.role === userRoles.MENTOR && (
         <>
           <div className={styles.topRow}>
             <UserCards
-              onlineUserCountByRole={onlineUserCountByRole}
+              onlineUserCountByRole={{}}
               user={user}
-              coursesCount={coursesCount}
+              coursesCount={{}}
             />
           </div>
-          <div className={styles.bottomRow}></div>
+          <div className={styles.bottomRow}>
+            <Card className={styles.chartCard}>
+              <Typography variant="h6">Your Students</Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Course</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paginatedStudents.map((student) => (
+                      <TableRow key={student._id}>
+                        <TableCell>{student.name}</TableCell>
+                        <TableCell>{student.status}</TableCell>
+                        <TableCell>{student.courseName}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <Pagination
+                count={Math.ceil(students.length / rowsPerPage)}
+                page={page}
+                onChange={handleChangePage}
+                color="primary"
+                style={{
+                  marginTop: "20px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              />
+            </Card>
+          </div>
         </>
       )}
     </div>

@@ -102,3 +102,33 @@ export async function fetchMentorByCurrentUser() {
     throw error;
   }
 }
+
+/**
+ * Fetch a list of students assigned to a specific mentor.
+ * @param {string} mentorId - The ID of the mentor.
+ * @returns {Promise<Array>} A promise that resolves to an array of students, each with personal details,
+ * status, and course information.
+ * @throws {Error} Throws an error if the request fails.
+ */
+export async function fetchMentorStudents(mentorId) {
+  try {
+    const response = await fetch("/api/mentors/getMentorStudents", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ mentorId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error fetching mentor students: ${response.statusText}`);
+    }
+
+    const students = await response.json();
+    return students;
+  } catch (error) {
+    console.error("fetchMentorStudents error:", error);
+    throw error;
+  }
+}
+
