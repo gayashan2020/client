@@ -28,6 +28,8 @@ import { fetchStudentDetails } from "@/services/mentorService";
 import { fetchCurrentUser } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { addMentorComment } from "@/services/reflectiveLog";
+import { addCpdLogEntry } from "@/services/cpdLog";
+import { toast } from "react-toastify";
 
 export default function StudentDetails() {
   const [studentDetails, setStudentDetails] = useState(null);
@@ -82,26 +84,45 @@ export default function StudentDetails() {
   };
 
   // Function to handle opening the reflective log details dialog
-  const handleOpenLogDialog = (log) => {
+  const handleOpenLogDialog = (log, course) => {
     setSelectedLog(log);
+    setSelectedCourse(course);
     setOpenLogDialog(true);
   };
 
   const handleSubmitReflectiveLog = async (event) => {
     event.preventDefault();
     if (!selectedLog || !selectedLog._id) return;
-
+  
     const { _id: logId, comment, score } = selectedLog;
+  
+    // Validation: Ensure the score is within the allowed range
+    if (Number(score) < 0 || Number(score) > selectedCourse.total_cpd_points) {
+      toast.error(`Score must be between 0 and ${selectedCourse.total_cpd_points}`);
+      return;
+    }
+  
     try {
       await addMentorComment(logId, comment, Number(score));
+  
+      // Add entry to cpdLog
+      const cpdLogEntry = {
+        cpdPoints: Number(score),
+        users_courses_id: selectedLog?.users_courses_id,
+        dateTime: new Date().toISOString(),
+      };
+  
+      await addCpdLogEntry(cpdLogEntry); // Call the service function to insert the cpdLog entry
+  
       setOpenLogDialog(false);
+      toast.success("Reflective log updated successfully!");
       // Optionally, refresh the data to show the updated log
       fetchStudentDetailsData(user._id, userId);
     } catch (error) {
-      console.error("Error updating reflective log:", error);
-      // Handle error (e.g., display an error message)
+      console.error("Error updating reflective log and adding CPD log entry:", error);
+      toast.error("Failed to update reflective log.");
     }
-  };
+  };   
 
   return (
     <Layout>
@@ -144,7 +165,7 @@ export default function StudentDetails() {
                       <InfoIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleOpenLogDialog(course.reflectiveLog)}
+                      onClick={() => handleOpenLogDialog(course?.reflectiveLog, course)}
                     >
                       <AssignmentIcon />
                     </IconButton>
