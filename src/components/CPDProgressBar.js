@@ -1,8 +1,11 @@
 import React from 'react';
 import { Box, Typography, LinearProgress } from '@mui/material';
 
+const CPDProgressBar = ({ label, value, max }) => {
+  // Calculate progress and ensure it doesn't exceed 100%
+  const progress = Math.min((value / max) * 100, 100);
 
-const CPDProgressBar = ({ label, value, max }) => (
+  return (
     <Box>
       <Typography
         variant="body2"
@@ -15,7 +18,7 @@ const CPDProgressBar = ({ label, value, max }) => (
           <LinearProgress
             color="primary"
             variant="determinate"
-            value={(value / max) * 100}
+            value={progress}
             style={{ height: "10px", borderRadius: "5px" }}
           />
         </Box>
@@ -28,5 +31,6 @@ const CPDProgressBar = ({ label, value, max }) => (
       </Box>
     </Box>
   );
+};
 
-  export default CPDProgressBar;
+export default CPDProgressBar;

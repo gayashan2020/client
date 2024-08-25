@@ -28,7 +28,7 @@ import { fetchStudentDetails } from "@/services/mentorService";
 import { fetchCurrentUser } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { addMentorComment } from "@/services/reflectiveLog";
-import { addCpdLogEntry } from "@/services/cpdLog";
+import { addCpdLogEntry, updateCpdTotals } from "@/services/cpdLog";
 import { toast } from "react-toastify";
 
 export default function StudentDetails() {
@@ -113,6 +113,9 @@ export default function StudentDetails() {
       };
   
       await addCpdLogEntry(cpdLogEntry); // Call the service function to insert the cpdLog entry
+  
+      // Update the user's CPD totals
+      await updateCpdTotals(userId);
   
       setOpenLogDialog(false);
       toast.success("Reflective log updated successfully!");

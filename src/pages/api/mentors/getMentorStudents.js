@@ -2,10 +2,12 @@ import { ObjectId } from "mongodb";
 import dbConnect from "@/lib/dbConnect";
 
 export default async function handler(req, res) {
-  // Ensure the mentorId is a valid ObjectId
   const { mentorId } = req.body;
 
-  // Connect to the database
+  if (!mentorId) {
+    return res.status(400).json({ message: "Missing mentorId in request." });
+  }
+
   const { db } = await dbConnect();
 
   try {
@@ -14,7 +16,7 @@ export default async function handler(req, res) {
       {
         $match: {
           mentorId: new ObjectId(mentorId),
-          enrollStatus: "approved", // Assuming you only want to fetch approved students
+          enrollStatus: "approved", // Fetch only approved students
         },
       },
       {
@@ -40,13 +42,27 @@ export default async function handler(req, res) {
         $unwind: "$courseDetails", // Unwind the array to flatten the structure
       },
       {
+        $group: {
+          _id: "$studentDetails._id",
+          name: { $first: "$studentDetails.fullName" },
+          email: { $first: "$studentDetails.email" },
+          status: { $first: "$studentDetails.status" },
+          courses: {
+            $push: {
+              courseName: "$courseDetails.event",
+              category: "$courseDetails.category",
+            },
+          },
+        },
+      },
+      {
         $project: {
           _id: 0,
-          studentId: "$studentDetails._id",
-          name: "$studentDetails.fullName",
-          status: "$studentDetails.status",
-          courseName: "$courseDetails.event",
-          category: "$courseDetails.category",
+          studentId: "$_id",
+          name: 1,
+          email: 1,
+          status: 1,
+          courses: 1,
         },
       },
     ]).toArray();
@@ -54,6 +70,6 @@ export default async function handler(req, res) {
     res.status(200).json(usersCourses);
   } catch (error) {
     console.error("Error fetching mentor's students:", error);
-    throw new Error("Failed to fetch mentor's students");
+    res.status(500).json({ error: "Internal Server Error", message: error.message });
   }
 }

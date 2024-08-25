@@ -19,12 +19,12 @@ const CPDCard = ({ user, setting, monthlyCPD, yearlyCPD }) => {
         <CardContent>
           <CPDProgressBar
             label="Monthly CPD target"
-            value={setting?.currentCPD}
+            value={setting?.totalCpd}
             max={monthlyCPD}
           />
           <CPDProgressBar
             label="Yearly CPD target"
-            value={setting?.currentCPD}
+            value={setting?.totalCpd}
             max={yearlyCPD}
           />
         </CardContent>

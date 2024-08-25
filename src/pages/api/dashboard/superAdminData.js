@@ -28,6 +28,7 @@ export default async function handler(req, res) {
     }));
 
     const mentorDetails = mentors.map(mentor => ({
+      _id: mentor._id,
       fullName: mentor.fullName,
       email: mentor.email,
       contactNumber: mentor.contactNumber,

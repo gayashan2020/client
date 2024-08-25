@@ -16,11 +16,9 @@ export default async function handler(req, res) {
   try {
     const { db } = await dbConnect();
 
-    // Access settings collection
-    const settings = db.collection("settings");
+    const settingsCollection = db.collection("settings");
 
-    // Find setting by ID
-    const setting = await settings.findOne({ userId: id });
+    const setting = await settingsCollection.findOne({ userId: id });
 
     if (!setting) {
       return res.status(404).json({ error: "Setting not found" });

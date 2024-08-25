@@ -21,14 +21,14 @@ import { routes } from "@/assets/constants/routeConstants";
 import { userRoles } from "@/assets/constants/authConstants";
 import CourseCard from "@/components/CourseCard"; // Import CourseCard component
 import {
-  getUserData,
+  getCoursesByMentor,
   getUserCount,
   getUserCoursesCount,
   getOccupationData,
   fetchSuperAdminData,
 } from "@/services/dashboard";
 import { fetchMentorByCurrentUser } from "@/services/mentorService";
-import { getSettingByID } from "@/services/setting";
+import { getSettingByID,fetchMonthlyCpd,fetchYearlyCpd } from "@/services/setting";
 import AvatarBox from "@/components/AvatarBox";
 import CPDCard from "@/components/CPDCard";
 import UserCards from "@/components/UserCards";
@@ -53,7 +53,8 @@ import {
   defaultInputRanges,
 } from "react-date-range";
 import { addYears, startOfYear, endOfYear, isSameDay } from "date-fns";
-import {fetchMentorStudents} from "@/services/mentorService";
+import { fetchMentorStudents } from "@/services/mentorService";
+import { getCpdLogEntries } from "@/services/cpdLog"; // Adjust the path based on your project structure
 
 const lastYearRange = {
   label: "Last Year",
@@ -121,47 +122,67 @@ export default function AdminDashboard() {
   ]);
 
   const [filteredCourses, setFilteredCourses] = useState([]);
-  const [filteredCPD, setFilteredCPD] = useState(settingsData);
+  const [filteredCPD, setFilteredCPD] = useState([]);
 
   const [mentorDetails, setMentorDetails] = useState([]);
 
   const [students, setStudents] = useState([]);
 
+  const [selectedMentorId, setSelectedMentorId] = useState(null);
+
   const handleSelect = (ranges) => {
     const { startDate, endDate } = ranges.selection;
     setDateRange([ranges.selection]);
     filterCoursesByDate(startDate, endDate);
-    filterCPDByDate(startDate, endDate);
+    filterCPDByDate(startDate, endDate, selectedMentorId);
   };
 
   const filterCoursesByDate = (startDate, endDate) => {
-    const filteredCourses = coursesCount?.courseDetails?.filter((course) => {
+    const filteredCourse = coursesCount?.courseDetails?.filter((course) => {
       const courseDate = new Date(course.dates);
       return courseDate >= startDate && courseDate <= endDate;
     });
-    setFilteredCourses(filteredCourses);
+    setFilteredCourses(filteredCourse);
   };
 
-  const filterCPDByDate = (startDate, endDate) => {
-    const filteredCPD = settingsData.filter((data) => {
-      const dataDate = new Date(data.date);
-      return dataDate >= startDate && dataDate <= endDate;
-    });
-    setFilteredCPD(filteredCPD);
+  const filterCPDByDate = async (startDate, endDate, mentorId = null) => {
+    user?.role === "mentor"?mentorId = user._id:mentorId
+    try {
+      const filteredCPD = await getCpdLogEntries(startDate, endDate, mentorId);
+      setFilteredCPD(filteredCPD);
+    } catch (error) {
+      console.error("Failed to filter CPD data by date:", error);
+    }
   };
+
+  const handleMentorSelect = (mentorId) => {
+    setSelectedMentorId(mentorId);
+    filterCPDByDate(dateRange[0].startDate, dateRange[0].endDate, mentorId);
+    fetchCourseData(mentorId);
+  };
+
 
   useEffect(() => {
-    if (user) {
-      setLoading(true);
-      fetchOccupationData();
-      fetchMentorDetails();
-      fetchSettings(user._id);
-      fetchData();
-      filterCoursesByDate(dateRange[0].startDate, dateRange[0].endDate);
-      filterCPDByDate(dateRange[0].startDate, dateRange[0].endDate);
-      setLoading(false);
-      fetchMentorStudentsDetails();
+    async function initializeDashboard() {
+      try {
+        if (user) {
+          setLoading(true);
+          await fetchOccupationData();
+          await fetchMentorDetails();
+          await fetchSettings(user._id);
+          await fetchData();
+          filterCoursesByDate(dateRange[0].startDate, dateRange[0].endDate);
+          await filterCPDByDate(dateRange[0].startDate, dateRange[0].endDate);
+          await fetchMentorStudentsDetails();
+          await fetchCourseData();
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Failed to initialize dashboard", error);
+      }
     }
+
+    initializeDashboard();
   }, [user]);
 
   const fetchOccupationData = async () => {
@@ -220,13 +241,28 @@ export default function AdminDashboard() {
           courseDetails: courseCountData?.courseOverview,
         };
         setCoursesCount(courseData);
-        setFilteredCourses(courseCountData?.courseOverview);
+        // setFilteredCourses(courseCountData?.courseOverview);
         setMentorDetails(courseCountData?.mentorDetails);
       }
 
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
+    }
+  };
+
+  const fetchCourseData = async (mentorId = null) => {
+    user?.role === "mentor"?mentorId = user._id:mentorId
+    try {
+      setLoading(true);
+  
+      const courseOverview = await getCoursesByMentor(mentorId);
+      setFilteredCourses(courseOverview);
+  
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch course data:", error);
+      setLoading(false);
     }
   };
 
@@ -244,24 +280,22 @@ export default function AdminDashboard() {
 
   const fetchSettings = async (id) => {
     try {
-      if (user?.role === "student") {
-        const settings = await getSettingByID(id);
-        setSetting(settings?.body);
-        const currentYear = new Date().getFullYear();
-        const currentMonth = new Date().getMonth() + 1;
-
-        const monthlyTarget =
-          settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.monthly ||
-          0;
-        const yearlyTarget =
-          settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.yearly || 0;
-        setMonthlyCPD(monthlyTarget);
-        setYearlyCPD(yearlyTarget);
-      }
+      const setting = await getSettingByID(id);
+      setSetting(setting?.body);
+      
+      const currentYear = new Date().getFullYear();
+      const currentMonth = new Date().getMonth() + 1;
+  
+      const yearlyCpdData = await fetchYearlyCpd(setting?.body?._id, currentYear);
+      const monthlyCpdData = await fetchMonthlyCpd(setting?.body?._id, currentYear, currentMonth);
+  
+      setYearlyCPD(yearlyCpdData?.body?.yearlyTarget || 0);
+      setMonthlyCPD(monthlyCpdData?.body?.monthlyTarget || 0);
     } catch (error) {
-      console.log("Failed to fetch settings", error);
+      console.error("Error fetching CPD data:", error);
     }
   };
+  
 
   const navigateShortCuts = (type) => {
     if (type === "course" && user?.role === userRoles.SITE_ADMIN) {
@@ -354,9 +388,9 @@ export default function AdminDashboard() {
                 CPD Points Achieved Over Time
               </Typography>
               <LineChartComponent
-                data={filteredCPD.map((item) => item.cpd_points)}
+                data={filteredCPD.map((item) => item.totalCpdPoints)}
                 labels={filteredCPD.map((item) =>
-                  new Date(item.date).toLocaleDateString()
+                  new Date(item._id).toLocaleDateString()
                 )}
               />
             </Card>
@@ -373,7 +407,17 @@ export default function AdminDashboard() {
                   </TableHead>
                   <TableBody>
                     {mentorDetails.map((mentor) => (
-                      <TableRow key={mentor.fullName}>
+                      <TableRow
+                        key={mentor.fullName}
+                        onClick={() => handleMentorSelect(mentor._id)} // Click to select mentor
+                        style={{
+                          cursor: "pointer",
+                          backgroundColor:
+                            mentor._id === selectedMentorId
+                              ? "#f0f0f0"
+                              : "inherit",
+                        }} // Highlight selected mentor
+                      >
                         <TableCell>{mentor.fullName}</TableCell>
                         <TableCell>{mentor.email}</TableCell>
                         <TableCell>{mentor.contactNumber}</TableCell>
@@ -432,27 +476,74 @@ export default function AdminDashboard() {
       )}
       {/* Mentor Role */}
       {user?.role === userRoles.MENTOR && (
-        <>
-          <div className={styles.bottomRow}>
+        <div className={styles.dashboard}>
+          <div className={styles.topRow}>
             <Card className={styles.chartCard}>
-              <Typography variant="h6">Your Students</Typography>
+              <Typography variant="h6">Your Courses Overview</Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Event</TableCell>
+                      <TableCell>Organizing Body</TableCell>
+                      <TableCell>Dates</TableCell>
+                      <TableCell>CPD Points</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paginatedCourses.map((course) => (
+                      <TableRow key={course.id}>
+                        <TableCell>{course.event}</TableCell>
+                        <TableCell>{course.organizing_body}</TableCell>
+                        <TableCell>{course.dates}</TableCell>
+                        <TableCell>{course.total_cpd_points}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <Pagination
+                count={Math.ceil(filteredCourses.length / rowsPerPage)}
+                page={page}
+                onChange={handleChangePage}
+                color="primary"
+                style={{
+                  marginTop: "20px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              />
+            </Card>
+          </div>
+          <div className={styles.bottomRow}>
+          <Card className={styles.chartCard}>
+              <Typography variant="h6">CPD Points Achieved Over Time</Typography>
+              <LineChartComponent
+                data={filteredCPD.map((item) => item.totalCpdPoints)}
+                labels={filteredCPD.map((item) =>
+                  new Date(item._id).toLocaleDateString()
+                )}
+              />
+            </Card>
+            <Card className={styles.chartCard}>
+              <Typography variant="h6">Your Students Overview</Typography>
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
                     <TableRow>
                       <TableCell>Name</TableCell>
+                      <TableCell>Email</TableCell>
                       <TableCell>Status</TableCell>
-                      <TableCell>Category</TableCell>
-                      <TableCell>Course</TableCell>
+                      <TableCell>Course Count</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {paginatedStudents.map((student) => (
-                      <TableRow key={student._id}>
+                      <TableRow key={student.studentId}>
                         <TableCell>{student.name}</TableCell>
+                        <TableCell>{student.email}</TableCell>
                         <TableCell>{student.status}</TableCell>
-                        <TableCell>{student.category}</TableCell>
-                        <TableCell>{student.courseName}</TableCell>
+                        <TableCell>{student?.courses?.length}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -471,7 +562,7 @@ export default function AdminDashboard() {
               />
             </Card>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

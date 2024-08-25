@@ -1,5 +1,3 @@
-// pages/admin/dashboard.js
-
 import {
   Box,
   Grid,
@@ -40,8 +38,6 @@ import { styled } from "@mui/material/styles";
 import { toast } from "react-toastify";
 import { updateUser, updateAvatar } from "@/services/users";
 import { userRoles } from "@/assets/constants/authConstants";
-// import { useTheme } from "@mui/material/styles";
-// import { PieChartComponent } from "@/components/PieChartComponent";
 import { BarChartComponent } from "@/components/BarChartComponent";
 import {
   getOccupationData,
@@ -50,7 +46,7 @@ import {
   fetchRegisteredCourses,
   fetchRegisteredCoursesByUser,
 } from "@/services/dashboard";
-import { getSettingByID, updateSetting } from "@/services/setting";
+import { updateYearlyCpd, updateMonthlyCpd, getSettingByID, fetchMonthlyCpd, fetchYearlyCpd } from "@/services/setting"; // Import the new services
 
 export default function Index() {
   const [user, setUser] = useState(null);
@@ -60,8 +56,8 @@ export default function Index() {
   const [editOpen, setEditOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
 
-  const [avatar, setAvatar] = useState(null); // State to store the selected file
-  const [avatarPreview, setAvatarPreview] = useState(null); // State to store the preview URL
+  const [avatar, setAvatar] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
 
   const [fullName, setFirstName] = useState("");
   const [gender, setGender] = useState("");
@@ -129,7 +125,6 @@ export default function Index() {
       }
     } catch (error) {
       console.error("Failed to fetch user data:", error);
-      // Handle error appropriately, perhaps set some error state
     }
   };
 
@@ -162,18 +157,23 @@ export default function Index() {
   };
 
   const fetchSettings = async (id) => {
-    const settings = await getSettingByID(id);
-    setSetting(settings?.body);
-    const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1;
-
-    const monthlyTarget =
-      settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.monthly || 0;
-    const yearlyTarget =
-      settings?.body?.cpdTarget?.[currentYear]?.[currentMonth]?.yearly || 0;
-    setMonthlyCPD(monthlyTarget);
-    setYearlyCPD(yearlyTarget);
+    try {
+      const setting = await getSettingByID(id);
+      setSetting(setting?.body);
+      
+      const currentYear = new Date().getFullYear();
+      const currentMonth = new Date().getMonth() + 1;
+  
+      const yearlyCpdData = await fetchYearlyCpd(setting?.body?._id, currentYear);
+      const monthlyCpdData = await fetchMonthlyCpd(setting?.body?._id, currentYear, currentMonth);
+  
+      setYearlyCPD(yearlyCpdData?.body?.yearlyTarget || 0);
+      setMonthlyCPD(monthlyCpdData?.body?.monthlyTarget || 0);
+    } catch (error) {
+      console.error("Error fetching CPD data:", error);
+    }
   };
+  
 
   const handleAvatarChange = async (event) => {
     const file = event.target.files[0];
@@ -186,47 +186,28 @@ export default function Index() {
       reader.readAsDataURL(file);
       setLoading(true);
       const response = await updateAvatar(user._id, file);
-      console.log(response);
       setLoading(false);
       if (response.status === 200) {
-        // Handle successful upload
         toast.success("Avatar updated successfully!");
-        // Optionally, fetch the updated user data to refresh the avatar preview
       } else {
-        // Handle errors
         toast.error("Failed to update avatar.");
       }
     }
   };
 
   const handleEditOpen = (user) => {
-    setEditUser(user); // Set the user to be edited
-    setFirstName(user.fullName); // Update the firstName state
-    setGender(user.gender); // Update the gender state
-    setEmail(user.email); // Update the email state
-    setOccupation(user.occupation); // Update the occupation state
-    setDistrict(user.district); // Update the district state
-    setCity(user.city); // Update the city state
-    setCurrentStation(user.currentStation); // Update the currentStation state
-    setNicOrPassport(user.nicOrPassport); // Update the nicOrPassport state
-    setContactNumber(user.contactNumber); // Update the contactNumber state
-    setBatch(user.batch); // Update the batch state
-    setFaculty(user.faculty); // Update the faculty state
-  };
-
-  const handleAvatarSubmit = async () => {
-    // Send a PUT or POST request to the endpoint handling file uploads
-    const response = await updateAvatar(user._id, avatar);
-
-    // Handle the response from the file upload endpoint
-    if (response.ok) {
-      // Handle successful upload
-      toast.success("Avatar updated successfully!");
-      // Optionally, fetch the updated user data to refresh the avatar preview
-    } else {
-      // Handle errors
-      toast.error("Failed to update avatar.");
-    }
+    setEditUser(user);
+    setFirstName(user.fullName);
+    setGender(user.gender);
+    setEmail(user.email);
+    setOccupation(user.occupation);
+    setDistrict(user.district);
+    setCity(user.city);
+    setCurrentStation(user.currentStation);
+    setNicOrPassport(user.nicOrPassport);
+    setContactNumber(user.contactNumber);
+    setBatch(user.batch);
+    setFaculty(user.faculty);
   };
 
   const handleSubmit = async (event) => {
@@ -250,7 +231,6 @@ export default function Index() {
     setLoading(false);
 
     if (response.ok) {
-      // Update the table
       fetchCurrentUser()
         .then((currentUser) => {
           setUser(currentUser);
@@ -262,25 +242,9 @@ export default function Index() {
           setLoading(false);
         });
 
-      // Close the modal
       setEditOpen(false);
-
       toast.success("Update successful!");
     } else {
-      console.log("Failed to update");
-      toast.error("Update failed.");
-    }
-  };
-
-  const handleSubmitAvatar = async (event) => {
-    event.preventDefault();
-
-    try {
-      setLoading(true);
-      await handleAvatarSubmit();
-      setLoading(false);
-      toast.success("Update successful!");
-    } catch (error) {
       toast.error("Update failed.");
     }
   };
@@ -290,20 +254,19 @@ export default function Index() {
 
     try {
       const year = new Date().getFullYear();
-      const month = new Date().getMonth() + 1; // JavaScript months are 0-based
-      const value = { monthly: monthlyCPD, yearly: yearlyCPD };
-      try {
-        setLoading(true);
-        await updateSetting(user._id, year, month, value);
-        setLoading(false);
-        setCPDOpen(false);
-        toast.success("Update successful!");
-      } catch (error) {
-        setLoading(false);
-        toast.success("Update Failed!");
-      }
+      const month = new Date().getMonth() + 1;
+
+      setLoading(true);
+      await updateYearlyCpd(setting._id, year, yearlyCPD);
+      console.log(setting._id, year, month,monthlyCPD);
+      await updateMonthlyCpd(setting._id, month, monthlyCPD, year);
+      setLoading(false);
+
+      setCPDOpen(false);
+      toast.success("CPD Targets updated successfully!");
     } catch (error) {
-      toast.error("Update failed.");
+      setLoading(false);
+      toast.error("Failed to update CPD Targets.");
     }
   };
 
@@ -359,94 +322,6 @@ export default function Index() {
     whiteSpace: "nowrap",
     width: 1,
   });
-
-  const RoleCard = () => (
-    <Card
-      variant="outlined"
-      style={{
-        display: "flex",
-        justifyContent: "space-around",
-        padding: "40px 20px",
-      }}
-      sx={{
-        display: "flex",
-        justifyContent: "space-around",
-        padding: "40px 20px",
-        "& .roleBox": {
-          // Adding a className for reference
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          transition: "transform 0.4s ease-in-out", // Smooth transition for transform
-          "&:hover": {
-            transform: "scale(1.1)", // Scale up box slightly on hover
-            cursor: "pointer", // Change cursor to indicate clickable
-          },
-        },
-      }}
-    >
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        onClick={() =>
-          router.push(routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT)
-        }
-        className="roleBox"
-      >
-        <AccountBox fontSize="large" />
-        <Typography>Admin</Typography>
-      </Box>
-      <Badge
-        badgeContent={pendingApprovalCount.student}
-        color="error"
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          onClick={() =>
-            router.push(routes.ADMIN_USERS_STUDENTS_USER_MANAGEMENT)
-          }
-          className="roleBox"
-        >
-          <School fontSize="large" />
-          <Typography>Mentee</Typography>
-        </Box>
-      </Badge>
-      <Badge
-        badgeContent={pendingApprovalCount.mentor}
-        color="error"
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          onClick={() =>
-            router.push(routes.ADMIN_USERS_MENTORS_USER_MANAGEMENT)
-          }
-          className="roleBox"
-        >
-          <People fontSize="large" />
-          <Typography>Mentor</Typography>
-        </Box>
-      </Badge>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        onClick={() =>
-          router.push(routes.ADMIN_USERS_CPD_PROVIDERS_USER_MANAGEMENT)
-        }
-        className="roleBox"
-      >
-        <Business fontSize="large" />
-        <Typography>CPD Provider</Typography>
-      </Box>
-    </Card>
-  );
 
   return (
     <Layout>
@@ -593,12 +468,11 @@ export default function Index() {
             style={{
               backgroundColor: "#121212",
               color: "white",
-              borderRadius: "10px", // Rounded corners for the card
-              overflow: "visible", // Ensure that children can render outside the card
-              position: "relative", // Position relative for absolute positioning of children
+              borderRadius: "10px",
+              overflow: "visible",
+              position: "relative",
             }}
           >
-            {/* Avatar Box */}
             <Box
               style={{
                 position: "absolute",
@@ -617,14 +491,13 @@ export default function Index() {
                   boxShadow: "0 4px 8px rgba(0,0,0,0.5)",
                 }}
               />
-              {/* Upload Button Box */}
               <Box
                 style={{
                   position: "absolute",
-                  top: 110, // adjust this value as needed
+                  top: 110,
                   left: "50%",
                   transform: "translateX(-50%)",
-                  zIndex: 2, // above the avatar
+                  zIndex: 2,
                 }}
               >
                 <Button
@@ -635,16 +508,16 @@ export default function Index() {
                     backgroundColor: "white",
                     minWidth: 0,
                     padding: "10px",
-                    borderRadius: "50%", // Makes the button circular
-                    position: "absolute", // Position the button absolutely
-                    top: "calc(100% - 10px)", // Position it 20px from the bottom of the avatar
-                    left: "calc(50% - 20px)", // Center it horizontally with respect to the avatar
-                    boxShadow: 3, // Apply some shadow for better visibility
+                    borderRadius: "50%",
+                    position: "absolute",
+                    top: "calc(100% - 10px)",
+                    left: "calc(50% - 20px)",
+                    boxShadow: 3,
                     "& .MuiButton-startIcon": {
-                      margin: 0, // Remove the margin from the start icon
+                      margin: 0,
                     },
                     "& .MuiButton-label": {
-                      display: "none", // Hide the label
+                      display: "none",
                     },
                   }}
                 >
@@ -672,29 +545,14 @@ export default function Index() {
               >
                 {user?.role}
               </Typography>
-              {/* <Button
-                component="label"
-                role={undefined}
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUpload />}
-                style={{ alignContent: "center" }}
-              >
-                Upload New Avatar
-                <VisuallyHiddenInput
-                  type="file"
-                  onChange={handleAvatarChange}
-                />
-              </Button> */}
               <List dense style={{ position: "relative", marginTop: "20px" }}>
-                {/* Vertical line container */}
                 <Box
                   style={{
                     position: "absolute",
-                    left: "50px", // Adjust as needed
+                    left: "50px",
                     top: 0,
                     bottom: 0,
-                    width: "1px", // Line thickness
+                    width: "1px",
                     backgroundColor: "white",
                   }}
                 />
@@ -744,12 +602,12 @@ export default function Index() {
               <CardContent>
                 <CPDProgressBar
                   label="Monthly CPD target"
-                  value={setting?.currentCPD}
+                  value={setting?.totalCpd}
                   max={monthlyCPD}
                 />
                 <CPDProgressBar
                   label="Yearly CPD target"
-                  value={setting?.currentCPD}
+                  value={setting?.totalCpd}
                   max={yearlyCPD}
                 />
                 <TextField
@@ -777,15 +635,6 @@ export default function Index() {
           </Grid>
           <Grid item xs={12} md={12} lg={12}>
             <Box display="flex" justifyContent="space-between" padding={2}>
-              {/* <Button
-                variant="contained"
-                color="secondary"
-                sx={{
-                  backgroundColor: "red",
-                }}
-              >
-                Reset Password
-              </Button> */}
               <Button
                 variant="contained"
                 color="secondary"
@@ -833,7 +682,12 @@ export default function Index() {
             >
               Yes
             </Button>
-            <Button variant="contained" color="secondary" onClick={handleCPDClose} sx={{ bgcolor: "red", color: "white" }}>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleCPDClose}
+              sx={{ bgcolor: "red", color: "white" }}
+            >
               Cancel
             </Button>
           </Box>
