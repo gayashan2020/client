@@ -14,24 +14,20 @@ export default async function handler(req, res) {
   const { db } = await dbConnect();
 
   try {
-    // Fetch entries from users_courses where mentorId matches and mentor_approved is not true
+    // Fetch entries from users_courses where mentorId matches
     const userCoursesCollection = db.collection('users_courses');
     const coursesCollection = db.collection('courses');
     const usersCollection = db.collection('users');
     const menteeEntries = await userCoursesCollection.find({ mentorId: new ObjectId(mentorId) }).toArray();
 
-    if (!menteeEntries.length) {
-      return res.status(404).json({ message: 'No mentees found for this mentor.' });
-    }
-
-    // Extract userIds
-    const userIds = menteeEntries.map(entry => entry.userId);
+    // Extract userIds from users_courses
+    const userIdsFromCourses = menteeEntries.map(entry => entry.userId);
 
     // Fetch details from users table
-    const menteeDetails = await usersCollection.find({ _id: { $in: userIds } }).toArray();
+    const menteeDetailsFromCourses = await usersCollection.find({ _id: { $in: userIdsFromCourses } }).toArray();
 
     // Enhance menteeDetails with unapprovedCoursesCount and unapprovedCourses list
-    const menteeDetailsWithUnapprovedCourses = await Promise.all(menteeDetails.map(async (mentee) => {
+    const menteeDetailsWithUnapprovedCourses = await Promise.all(menteeDetailsFromCourses.map(async (mentee) => {
       // Find unapproved courses for this mentee
       const unapprovedCoursesEntries = await userCoursesCollection.find({
         userId: mentee._id,
@@ -55,8 +51,22 @@ export default async function handler(req, res) {
       };
     }));
 
+    // Fetch mentees directly from users table who have mentorId
+    const additionalMentees = await usersCollection.find({
+      mentorId: mentorId,
+    }).toArray();
+    
+
+    // Remove duplicates from additionalMentees
+    const uniqueAdditionalMentees = additionalMentees.filter(mentee => 
+      !userIdsFromCourses.some(userId => userId.equals(mentee._id))
+    );
+
+    // Combine mentees from users_courses and additional mentees from users collection
+    const allMentees = [...menteeDetailsWithUnapprovedCourses, ...uniqueAdditionalMentees];
+
     // Filter out sensitive information
-    const filteredMenteeDetails = menteeDetailsWithUnapprovedCourses.map(({ password, ...rest }) => rest);
+    const filteredMenteeDetails = allMentees.map(({ password, ...rest }) => rest);
 
     res.status(200).json(filteredMenteeDetails);
   } catch (error) {

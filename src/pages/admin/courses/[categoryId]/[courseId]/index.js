@@ -30,6 +30,9 @@ import { fetchCurrentUser, fetchUsers, updateUser } from "@/services/users";
 import { toast } from "react-toastify";
 import { userRoles } from "@/assets/constants/authConstants";
 import { fetchReflectiveLogByUsersCourses } from "@/services/reflectiveLog";
+import MentorSelectionDialog from "@/components/MentorSelectionDialog";
+import MentorSelectionPendingDialog from "@/components/MentorSelectionPendingDialog"
+
 
 export default function CourseDetail() {
   const [course, setCourse] = useState(null);
@@ -42,6 +45,8 @@ export default function CourseDetail() {
   const [reflectiveLog, setReflectiveLog] = useState(null);
   const [open, setOpen] = useState(false);
   const [mentorSelected, setMentorSelected] = useState(false);
+  const [mentorSelectedPending, setMentorSelectedPending] = useState(false);
+  const [mentorSelectedPendingModel, setMentorSelectedPendingModel] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -66,6 +71,9 @@ export default function CourseDetail() {
           if (currentUser?.mentorApprovalStatus === true) {
             setMentorSelected(true);
             setSelectedMentor(currentUser?.mentorId);
+          }
+          if (currentUser?.mentorId && currentUser?.mentorApprovalStatus === false) {
+            setMentorSelectedPending(true);
           }
         })
         .catch((error) => {
@@ -171,78 +179,13 @@ export default function CourseDetail() {
   const handleEnrollClick = () => {
     if (mentorSelected) {
       handleEnroll();
+    } else if (mentorSelectedPending) {
+      setMentorSelectedPendingModel(true)
     } else {
       setMentorDialogOpen(true);
     }
   };
 
-  // Mentor Dialog
-  const MentorSelectionDialog = () => {
-    const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down("sm")); // Responsive full-screen dialog on smaller screens
-
-    return (
-      <Dialog
-        fullScreen={fullScreen}
-        open={mentorDialogOpen}
-        onClose={() => setMentorDialogOpen(false)}
-        PaperProps={{
-          style: {
-            backgroundColor: theme.palette.background.paper,
-            boxShadow: theme.shadows[5],
-            padding: theme.spacing(2), // Adds padding inside the dialog
-            borderRadius: theme.shape.borderRadius, // Applies theme border radius
-          },
-        }}
-      >
-        <DialogTitle style={{ textAlign: "center" }}>
-          Select a Mentor
-        </DialogTitle>
-        <DialogContent>
-          <FormControl fullWidth style={{ marginTop: theme.spacing(2) }}>
-            <Select
-              value={selectedMentor}
-              onChange={(e) => setSelectedMentor(e.target.value)}
-              displayEmpty
-              inputProps={{ "aria-label": "Without label" }}
-              style={{
-                marginTop: theme.spacing(1), // Adds margin above the Select component
-              }}
-            >
-              <MenuItem value="" disabled>
-                Choose a mentor
-              </MenuItem>
-              {mentors &&
-                mentors.map((mentor) => (
-                  <MenuItem key={mentor._id} value={mentor._id}>
-                    {mentor.fullName}
-                  </MenuItem>
-                ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions
-          style={{ justifyContent: "center", padding: theme.spacing(3) }}
-        >
-          <Button
-            onClick={() => setMentorDialogOpen(false)}
-            variant="outlined"
-            style={{ marginRight: theme.spacing(1) }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleEnroll}
-            disabled={!selectedMentor}
-            variant="contained"
-            color="primary"
-          >
-            Continue
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  };
 
   const ReflectiveLogDetailsDialog = () => {
     return (
@@ -357,10 +300,10 @@ export default function CourseDetail() {
                   !enroll
                     ? { marginLeft: "1rem" }
                     : {
-                        marginLeft: "1rem",
-                        backgroundColor: "#7F00FF",
-                        color: "#ffffff",
-                      }
+                      marginLeft: "1rem",
+                      backgroundColor: "#7F00FF",
+                      color: "#ffffff",
+                    }
                 }
                 disabled={!enroll}
                 onClick={() =>
@@ -379,10 +322,10 @@ export default function CourseDetail() {
                   !enroll
                     ? { marginLeft: "1rem" }
                     : {
-                        marginLeft: "1rem",
-                        backgroundColor: "#7F00FF",
-                        color: "#ffffff",
-                      }
+                      marginLeft: "1rem",
+                      backgroundColor: "#7F00FF",
+                      color: "#ffffff",
+                    }
                 }
                 onClick={handleOpen}
               >
@@ -419,8 +362,19 @@ export default function CourseDetail() {
           </Grid>
         </Grid>
       </Container>
-      <MentorSelectionDialog />
+      <MentorSelectionDialog
+        mentorDialogOpen={mentorDialogOpen}
+        setMentorDialogOpen={setMentorDialogOpen}
+        mentors={mentors}
+        selectedMentor={selectedMentor}
+        setSelectedMentor={setSelectedMentor}
+        handleEnroll={handleEnroll}
+      />
       <ReflectiveLogDetailsDialog />
+      <MentorSelectionPendingDialog
+        mentorSelectedPendingModel={mentorSelectedPendingModel}
+        setMentorSelectedPendingModel={setMentorSelectedPendingModel}
+      />
     </Layout>
   ) : (
     <>

@@ -3,7 +3,7 @@
 import { getSession } from "../../lib/session";
 import { Box } from "@mui/material";
 import Layout from "@/components/Layout";
-import AdminDashboard from "./dashboard_temp";
+import AdminDashboard from "./dashboard";
 
 export default function AdminPage() {
   // Your page component

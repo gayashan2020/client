@@ -22,12 +22,14 @@ import { fetchCurrentUser, updateUser } from "@/services/users";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { useRouter } from "next/router";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 const MentorMenteesList = () => {
   const [mentees, setMentees] = useState([]);
   const [error, setError] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedMentee, setSelectedMentee] = useState(null);
+  const [dialogType, setDialogType] = useState("");
   const { setLoading } = useContext(LoadingContext);
   const router = useRouter();
 
@@ -41,6 +43,8 @@ const MentorMenteesList = () => {
       const user = await fetchCurrentUser();
       if (user?._id) {
         const menteeDetails = await fetchMenteesByMentor(user._id);
+        console.log("mentee --> ", menteeDetails);
+
         setMentees(menteeDetails);
       } else {
         setError("User not found");
@@ -55,7 +59,6 @@ const MentorMenteesList = () => {
   const handleApproveMentee = async () => {
     try {
       setLoading(true);
-      // await approveMentee(selectedMentee._id);
       let payload = {
         email: selectedMentee.email,
         mentorApprovalStatus: true,
@@ -70,12 +73,33 @@ const MentorMenteesList = () => {
     } catch (error) {
       setLoading(false);
       console.error("Failed to approve mentee:", error);
-      // Handle error (e.g., display an error message)
     }
   };
 
-  const handleOpenDialog = (mentee) => {
+  const handleRejectMentee = async () => {
+    try {
+      setLoading(true);
+      let payload = {
+        email: selectedMentee.email,
+        mentorApprovalStatus: null,
+        mentorId: null,
+      };
+      console.log(payload);
+      await updateUser(payload);
+      setLoading(false);
+      // Close the dialog and refresh the mentees list to reflect the rejection
+      setOpenDialog(false);
+      setSelectedMentee(null);
+      await fetchMentees();
+    } catch (error) {
+      setLoading(false);
+      console.error("Failed to reject mentee:", error);
+    }
+  };
+
+  const handleOpenDialog = (mentee, type) => {
     setSelectedMentee(mentee);
+    setDialogType(type);
     setOpenDialog(true);
   };
 
@@ -103,7 +127,6 @@ const MentorMenteesList = () => {
                 <TableCell>Location</TableCell>
                 <TableCell>Contact</TableCell>
                 <TableCell>SLMC Reg Number</TableCell>
-                {/* <TableCell>Unapproved Courses</TableCell> */}
                 <TableCell>Action</TableCell>
               </TableRow>
             </TableHead>
@@ -125,17 +148,26 @@ const MentorMenteesList = () => {
                   </TableCell>
                   <TableCell>{mentee.contactNumber}</TableCell>
                   <TableCell>{mentee.slmcRegNumber || "N/A"}</TableCell>
-                  {/* <TableCell>{mentee.unapprovedCoursesCount}</TableCell> */}
                   <TableCell>
                     {mentee?.mentorApprovalStatus !== true && (
-                      <IconButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenDialog(mentee);
-                        }}
-                      >
-                        <CheckCircleIcon />
-                      </IconButton>
+                      <>
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenDialog(mentee, "approve");
+                          }}
+                        >
+                          <CheckCircleIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenDialog(mentee, "reject");
+                          }}
+                        >
+                          <CancelIcon />
+                        </IconButton>
+                      </>
                     )}
                   </TableCell>
                 </TableRow>
@@ -152,19 +184,25 @@ const MentorMenteesList = () => {
         </TableContainer>
 
         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-          <DialogTitle>Confirm Approval</DialogTitle>
+          <DialogTitle>Confirm {dialogType === "approve" ? "Approval" : "Rejection"}</DialogTitle>
           <DialogContent>
             <Typography>
-              Are you sure you want to approve all courses for{" "}
+              Are you sure you want to {dialogType === "approve" ? "approve" : "reject"} mentorship for{" "}
               {selectedMentee?.fullName ||
-                `${selectedMentee?.firstName} ${selectedMentee?.lastName}`}
-              ?
+                `${selectedMentee?.firstName} ${selectedMentee?.lastName}`}?
             </Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-            <Button onClick={() => handleApproveMentee()} color="primary">
-              Approve
+            <Button
+              onClick={() =>
+                dialogType === "approve"
+                  ? handleApproveMentee()
+                  : handleRejectMentee()
+              }
+              color="primary"
+            >
+              {dialogType === "approve" ? "Approve" : "Reject"}
             </Button>
           </DialogActions>
         </Dialog>

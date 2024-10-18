@@ -14,17 +14,20 @@ import {
   useTheme,
   useMediaQuery,
   IconButton,
+  Badge,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useRouter } from "next/router";
 import { darkTheme } from "@/styles/theme";
-import { userRoles } from "@/assets/constants/authConstants";
+import { userRoles, userStatus } from "@/assets/constants/authConstants";
 import { routes } from "@/assets/constants/routeConstants";
 import { logoutUser } from "@/services/auth";
 import { AuthContext } from "@/contexts/AuthContext";
 import { LoadingContext } from "@/contexts/LoadingContext";
+import { fetchMenteesByMentor } from "@/services/mentorService";
+import { fetchUsers } from "@/services/users";
 
 export default function Layout({ children }) {
   const router = useRouter();
@@ -34,6 +37,8 @@ export default function Layout({ children }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { loading, setLoading } = useContext(LoadingContext);
+  const [pendingApprovals, setPendingApprovals] = useState(0);
+  const [pendingUserApprovals, setPendingUserApprovals] = useState(0);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -42,8 +47,48 @@ export default function Layout({ children }) {
   useEffect(() => {
     if (user) {
       setLoading(false);
+      fetchPendingApprovals();
+      fetchPendingUserApprovals();
     }
   }, [user, setLoading]);
+
+  const fetchPendingApprovals = async () => {
+    if (user && [userRoles.SUPER_ADMIN, userRoles.MENTOR].includes(user.role)) {
+      setLoading(true);
+      try {
+        const mentees = await fetchMenteesByMentor(user._id);
+        const pendingCount = mentees.filter(
+          (mentee) => mentee.mentorApprovalStatus !== true
+        ).length;
+        setPendingApprovals(pendingCount);
+      } catch (error) {
+        console.error("Failed to fetch pending approvals:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const fetchPendingUserApprovals = async () => {
+    if (user && [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role)) {
+      setLoading(true);
+      try {
+        const users = await fetchUsers();
+        const pendingCount = users.filter((user) => {
+          const statusKey = user.status ? user.status.toUpperCase() : "";
+          const statusInfo = userStatus[statusKey];
+          return (
+            !statusInfo || statusInfo.value !== userStatus.ACTIVE.value
+          ) && statusKey !== userStatus.DELETED_NO_APPEAL.value;
+        }).length;
+        setPendingUserApprovals(pendingCount);
+      } catch (error) {
+        console.error("Failed to fetch pending user approvals:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
   const handleLogout = async () => {
     setLoading(true);
@@ -80,7 +125,13 @@ export default function Layout({ children }) {
             router.pathname === routes.ADMIN_USERS
           }
         >
-          <ListItemText primary="Users" />
+          <Badge
+            color="error"
+            badgeContent={pendingUserApprovals}
+            invisible={pendingUserApprovals === 0}
+          >
+            <ListItemText primary="Users" />
+          </Badge>
         </ListItemButton>
       )}
 
@@ -143,7 +194,13 @@ export default function Layout({ children }) {
             href={routes.ADMIN_MENTEEMANAGEMENT}
             selected={router.pathname === routes.ADMIN_MENTEEMANAGEMENT}
           >
-            <ListItemText primary="Mentee Management" />
+            <Badge
+              color="error"
+              badgeContent={pendingApprovals}
+              invisible={pendingApprovals === 0}
+            >
+              <ListItemText primary="Mentee Management" />
+            </Badge>
           </ListItemButton>
         )}
 
