@@ -20,7 +20,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { GENDER_OPTIONS } from "@/assets/constants/studentConstants";
 import { OCCUPATION_OPTIONS } from "@/assets/constants/adminConstants";
-import citiesAndPostalCodes from "../../../../assets/constants/cities-and-postalcode-by-district.json";
+import citiesAndPostalCodes from "../../../assets/constants/cities-and-postalcode-by-district.json";
 import { routes } from "@/assets/constants/routeConstants";
 import Layout from "@/components/Layout";
 import { registerUser } from "@/services/auth";

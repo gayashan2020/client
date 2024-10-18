@@ -17,7 +17,7 @@ const ShortCuts = ({ user, navigateShortCuts }) => {
           className={styles.actionIcons}
           onClick={() => {
             router.push(
-              routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT
+              routes.ADMIN_USERS
             );
           }}
         >

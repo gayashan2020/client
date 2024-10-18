@@ -75,9 +75,9 @@ export default function Layout({ children }) {
       {user && [userRoles.SUPER_ADMIN, userRoles.ADMIN].includes(user.role) && (
         <ListItemButton
           component="a"
-          href={routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT}
+          href={routes.ADMIN_USERS}
           selected={
-            router.pathname === routes.ADMIN_USERS_SITE_ADMIN_USER_MANAGEMENT
+            router.pathname === routes.ADMIN_USERS
           }
         >
           <ListItemText primary="Users" />
