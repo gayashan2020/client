@@ -33,6 +33,7 @@ import { useTheme } from "@mui/material/styles";
 import { darkTheme } from "@/styles/theme";
 import PhotoIcon from "@mui/icons-material/Photo";
 import { uploadImage } from "@/services/image";
+import DOMPurify from 'dompurify';
 
 export default function Chat() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -117,9 +118,8 @@ export default function Chat() {
       ? theme.palette.primary.main
       : theme.palette.grey[800],
     color: theme.palette.common.white,
-    margin: `${theme.spacing(1)} ${
-      isCurrentUser ? theme.spacing(2) : "auto"
-    } ${theme.spacing(1)} ${isCurrentUser ? "auto" : theme.spacing(2)}`,
+    margin: `${theme.spacing(1)} ${isCurrentUser ? theme.spacing(2) : "auto"
+      } ${theme.spacing(1)} ${isCurrentUser ? "auto" : theme.spacing(2)}`,
     alignSelf: isCurrentUser ? "flex-end" : "flex-start",
   });
 
@@ -200,9 +200,8 @@ export default function Chat() {
 
     setLoading(true);
     try {
-      const initialMessage = `Hello, ${
-        currentUser.fullName
-      } (Role: ${formatRole(currentUser.role)}) has started this conversation.`;
+      const initialMessage = `Hello, ${currentUser.fullName
+        } (Role: ${formatRole(currentUser.role)}) has started this conversation.`;
       // Send the initial message
       const conversation = await sendMessage(
         currentUser._id,
@@ -269,7 +268,7 @@ export default function Chat() {
       console.log('No file selected'); // Debugging line
       return;
     }
-  
+
     console.log('File selected:', file);
 
     // Assuming you have an upload service that returns the uploaded image URL
@@ -357,9 +356,12 @@ export default function Chat() {
                           />
                         )}
                         {message.message && (
-                          <Typography variant="body2">
-                            {message.message}
-                          </Typography>
+                          <Typography
+                            variant="body2"
+                            dangerouslySetInnerHTML={{
+                              __html: DOMPurify.sanitize(message.message),
+                            }}
+                          />
                         )}
                       </Box>
                     </ListItem>
@@ -394,7 +396,7 @@ export default function Chat() {
             >
               <GroupAddIcon />
             </IconButton>
-            {selectedConversation &&(<input
+            {selectedConversation && (<input
               accept="image/*"
               style={{ display: "none" }}
               id="file-input"

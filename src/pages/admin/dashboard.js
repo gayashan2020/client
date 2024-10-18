@@ -56,6 +56,12 @@ import { addYears, startOfYear, endOfYear, isSameDay } from "date-fns";
 import { fetchMentorStudents } from "@/services/mentorService";
 import { getCpdLogEntries } from "@/services/cpdLog";
 import MentorSelectionDialog from "@/components/MentorSelectionDialog";
+import {
+  fetchConversationsWithNames,
+  fetchMessages,
+  sendMessage,
+  createConversation, // Import this if you have a service to create conversations
+} from "@/services/conversations";
 
 const lastYearRange = {
   label: "Last Year",
@@ -335,13 +341,14 @@ export default function AdminDashboard() {
     return <div>Loading...</div>;
   }
 
-  const handleMentorSelectionSubmit = async () => {
+  const handleMentorSelectionSubmit = async (editorContent) => {
     if (!selectedMentor) {
       return;
     }
     try {
       setLoading(true);
-      // Call an API or function to update mentor selection for the student
+
+      // Update user with selected mentor information
       let payload = {
         email: user.email,
         mentorId: selectedMentor,
@@ -349,10 +356,22 @@ export default function AdminDashboard() {
       };
       await updateUser(payload);
       toast.success("Mentor selected successfully!");
-      setMentorDialogOpen(false);
-      // Update mentor details after successful selection
-      const mentorDetails = await fetchMentorByCurrentUser();
-      setMentor(mentorDetails);
+
+      // Send mentorship request message
+      const initialMessage = editorContent || `Hello, ${user.fullName} has requested mentorship.`;
+      console.log("editorContent --> ",editorContent);
+      
+
+      const conversation = await sendMessage(user._id, selectedMentor, initialMessage);
+      if (conversation) {
+        toast.success("Mentorship request sent successfully!");
+
+        // Update mentor dialog and current mentor details
+        setMentorDialogOpen(false);
+        const mentorDetails = await fetchMentorByCurrentUser();
+        setMentor(mentorDetails);
+      }
+
     } catch (error) {
       console.error("Failed to select mentor", error);
       toast.error("Failed to select mentor");

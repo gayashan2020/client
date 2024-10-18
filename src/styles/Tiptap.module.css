@@ -1,0 +1,92 @@
+.controlGroup {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .buttonGroup {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .isActive {
+    background-color: #6200ea;
+    color: white;
+    border: none;
+  }
+  
+  .buttonGroup button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .buttonGroup button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .buttonGroup button:disabled {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+    color: #aaa;
+  }
+  
+  .tiptapEditor {
+    border: 1px solid #ddd;
+    padding: 10px;
+    min-height: 150px;
+    border-radius: 5px;
+    background-color: white;
+  }
+  
+  .tiptapEditor:focus {
+    outline: none;
+    border-color: #6200ea;
+  }
+  
+  /* Specific heading styles for better readability */
+  .tiptapEditor h1 {
+    font-size: 1.6em;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+  }
+  
+  .tiptapEditor h2 {
+    font-size: 1.4em;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+  }
+  
+  .tiptapEditor h3 {
+    font-size: 1.2em;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+  }
+  
+  .tiptapEditor blockquote {
+    border-left: 3px solid #6200ea;
+    padding-left: 10px;
+    margin-left: 0;
+    color: #666;
+  }
+  
+  .tiptapEditor code {
+    background-color: #f5f5f5;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  
+  .tiptapEditor ul, .tiptapEditor ol {
+    padding-left: 20px;
+  }
+  
+  .tiptapEditor hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+  }
+  
