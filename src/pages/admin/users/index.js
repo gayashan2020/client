@@ -32,8 +32,9 @@ import { LoadingContext } from "@/contexts/LoadingContext";
 import { PersonAdd, AccountBox, People, School, Business } from "@mui/icons-material";
 import { routes } from "@/assets/constants/routeConstants";
 import { useRouter } from "next/router";
-import { approveUser } from "@/services/users";
+import { approveUser, fetchCurrentUser } from "@/services/users";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import { NotificationContext } from "@/contexts/NotificationProvider";
 
 export default function UserManagement() {
   const { setLoading } = useContext(LoadingContext);
@@ -59,6 +60,7 @@ export default function UserManagement() {
   const [selectedRole, setSelectedRole] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogState, setDialogState] = useState("");
+  const { updatePendingUserApprovals } = useContext(NotificationContext);
 
   useEffect(() => {
     fetchData(selectedRole);
@@ -179,6 +181,8 @@ export default function UserManagement() {
       if (response.ok) {
         toast.success(`User ${dialogState}ed successfully!`);
         fetchData(selectedRole);
+        const user = await fetchCurrentUser();
+        updatePendingUserApprovals(user._id)
       } else {
         toast.error(`Failed to ${dialogState} user.`);
       }

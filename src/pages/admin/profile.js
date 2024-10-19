@@ -42,7 +42,6 @@ export default function AdminDashboard() {
     fetchCurrentUser()
       .then((currentUser) => {
         setUser(currentUser);
-        // console.log(currentUser);
         const statusKey = currentUser.status
           ? currentUser.status.toUpperCase()
           : "";
@@ -69,7 +68,18 @@ export default function AdminDashboard() {
 
       if (response.ok) {
         toast.success("Appealed successfully!");
-        fetchData();
+        fetchCurrentUser()
+          .then((currentUser) => {
+            setUser(currentUser);
+            const statusKey = currentUser.status
+              ? currentUser.status.toUpperCase()
+              : "";
+            const statusInfo = userStatus[statusKey];
+            setStatusDetails(statusInfo);
+          })
+          .catch((error) => {
+            console.error("Failed to fetch current user", error);
+          });
       } else {
         toast.error("Failed to appeal.");
       }
@@ -83,63 +93,105 @@ export default function AdminDashboard() {
         style={{
           minHeight: "100vh",
           justifyContent: "center",
-          alignContent: "center",
+          alignItems: "center",
+          padding: "20px",
+          backgroundColor: darkTheme.palette.background.default,
         }}
         spacing={4}
       >
         <Grid item xs={12} md={6} lg={4}>
           <Card
             style={{
-              // backgroundColor: "#121212",
-              // color: "white",
-              borderRadius: "10px", // Rounded corners for the card
-              overflow: "visible", // Ensure that children can render outside the card
+              borderRadius: "15px",
+              overflow: "visible",
               position: "relative",
               textAlign: "center",
               minHeight: "50vh",
-              alignContent: "center",
+              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+              backgroundColor: darkTheme.palette.background.paper,
             }}
           >
-            {statusDetails &&
-            statusDetails.label !== userStatus.DELETED_NO_APPEAL.label ? (
-              <Chip label={statusDetails?.label} style={statusDetails?.style} />
-            ) : (
-              <Grid container>
-                <Grid item xs={12} md={12} lg={12}>
-                  <Chip
-                    label={
-                      statusDetails?.label === userStatus.DELETED_NO_APPEAL.label
-                        ? "Account deleted - appeal within 3 months"
-                        : statusDetails?.label
-                    }
-                    style={statusDetails?.style}
-                  />
-                </Grid>
-                {statusDetails?.label === userStatus.DELETED_NO_APPEAL.label &&(<Grid item xs={12} md={12} lg={12}>
-                  <Chip
-                    label={
-                      "Reason : " + user?.reason
-                    }
-                    style={statusDetails?.style}
-                  />
-                </Grid>)}
+            <CardContent>
+              <Typography
+                variant="h5"
+                style={{
+                  marginBottom: "15px",
+                  color: darkTheme.palette.text.primary,
+                }}
+              >
+                Account Status
+              </Typography>
 
-                <Grid item xs={12} md={12} lg={12}>
-                  <Button
-                    color="primary"
-                    onClick={() => handleAppeal(user)}
-                    style={{
-                      padding: "10px",
-                      margin: "10px",
-                      // backgroundColor: "green",
-                      borderRadius: "10px",
-                    }}
-                  >
-                    Appeal
-                  </Button>
+              {statusDetails &&
+              statusDetails.label !== userStatus.DELETED_NO_APPEAL.label ? (
+                <Chip
+                  label={statusDetails?.label}
+                  style={{
+                    ...statusDetails?.style,
+                    fontSize: "1.2rem",
+                    padding: "15px",
+                    backgroundColor: statusDetails?.style?.backgroundColor || "#1976d2",
+                    color: statusDetails?.style?.color || "#ffffff",
+                    borderRadius: "8px",
+                  }}
+                />
+              ) : (
+                <Grid container justifyContent="center" spacing={2}>
+                  <Grid item xs={12}>
+                    <Chip
+                      label={
+                        statusDetails?.label === userStatus.DELETED_NO_APPEAL.label
+                          ? "Account deleted - appeal within 3 months"
+                          : statusDetails?.label
+                      }
+                      style={{
+                        ...statusDetails?.style,
+                        fontSize: "1.2rem",
+                        padding: "10px",
+                        backgroundColor: "#d32f2f",
+                        color: "#ffffff",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </Grid>
+
+                  {statusDetails?.label === userStatus.DELETED_NO_APPEAL.label && (
+                    <Grid item xs={12}>
+                      <Chip
+                        label={"Reason : " + user?.reason}
+                        style={{
+                          ...statusDetails?.style,
+                          fontSize: "1rem",
+                          padding: "10px",
+                          backgroundColor: "#ffb74d",
+                          color: "#000000",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    </Grid>
+                  )}
+
+                  <Grid item xs={12}>
+                    <Button
+                      color="primary"
+                      onClick={() => handleAppeal(user)}
+                      variant="contained"
+                      style={{
+                        padding: "15px 25px",
+                        margin: "20px 0",
+                        backgroundColor: "#4caf50",
+                        color: "#ffffff",
+                        fontSize: "1rem",
+                        borderRadius: "25px",
+                        textTransform: "none",
+                      }}
+                    >
+                      Appeal
+                    </Button>
+                  </Grid>
                 </Grid>
-              </Grid>
-            )}
+              )}
+            </CardContent>
           </Card>
         </Grid>
       </Grid>
