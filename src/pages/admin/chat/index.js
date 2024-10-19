@@ -24,8 +24,8 @@ import {
   fetchConversationsWithNames,
   fetchMessages,
   sendMessage,
-  createConversation, // Import this if you have a service to create conversations
-} from "@/services/conversations";
+  markMessagesAsRead,
+} from "@/services/conversations"; // Include markMessagesAsRead service
 import Layout from "@/components/Layout";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { userRoles } from "@/assets/constants/authConstants";
@@ -34,6 +34,7 @@ import { darkTheme } from "@/styles/theme";
 import PhotoIcon from "@mui/icons-material/Photo";
 import { uploadImage } from "@/services/image";
 import DOMPurify from 'dompurify';
+import { NotificationContext } from "@/contexts/NotificationProvider";
 
 export default function Chat() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -48,6 +49,7 @@ export default function Chat() {
   const [filteredUsers, setFilteredUsers] = useState([]);
 
   const { setLoading } = useContext(LoadingContext);
+  const { updateUnreadMessagesCount } = useContext(NotificationContext);
 
   const theme = darkTheme;
 
@@ -185,14 +187,20 @@ export default function Chat() {
     }
   };
 
-  const handleSelectConversation = (conversation) => {
+  const handleSelectConversation = async (conversation) => {
     setSelectedConversation(conversation);
-    fetchMessages(conversation._id).then(setMessages);
+    const messages = await fetchMessages(conversation._id);
+    setMessages(messages);
+
     setResponder(
       conversation.initiator === currentUser._id
         ? conversation.responder
         : conversation.initiator
     );
+
+    // Mark messages as read when opening the conversation
+    await markMessagesAsRead(conversation._id, currentUser._id);
+    await updateUnreadMessagesCount(currentUser._id); // Update unread messages count
   };
 
   const handleCreateConversation = async () => {
@@ -225,6 +233,7 @@ export default function Chat() {
         }
         setNewMessage("");
         await updateConversations(currentUser._id);
+        await updateUnreadMessagesCount(currentUser._id); // Update unread messages count
       }
     } catch (error) {
       console.error("Error creating conversation:", error);
@@ -320,7 +329,11 @@ export default function Chat() {
                       },
                     }}
                   >
-                    <ListItemText primary={conversation.partnerName} />
+                    <ListItemText primary={conversation.partnerName} secondary={
+                      conversation.unreadCount > 0
+                        ? `${conversation.unreadCount} unread messages`
+                        : "All messages read"
+                    } />
                   </ListItem>
                 ))}
               </List>
@@ -362,6 +375,14 @@ export default function Chat() {
                               __html: DOMPurify.sanitize(message.message),
                             }}
                           />
+                        )}
+                        {message.readBy && message.readBy.includes(responder) && (
+                          <Typography
+                            variant="caption"
+                            sx={{ display: "block", marginTop: theme.spacing(1) }}
+                          >
+                            Read
+                          </Typography>
                         )}
                       </Box>
                     </ListItem>

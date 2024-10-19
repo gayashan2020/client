@@ -1,5 +1,3 @@
-// src/pages/api/message/messages.js
-
 import dbConnect from "@/lib/dbConnect";
 import { ObjectId } from "mongodb";
 
@@ -8,32 +6,26 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  const conversationId = req.query.conversationId; // Assuming the conversation ID is passed as a query parameter
+  const conversationId = req.query.conversationId;
 
   if (!conversationId) {
-    return res
-      .status(400)
-      .json({ message: "Missing conversationId in query." });
+    return res.status(400).json({ message: "Missing conversationId in query." });
   }
 
   const { db } = await dbConnect();
 
   try {
-    const messages = await db
-      .collection("messages")
-      .find({
-        conversationId: new ObjectId(conversationId),
-      })
-      .toArray();
+    const messages = await db.collection("messages").find({
+      conversationId: new ObjectId(conversationId),
+    }).toArray();
 
     res.status(200).json(messages);
   } catch (error) {
     console.error("Error fetching messages:", error);
-    res
-      .status(500)
-      .json({ error: "Internal Server Error", message: error.message });
+    res.status(500).json({ error: "Internal Server Error", message: error.message });
   }
 }
+
 
 /**
  * Fetches all conversations for a given user.

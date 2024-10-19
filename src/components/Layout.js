@@ -28,17 +28,20 @@ import { AuthContext } from "@/contexts/AuthContext";
 import { LoadingContext } from "@/contexts/LoadingContext";
 import { fetchMenteesByMentor } from "@/services/mentorService";
 import { fetchUsers } from "@/services/users";
+import { fetchUnreadMessagesCount } from "@/services/conversations";
+import { NotificationContext } from "@/contexts/NotificationProvider";
+
 
 export default function Layout({ children }) {
   const router = useRouter();
   const { user, logout } = useContext(AuthContext);
+  const { unreadMessagesCount, pendingUserApprovals, pendingMenteeApprovals, setUnreadMessagesCount } = useContext(NotificationContext);
   const drawerWidth = 200;
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { loading, setLoading } = useContext(LoadingContext);
   const [pendingApprovals, setPendingApprovals] = useState(0);
-  const [pendingUserApprovals, setPendingUserApprovals] = useState(0);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -49,8 +52,23 @@ export default function Layout({ children }) {
       setLoading(false);
       fetchPendingApprovals();
       fetchPendingUserApprovals();
+      fetchUnreadMessages();
     }
   }, [user, setLoading]);
+
+  const fetchUnreadMessages = async () => {
+    if (user) {
+      setLoading(true);
+      try {
+        const totalUnread = await fetchUnreadMessagesCount(user._id);
+        setUnreadMessagesCount(totalUnread);
+      } catch (error) {
+        console.error("Failed to fetch unread messages count:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
   const fetchPendingApprovals = async () => {
     if (user && [userRoles.SUPER_ADMIN, userRoles.MENTOR].includes(user.role)) {
@@ -121,13 +139,11 @@ export default function Layout({ children }) {
         <ListItemButton
           component="a"
           href={routes.ADMIN_USERS}
-          selected={
-            router.pathname === routes.ADMIN_USERS
-          }
+          selected={router.pathname === routes.ADMIN_USERS}
         >
           <Badge
             color="error"
-            badgeContent={pendingUserApprovals}
+            badgeContent={pendingUserApprovals > 99 ? '99+' : pendingUserApprovals}
             invisible={pendingUserApprovals === 0}
           >
             <ListItemText primary="Users" />
@@ -187,30 +203,36 @@ export default function Layout({ children }) {
           </ListItemButton>
         )}
 
-      {user &&
-        [userRoles.SUPER_ADMIN, userRoles.MENTOR].includes(user.role) && (
-          <ListItemButton
-            component="a"
-            href={routes.ADMIN_MENTEEMANAGEMENT}
-            selected={router.pathname === routes.ADMIN_MENTEEMANAGEMENT}
+      {user && [userRoles.SUPER_ADMIN, userRoles.MENTOR].includes(user.role) && (
+        <ListItemButton
+          component="a"
+          href={routes.ADMIN_MENTEEMANAGEMENT}
+          selected={router.pathname === routes.ADMIN_MENTEEMANAGEMENT}
+        >
+          <Badge
+            color="error"
+            badgeContent={pendingMenteeApprovals > 99 ? '99+' : pendingMenteeApprovals}
+            invisible={pendingMenteeApprovals === 0}
           >
-            <Badge
-              color="error"
-              badgeContent={pendingApprovals}
-              invisible={pendingApprovals === 0}
-            >
-              <ListItemText primary="Mentee Management" />
-            </Badge>
-          </ListItemButton>
-        )}
+            <ListItemText primary="Mentee Management" />
+          </Badge>
+        </ListItemButton>
+      )}
 
       <ListItemButton
         component="a"
         href={routes.ADMIN_CHAT}
         selected={router.pathname === routes.ADMIN_CHAT}
       >
-        <ListItemText primary="Chat" />
+        <Badge
+          color="error"
+          badgeContent={unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
+          invisible={unreadMessagesCount === 0}
+        >
+          <ListItemText primary="Chat" />
+        </Badge>
       </ListItemButton>
+
 
       <ListItemButton
         component="a"

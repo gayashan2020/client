@@ -111,3 +111,59 @@ export async function fetchConversationsWithNames(userId) {
   }
   return await res.json();
 }
+
+
+/**
+ * Marks all messages in a conversation as read for the given user.
+ *
+ * @param {string} conversationId - The ID of the conversation whose messages are to be marked as read.
+ * @param {string} userId - The ID of the user who has read the messages.
+ * @returns {Promise<void>}
+ */
+export async function markMessagesAsRead(conversationId, userId) {
+  try {
+    const response = await fetch("/api/message/markMessagesAsRead", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ conversationId, userId }),
+    });
+
+    if (!response.ok) {
+      // Convert non-2xx HTTP responses into errors
+      const errorBody = await response.text();
+      throw new Error(
+        `Error marking messages as read: ${response.status} - ${errorBody}`
+      );
+    }
+  } catch (error) {
+    console.error("Error in markMessagesAsRead:", error);
+    throw error; // Re-throw the error to be handled by the calling code
+  }
+}
+
+export async function fetchUnreadMessagesCount(userId) {
+  try {
+    const response = await fetch(`/api/message/unreadMessagesCount?userId=${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      // Convert non-2xx HTTP responses into errors
+      const errorBody = await response.text();
+      throw new Error(
+        `Error fetching unread messages count: ${response.status} - ${errorBody}`
+      );
+    }
+
+    const { unreadCount } = await response.json();
+    return unreadCount;
+  } catch (error) {
+    console.error("Error in fetchUnreadMessagesCount:", error);
+    throw error; // Re-throw the error to be handled by the calling code
+  }
+}

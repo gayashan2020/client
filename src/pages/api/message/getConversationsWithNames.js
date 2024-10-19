@@ -1,4 +1,4 @@
-// src/pages/api/conversations/getConversationsWithNames.js
+// src/pages/api/message/getConversationsWithNames.js
 
 import dbConnect from "@/lib/dbConnect";
 import { ObjectId } from "mongodb";
@@ -21,8 +21,8 @@ export default async function handler(req, res) {
   const { db } = await dbConnect();
 
   try {
-    const conversations = await db
-      .collection("conversations")
+    // Fetch all conversations involving the user
+    const conversations = await db.collection("conversations")
       .find({
         $or: [
           { initiator: new ObjectId(userId) },
@@ -32,13 +32,12 @@ export default async function handler(req, res) {
       .toArray();
 
     const userMap = new Map();
-
-    // Retrieve all unique user IDs involved in the conversations
+    // Collect all unique user IDs excluding the current user
     const userIds = conversations
       .flatMap((convo) => [convo.initiator, convo.responder])
-      .filter((id) => id.toString() !== userId); // Exclude the current user
+      .filter((id) => id.toString() !== userId);
 
-    // Fetch all users by their IDs
+    // Fetch user information for all users involved in conversations
     await Promise.all(
       Array.from(new Set(userIds)).map(async (id) => {
         if (!userMap.has(id.toString())) {
@@ -48,7 +47,8 @@ export default async function handler(req, res) {
       })
     );
 
-    const conversationsWithNames = conversations.map((convo) => {
+    // Add partner name and unread messages count to each conversation
+    const conversationsWithNames = await Promise.all(conversations.map(async (convo) => {
       // Determine the ID of the conversation partner
       const partnerId =
         convo.initiator.toString() === userId
@@ -57,19 +57,19 @@ export default async function handler(req, res) {
 
       const partner = userMap.get(partnerId);
 
-      // Function to decide which name to use: fullName or firstName + lastName
-      const getUserName = (user) => {
-        if (!user) return "Unknown User"; // Return a default string if user is not found
-        if (user.fullName) return user.fullName;
-        return `${user.firstName} ${user.lastName}`;
-      };
+      // Count unread messages that are not read by the current user
+      const unreadCount = await db.collection("messages").countDocuments({
+        conversationId: convo._id,
+        sender: { $ne: new ObjectId(userId) }, // Messages sent by others
+        readBy: { $ne: new ObjectId(userId) } // Messages not read by current user
+      });
 
       return {
         ...convo,
-        partnerName: getUserName(partner), // Use the name of the partner
-        // Keep other properties of the conversation as needed
+        partnerName: partner?.fullName || `${partner?.firstName} ${partner?.lastName}` || "Unknown User",
+        unreadCount,
       };
-    });
+    }));
 
     res.status(200).json(conversationsWithNames);
   } catch (error) {
