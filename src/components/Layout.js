@@ -35,13 +35,19 @@ import { NotificationContext } from "@/contexts/NotificationProvider";
 export default function Layout({ children }) {
   const router = useRouter();
   const { user, logout } = useContext(AuthContext);
-  const { unreadMessagesCount, pendingUserApprovals, pendingMenteeApprovals, setUnreadMessagesCount } = useContext(NotificationContext);
+  const {
+    unreadMessagesCount,
+    pendingUserApprovals,
+    pendingMenteeApprovals,
+    setUnreadMessagesCount,
+    setPendingUserApprovals,
+    setPendingMenteeApprovals,
+  } = useContext(NotificationContext);
   const drawerWidth = 200;
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { loading, setLoading } = useContext(LoadingContext);
-  const [pendingApprovals, setPendingApprovals] = useState(0);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -78,7 +84,7 @@ export default function Layout({ children }) {
         const pendingCount = mentees.filter(
           (mentee) => mentee.mentorApprovalStatus !== true
         ).length;
-        setPendingApprovals(pendingCount);
+        setPendingMenteeApprovals(pendingCount);
       } catch (error) {
         console.error("Failed to fetch pending approvals:", error);
       } finally {

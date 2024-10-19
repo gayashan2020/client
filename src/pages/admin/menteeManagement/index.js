@@ -23,6 +23,7 @@ import { LoadingContext } from "@/contexts/LoadingContext";
 import { useRouter } from "next/router";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { NotificationContext } from "@/contexts/NotificationProvider";
 
 const MentorMenteesList = () => {
   const [mentees, setMentees] = useState([]);
@@ -31,11 +32,12 @@ const MentorMenteesList = () => {
   const [selectedMentee, setSelectedMentee] = useState(null);
   const [dialogType, setDialogType] = useState("");
   const { setLoading } = useContext(LoadingContext);
+  const { updatePendingMenteeApprovals } = useContext(NotificationContext);
   const router = useRouter();
 
   useEffect(() => {
     fetchMentees();
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
 
   const fetchMentees = async () => {
     setLoading(true);
@@ -43,8 +45,6 @@ const MentorMenteesList = () => {
       const user = await fetchCurrentUser();
       if (user?._id) {
         const menteeDetails = await fetchMenteesByMentor(user._id);
-        console.log("mentee --> ", menteeDetails);
-
         setMentees(menteeDetails);
       } else {
         setError("User not found");
@@ -56,44 +56,28 @@ const MentorMenteesList = () => {
     }
   };
 
-  const handleApproveMentee = async () => {
+  const handleMenteeAction = async (action) => {
+    if (!selectedMentee) return;
     try {
       setLoading(true);
       let payload = {
         email: selectedMentee.email,
-        mentorApprovalStatus: true,
+        mentorApprovalStatus: action === "approve" ? true : null,
+        mentorId: action === "reject" ? null : undefined,
       };
-      console.log(payload);
-      await updateUser(payload);
-      setLoading(false);
-      // Close the dialog and refresh the mentees list to reflect the approval
-      setOpenDialog(false);
-      setSelectedMentee(null);
-      await fetchMentees();
-    } catch (error) {
-      setLoading(false);
-      console.error("Failed to approve mentee:", error);
-    }
-  };
 
-  const handleRejectMentee = async () => {
-    try {
-      setLoading(true);
-      let payload = {
-        email: selectedMentee.email,
-        mentorApprovalStatus: null,
-        mentorId: null,
-      };
-      console.log(payload);
       await updateUser(payload);
-      setLoading(false);
-      // Close the dialog and refresh the mentees list to reflect the rejection
       setOpenDialog(false);
       setSelectedMentee(null);
       await fetchMentees();
+      const user = await fetchCurrentUser();
+      console.log("user id --> ",user._id);
+      
+      await updatePendingMenteeApprovals(user._id);
     } catch (error) {
+      console.error(`Failed to ${action} mentee:`, error);
+    } finally {
       setLoading(false);
-      console.error("Failed to reject mentee:", error);
     }
   };
 
@@ -104,20 +88,17 @@ const MentorMenteesList = () => {
   };
 
   const navigateToCourse = (mentee) => {
-    // Navigate to the dynamic route for course details
     router.push(`/admin/menteeManagement/${mentee._id}`);
   };
 
   return (
     <Layout>
       <Box sx={{ padding: "20px" }}>
-        {/* Header outside the Table container */}
         <Typography variant="h4" gutterBottom>
           Mentees List
         </Typography>
         {error && <Typography color="error">{error}</Typography>}
 
-        {/* Table for displaying mentees */}
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -131,48 +112,48 @@ const MentorMenteesList = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {mentees.map((mentee, index) => (
-                <TableRow
-                  key={index}
-                  hover
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigateToCourse(mentee)}
-                >
-                  <TableCell>
-                    {mentee.fullName ||
-                      `${mentee.firstName} ${mentee.lastName}`}
-                  </TableCell>
-                  <TableCell>{mentee.occupation}</TableCell>
-                  <TableCell>
-                    {mentee.city}, {mentee.district}
-                  </TableCell>
-                  <TableCell>{mentee.contactNumber}</TableCell>
-                  <TableCell>{mentee.slmcRegNumber || "N/A"}</TableCell>
-                  <TableCell>
-                    {mentee?.mentorApprovalStatus !== true && (
-                      <>
-                        <IconButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenDialog(mentee, "approve");
-                          }}
-                        >
-                          <CheckCircleIcon />
-                        </IconButton>
-                        <IconButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenDialog(mentee, "reject");
-                          }}
-                        >
-                          <CancelIcon />
-                        </IconButton>
-                      </>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {mentees.length === 0 && !error && (
+              {mentees.length > 0 ? (
+                mentees.map((mentee, index) => (
+                  <TableRow
+                    key={index}
+                    hover
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigateToCourse(mentee)}
+                  >
+                    <TableCell>
+                      {mentee.fullName || `${mentee.firstName} ${mentee.lastName}`}
+                    </TableCell>
+                    <TableCell>{mentee.occupation}</TableCell>
+                    <TableCell>
+                      {mentee.city}, {mentee.district}
+                    </TableCell>
+                    <TableCell>{mentee.contactNumber}</TableCell>
+                    <TableCell>{mentee.slmcRegNumber || "N/A"}</TableCell>
+                    <TableCell>
+                      {mentee?.mentorApprovalStatus !== true && (
+                        <>
+                          <IconButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDialog(mentee, "approve");
+                            }}
+                          >
+                            <CheckCircleIcon />
+                          </IconButton>
+                          <IconButton
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDialog(mentee, "reject");
+                            }}
+                          >
+                            <CancelIcon />
+                          </IconButton>
+                        </>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
                 <TableRow>
                   <TableCell colSpan={7}>
                     <Typography align="center">No mentees found.</Typography>
@@ -184,22 +165,18 @@ const MentorMenteesList = () => {
         </TableContainer>
 
         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-          <DialogTitle>Confirm {dialogType === "approve" ? "Approval" : "Rejection"}</DialogTitle>
+          <DialogTitle>
+            Confirm {dialogType === "approve" ? "Approval" : "Rejection"}
+          </DialogTitle>
           <DialogContent>
             <Typography>
-              Are you sure you want to {dialogType === "approve" ? "approve" : "reject"} mentorship for{" "}
-              {selectedMentee?.fullName ||
-                `${selectedMentee?.firstName} ${selectedMentee?.lastName}`}?
+              Are you sure you want to {dialogType === "approve" ? "approve" : "reject"} mentorship for {selectedMentee?.fullName || `${selectedMentee?.firstName} ${selectedMentee?.lastName}`}?
             </Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
             <Button
-              onClick={() =>
-                dialogType === "approve"
-                  ? handleApproveMentee()
-                  : handleRejectMentee()
-              }
+              onClick={() => handleMenteeAction(dialogType)}
               color="primary"
             >
               {dialogType === "approve" ? "Approve" : "Reject"}
