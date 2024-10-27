@@ -195,9 +195,6 @@ export default function Layout({ children }) {
 
       {user &&
         [
-          userRoles.SUPER_ADMIN,
-          userRoles.ADMIN,
-          userRoles.CPD_PROVIDER,
           userRoles.STUDENT,
         ].includes(user.role) && (
           <ListItemButton
@@ -209,7 +206,7 @@ export default function Layout({ children }) {
           </ListItemButton>
         )}
 
-      {user && [userRoles.SUPER_ADMIN, userRoles.MENTOR].includes(user.role) && (
+      {user && [userRoles.MENTOR].includes(user.role) && (
         <ListItemButton
           component="a"
           href={routes.ADMIN_MENTEEMANAGEMENT}

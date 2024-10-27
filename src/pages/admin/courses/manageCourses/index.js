@@ -25,6 +25,7 @@ export default function ManageCourses() {
   const getAllCourses = async () => {
     setLoading(true);
     const response = await fetchCourses();
+    
     setLoading(false);
     if (response) {
       setCourses(response);
@@ -42,6 +43,7 @@ export default function ManageCourses() {
               <TableCell>Name</TableCell>
               <TableCell align="right">Category</TableCell>
               <TableCell align="right">Authors</TableCell>
+              <TableCell align="right">Dates</TableCell>
               <TableCell align="right">Keywords</TableCell>
             </TableRow>
           </TableHead>
@@ -52,18 +54,19 @@ export default function ManageCourses() {
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {course.name}
+                  {course?.event}
                 </TableCell>
-                <TableCell align="right">{course.category}</TableCell>
+                <TableCell align="right">{course?.category}</TableCell>
                 <TableCell align="right">
-                  {Array.isArray(course.authors)
-                    ? course.authors.join(", ")
-                    : course.authors}
+                  {course?.contact?.name}
                 </TableCell>
                 <TableCell align="right">
-                  {Array.isArray(course.keywords)
-                    ? course.keywords.join(", ")
-                    : course.keywords}
+                  {course?.dates}
+                </TableCell>
+                <TableCell align="right">
+                  {Array.isArray(course?.competency_assessed)
+                    ? course.competency_assessed.join(", ")
+                    : course.competency_assessed}
                 </TableCell>
               </TableRow>
             ))}
