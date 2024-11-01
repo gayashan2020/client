@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import Tiptap from "@/components/Tiptap";
+import { OCCUPATION_OPTIONS } from "@/assets/constants/adminConstants";
 
 const MentorSelectionDialog = ({
   mentorDialogOpen,
@@ -27,6 +28,18 @@ const MentorSelectionDialog = ({
   const [reConfirmOpen, setReConfirmOpen] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorContent, setEditorContent] = useState("");
+  const [genderFilter, setGenderFilter] = useState("");
+  const [cityFilter, setCityFilter] = useState("");
+  const [occupationFilter, setOccupationFilter] = useState("");
+
+  // Apply filters to the mentors list
+  const filteredMentors = mentors?.filter((mentor) => {
+    return (
+      (!genderFilter || mentor.gender === genderFilter) &&
+      (!cityFilter || mentor.city === cityFilter) &&
+      (!occupationFilter || mentor.occupation === occupationFilter)
+    );
+  });
 
   const handleContinueClick = () => {
     setReConfirmOpen(true);
@@ -63,15 +76,54 @@ const MentorSelectionDialog = ({
       >
         <DialogTitle style={{ textAlign: "center" }}>Select a Mentor</DialogTitle>
         <DialogContent>
-          <FormControl fullWidth style={{ marginTop: theme.spacing(2), minHeight: '200px' }}>
+          {/* Filters */}
+          <FormControl fullWidth style={{ marginBottom: theme.spacing(2), paddingTop: "10px" }}>
             <Autocomplete
               disablePortal
-              options={mentors ? mentors : []}
+              options={["male", "female"]}
+              getOptionLabel={(option) => option}
+              value={genderFilter}
+              onChange={(event, newValue) => setGenderFilter(newValue || "")}
+              renderInput={(params) => <TextField {...params} label="Gender" />}
+            />
+          </FormControl>
+          <FormControl fullWidth style={{ marginBottom: theme.spacing(2) }}>
+            <Autocomplete
+              disablePortal
+              options={[...new Set(mentors?.map((mentor) => mentor?.city))]} // unique cities
+              getOptionLabel={(option) => option}
+              value={cityFilter}
+              onChange={(event, newValue) => setCityFilter(newValue || "")}
+              renderInput={(params) => <TextField {...params} label="City" />}
+            />
+          </FormControl>
+          <FormControl fullWidth style={{ marginBottom: theme.spacing(2) }}>
+            <Autocomplete
+              disablePortal
+              options={[...new Set(mentors?.map((mentor) =>
+                OCCUPATION_OPTIONS.find((opt) => opt.value === mentor.occupation) // map mentor occupation to OCCUPATION_OPTIONS
+              ))].filter(Boolean)} // remove any undefined values
+              getOptionLabel={(option) => option.label}
+              value={OCCUPATION_OPTIONS.find((opt) => opt.value === occupationFilter) || null}
+              onChange={(event, newValue) => setOccupationFilter(newValue ? newValue.value : "")}
+              renderInput={(params) => <TextField {...params} label="Occupation" />}
+            />
+          </FormControl>
+
+          {/* Mentor Selection */}
+          <FormControl fullWidth style={{ marginTop: theme.spacing(2), minHeight: "200px" }}>
+            <Autocomplete
+              disablePortal
+              options={filteredMentors}
               getOptionLabel={(option) => option.fullName || ""}
-              value={mentors && mentors.length > 0 ? mentors.find((mentor) => mentor._id === selectedMentor) || null : null}
+              value={
+                filteredMentors?.length > 0
+                  ? filteredMentors?.find((mentor) => mentor._id === selectedMentor) || null
+                  : null
+              }
               onChange={(event, newValue) => setSelectedMentor(newValue ? newValue._id : "")}
               renderInput={(params) => <TextField {...params} label="Search Mentor" />}
-              ListboxProps={{ style: { maxHeight: 300, overflowY: 'auto', width: 'auto' } }}
+              ListboxProps={{ style: { maxHeight: 300, overflowY: "auto", width: "auto" } }}
             />
           </FormControl>
         </DialogContent>

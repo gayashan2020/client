@@ -236,6 +236,8 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       const data = await fetchUsers("", userRoles.MENTOR);
+      console.log("mentors --> ",data);
+      
       setMentors(data);
     } catch (error) {
       console.error("Failed to fetch users:", error);
