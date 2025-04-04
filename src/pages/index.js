@@ -5,7 +5,7 @@ import LandingPage2 from './landingPage2'
 
 export default function Home() {
   // Render your landing page content here
-  return <LandingPage2 />;
+  return <LandingPage />;
 }
 
 export async function getServerSideProps(context) {
