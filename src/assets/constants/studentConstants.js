@@ -7,7 +7,7 @@ export const GENDER_OPTIONS = [
     { value: 'prefer_not_to_say', label: 'Prefer not to say' },
   ];
   
-  export const BATCH_OPTIONS = Array.from({length: 25}, (_, i) => {
+  export const BATCH_OPTIONS = Array.from({length: 26}, (_, i) => {
     const year = 2000 + i;
     return { value: year.toString(), label: `Batch ${year}` };
   });

@@ -3,12 +3,12 @@
 import sendgrid from '@sendgrid/mail';
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
-export default async (req, res) => {
+export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       // Extract email data from request body
       const { to, subject, html } = req.body;
-
+      
       // Define email options
       const msg = {
         to, // recipient
@@ -19,7 +19,8 @@ export default async (req, res) => {
 
       // Send the email
       await sendgrid.send(msg);
-
+      console.log('Email sent successfully');
+      
       // Send a JSON response back
       res.status(200).json({ message: 'Email sent successfully' });
     } catch (error) {

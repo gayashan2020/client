@@ -8,6 +8,8 @@ import {
   Card,
   Container,
   Typography,
+  Box,
+  keyframes,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import Cookies from "js-cookie";
@@ -15,14 +17,20 @@ import { lightTheme as theme } from "@/styles/theme";
 import { toast } from "react-toastify";
 import { loginUser } from "@/services/auth";
 import { LoadingContext } from "@/contexts/LoadingContext";
-import { AuthContext } from "@/contexts/AuthContext"; // Import AuthContext
+import { AuthContext } from "@/contexts/AuthContext";
+
+// Animation keyframes from landing page
+const scaleUp = keyframes`
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+`;
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { setLoading } = useContext(LoadingContext);
-  const { login } = useContext(AuthContext); // Destructure login from AuthContext
+  const { login } = useContext(AuthContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -72,75 +80,156 @@ export default function LoginForm() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="sm">
-        <Card raised sx={{ marginTop: 8, padding: 4 }}>
-          <Typography component="h1" variant="h5" align="center">
-            Login
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  label="Username"
-                  autoFocus
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          background: `linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)`,
+          py: 8,
+        }}
+      >
+        <Container component="main" maxWidth="sm">
+          <Card
+            sx={{
+              padding: 4,
+              borderRadius: 3,
+              boxShadow: "0 8px 32px rgba(44, 102, 110, 0.1)",
+              animation: `${scaleUp} 0.6s ease-out`,
+              "&:hover": {
+                boxShadow: "0 12px 40px rgba(44, 102, 110, 0.2)",
+              },
+              borderBottom: "4px solid #ff7f50",
+            }}
+          >
+            <Typography
+              component="h1"
+              variant="h3"
+              align="center"
+              sx={{
+                color: "#2C666E",
+                fontWeight: 700,
+                mb: 4,
+                position: "relative",
+                "&:after": {
+                  content: '""',
+                  display: "block",
+                  width: "60px",
+                  height: "4px",
+                  backgroundColor: "#ff7f50",
+                  margin: "16px auto 0",
+                },
+              }}
+            >
+              Member Login
+            </Typography>
+            
+            <form onSubmit={handleSubmit}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Username"
+                    variant="outlined"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#2C666E",
+                        },
+                      },
+                    }}
+                  />
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    type="password"
+                    variant="outlined"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#2C666E",
+                        },
+                      },
+                    }}
+                  />
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <Button
+                    fullWidth
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      py: 1.5,
+                      borderRadius: 2,
+                      backgroundColor: "#2C666E",
+                      "&:hover": {
+                        backgroundColor: "#1a4a52",
+                        transform: "translateY(-2px)",
+                      },
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    Log In
+                  </Button>
+                </Grid>
+                
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    href="/register"
+                    variant="contained"
+                    sx={{
+                      py: 1.5,
+                      borderRadius: 2,
+                      backgroundColor: "#ff7f50",
+                      "&:hover": {
+                        backgroundColor: "#ff6b3a",
+                        transform: "translateY(-2px)",
+                      },
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    Register
+                  </Button>
+                </Grid>
+                
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    href="/"
+                    variant="outlined"
+                    sx={{
+                      py: 1.5,
+                      borderRadius: 2,
+                      borderColor: "#2C666E",
+                      color: "white",
+                      "&:hover": {
+                        backgroundColor: "#27548A",
+                        color: "white",
+                        borderColor: "#1a4a52",
+                        // transform: "translateY(-2px)",
+                      },
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    Home
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  label="Password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={{ py: 1.5 }} // Increase the padding for the button
-                >
-                  Log in
-                </Button>
-              </Grid>
-              <Grid item xs={6} style={{ color: "#fff" }}>
-                <Button
-                  component="a"
-                  href="/register"
-                  fullWidth
-                  color="inherit"
-                  variant="contained"
-                  sx={{ py: 1.5 }} // Increase the padding for the button
-                >
-                  Register
-                </Button>
-              </Grid>
-              <Grid item xs={6} style={{ color: "#fff" }}>
-                <Button
-                  component="a"
-                  href="/"
-                  fullWidth
-                  color="inherit"
-                  variant="contained"
-                  sx={{ py: 1.5 }}
-                >
-                  Home
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </Card>
-      </Container>
+            </form>
+          </Card>
+        </Container>
+      </Box>
     </ThemeProvider>
   );
 }

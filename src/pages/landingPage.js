@@ -76,25 +76,25 @@ const faqItems = [
 const statistics = [
   {
     title: "Total Courses",
-    value: "850+",
+    value: "200+",
     icon: <SchoolIcon fontSize="large" />,
     color: "#2C666E",
   },
   {
     title: "Active Students",
-    value: "25K+",
+    value: "50+",
     icon: <PersonIcon fontSize="large" />,
     color: "#ff7f50",
   },
   {
     title: "Expert Mentors",
-    value: "1.2K+",
+    value: "20+",
     icon: <GroupsIcon fontSize="large" />,
     color: "#2C666E",
   },
   {
     title: "Completed Courses",
-    value: "150K+",
+    value: "50+",
     icon: <AssignmentTurnedInIcon fontSize="large" />,
     color: "#ff7f50",
   },
@@ -494,15 +494,15 @@ const LandingPage = () => {
                 <Typography variant="h6">Contact Information</Typography>
               </Box>
               <Typography variant="body2" sx={{ lineHeight: 1.8 }}>
-                NCCPDM Headquarters
+                National Hospital of Sri Lanka
                 <br />
-                123 Medical Education Way
+                WV99+FHX, Colombo 00700
                 <br />
-                Knowledge City, PC 45678
-                <br />
+                {/* Knowledge City, PC 45678
+                <br /> */}
                 Email: contact@nccpdm.org
                 <br />
-                Phone: +1 (555) 123-4567
+                Phone: +94 112 691 111
               </Typography>
             </Grid>
 
@@ -615,14 +615,5 @@ const LandingPage = () => {
     </>
   );
 };
-
-// Add floating animation in your global CSS
-const globalStyles = `
-  @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-    100% { transform: translateY(0px); }
-  }
-`;
 
 export default LandingPage;
