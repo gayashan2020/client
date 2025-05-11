@@ -122,26 +122,33 @@ export const fetchCoursesByCategoryId = async (categoryId) => {
   return await response.json();
 };
 
-export const fetchCoursesByCategoryIds = async (categoryNames, userId = null) => {
+export const fetchCoursesByCategoryIds = async (
+  categoryNames,
+  userId = null,
+  searchTerm = "",
+  organizers = []
+) => {
   try {
     const response = await fetch("/api/courses/byCategoryIds", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ categoryNames, userId }),
+      body: JSON.stringify({
+        categoryNames,
+        userId,
+        searchTerm,
+        organizers,
+      }),
     });
 
-    if (!response.ok) {
+    if (!response.ok)
       throw new Error(`Error updating course: ${response.status}`);
-    }
-
     return response.json();
   } catch (error) {
     throw new Error("Failed to fetch courses by category IDs");
   }
 };
-
 
 export const updateCourseCategory = async (courseId, categoryName) => {
   try {

@@ -1,39 +1,67 @@
-import dbConnect from '@/lib/dbConnect';
-import { ObjectId } from 'mongodb';
+// src/pages/api/courses/byCategoryIds.js
+import dbConnect from "@/lib/dbConnect";
+import { ObjectId } from "mongodb";
 
 export default async function handler(req, res) {
   const { db } = await dbConnect();
 
   if (req.method === "POST") {
-    const { categoryNames, userId } = req.body;
+    const {
+      categoryNames,
+      userId,
+      searchTerm = "",
+      organizers = [],
+    } = req.body;
 
     try {
-      // Fetch courses that match the given category names
-      const courses = await db.collection('courses').find({
+      const filter = {
         category: { $in: categoryNames },
-      }).toArray();
+      };
 
+      // Add search filter
+      if (searchTerm) {
+        filter.$or = [
+          { event: { $regex: searchTerm, $options: "i" } },
+          { organizing_body: { $regex: searchTerm, $options: "i" } },
+          { category: { $regex: searchTerm, $options: "i" } },
+        ];
+      }
+
+      // Add organizer filter
+      if (organizers.length > 0) {
+        filter.organizing_body = { $in: organizers };
+      }
+
+      const courses = await db
+        .collection("courses")
+        .find(filter)
+        .collation({ locale: "en", strength: 2 }) // Add this line
+        .toArray();
+
+      // Rest of your existing user enrollment logic...
       if (userId) {
-        // Fetch the user's enrolled courses
-        const enrolledCoursesData = await db.collection('users_courses').find({
-          userId: new ObjectId(userId),
-        }).toArray();
+        const enrolledCoursesData = await db
+          .collection("users_courses")
+          .find({
+            userId: new ObjectId(userId),
+          })
+          .toArray();
 
-        // Create a map of courseId to enrollStatus
         const enrolledCoursesMap = enrolledCoursesData.reduce((map, course) => {
           map[course.courseId.toString()] = course.enrollStatus;
           return map;
         }, {});
 
-        // Separate courses into enrolled and other courses, and add enrollStatus to each enrolled course
         const enrolledCourses = courses
-          .filter(course => enrolledCoursesMap[course._id.toString()])
-          .map(course => ({
+          .filter((course) => enrolledCoursesMap[course._id.toString()])
+          .map((course) => ({
             ...course,
             enrollStatus: enrolledCoursesMap[course._id.toString()],
           }));
 
-        const otherCourses = courses.filter(course => !enrolledCoursesMap[course._id.toString()]);
+        const otherCourses = courses.filter(
+          (course) => !enrolledCoursesMap[course._id.toString()]
+        );
 
         res.status(200).json({ enrolledCourses, otherCourses });
       } else {

@@ -283,7 +283,7 @@ export default function Index() {
             sx={{ padding: "20px" }}
           >
             {courses.map((course, index) => (
-              <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+              <Grid item key={index} xs={12} sm={12} md={6} lg={4}>
                 <Box position="relative">
                   {editMode && (
                     <FormControl
